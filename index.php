@@ -7,14 +7,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scoreboards</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style_input.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-    <h2>Input</h2>
-
-    <script> 
+    <script>
         $(document).ready(function() {
+
+            $set_count = 1;
+            $show_team_score = 0;
+            $sets = $('.set');
+            $inputs = $('input:not([type=submit]), textarea');
+
+            function update_set() {
+                $.each($sets, function(i, set) {
+                    if (i+1 < $set_count) {
+                        $(this).show();
+                        $(this).removeClass('active');
+                        // highlight winner team in finished sets
+                        $scores = $(this).find('p.score');
+                        if ($($scores[0]).text() >= $($scores[1]).text()) {
+                            $($scores[0]).addClass('winner');
+                            $($scores[0]).removeClass('loser');
+                            $($scores[1]).removeClass('winner');
+                            $($scores[1]).addClass('loser');
+                        } else {
+                            $($scores[0]).addClass('loser');
+                            $($scores[0]).removeClass('winner');
+                            $($scores[1]).removeClass('loser');
+                            $($scores[1]).addClass('winner');
+                        }
+                    } else if (i+1 == $set_count) {
+                        $(this).show();
+                        $(this).addClass('active');
+                        $scores = $(this).find('p.score');
+                        $($scores[0]).removeClass('winner');
+                        $($scores[0]).removeClass('loser');
+                        $($scores[1]).removeClass('winner');
+                        $($scores[1]).removeClass('loser');
+                    } else if (i+1 > $set_count) {
+                        $(this).hide();
+                        $(this).removeClass('active');
+                    }
+                });
+            }
+
+            function update_team_counter() {
+                console.log('update team counter');
+                console.log($show_team_score);
+                if ($show_team_score == 1) {
+                    $('.group_score').show();
+                    $('.group-indicator').show();
+                } else {
+                    $('.group_score').hide();
+                    $('.group-indicator').hide();
+                }
+            }
 
             $.ajax({
                 type: "GET",
@@ -32,13 +81,32 @@
                     $('#score_b_2').val(data[0]['B_Score_2']);
                     $('#score_b_3').val(data[0]['B_Score_3']);
                     $('#game').val(data[0]['Game']);
+                    $set_count = data[0]['Set_Count'];
+                    $('#set_counter').val($set_count);
+                    $show_team_score = data[0]['Show_Team_Score'];
+                    if ($show_team_score == 1) {
+                        $('#show_team_score').prop("checked", true);
+                    } else {
+                        $('#show_team_score').prop("checked", false);
+                    }
                 }
             });
 
-            $inputs = $('input:not([type=submit]), textarea');
+            setTimeout(function() {
+                update_set();
+                update_team_counter();
+            }, 500)
 
             $inputs.on('input', function() {
-                console.log('changed');
+
+                $set_count = $('#set_counter').val();
+
+                if ($('#show_team_score').is(":checked")) {
+                    $show_team_score = 1
+                } else {
+                    $show_team_score = 0
+                }
+
                 $.ajax({
                     type: 'POST',
                     url: 'update_data.php',
@@ -47,18 +115,23 @@
                         game: $('#game').val(),
                         a_teamname: $('#a_teamname').val(),
                         b_teamname: $('#b_teamname').val(),
-                        // score_a_1: $('#score_a_1').val(),
-                        // score_a_2: $('#score_a_2').val(),
-                        // score_a_3: $('#score_a_3').val(),
-                        // score_b_1: $('#score_b_1').val(),
-                        // score_b_2: $('#score_b_2').val(),
-                        // score_b_3: $('#score_b_3').val(),
+                        score_a_1: $('#score_a_1').val(),
+                        score_a_2: $('#score_a_2').val(),
+                        score_a_3: $('#score_a_3').val(),
+                        score_b_1: $('#score_b_1').val(),
+                        score_b_2: $('#score_b_2').val(),
+                        score_b_3: $('#score_b_3').val(),
+                        set_count: $('#set_counter').val(),
+                        show_team_score: $show_team_score,
                     },
                     dataType: 'json',
                     // success: function(data) {
                     //     $('#debug').text(data);
                     // }
                 });
+
+                update_set();
+                update_team_counter();
             });
         });
     </script>
@@ -70,7 +143,14 @@
             <div class="content">
                 <input type="text" class="text" id="occasion" value="occasion"></input>
             </div>
-            <div class="group-indicator"></div>
+            <div class="group_container">
+                <span>Liga:</span>
+                <input type="checkbox" id="show_team_score" checked>
+            </div>
+            <div class="set_counter_container">
+                <span>Satz:</span>
+                <input type="number" id="set_counter" min="1" max="3">
+            </div>
         </div>
         <div class="center">
             <div class="teams">

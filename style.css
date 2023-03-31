@@ -1,12 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Antonio:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap');
 
+html, body {
+  background-color: transparent;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Barlow', sans-serif;
   font-weight: 500;
+  /* leading-trim: both;
+  text-edge: cap; */
 }
 
 :root {
@@ -24,7 +30,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.15));
-  margin: 40px 0;
+  margin: 20px;
 }
 
 .top, .bottom {
@@ -65,11 +71,13 @@
 .center {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   padding: 8px 10px 8px 16px;
   background-color: var(--white);
   border-radius: 0px 8px 8px 0px;
+  margin-top: -1px;
+  margin-bottom: -1px;
 }
 
 .center * {
@@ -79,14 +87,18 @@
 .teams {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   align-items: flex-start;
   gap: 8px;
   margin-right: 36px;
 }
 
 .teams .team {
-  flex-grow: 1;
+  padding-bottom: 1px;
+}
+
+.teams .team:last-child {
+  padding-bottom: 5px;
 }
 
 .teams .team p {
@@ -103,6 +115,7 @@
   justify-content: center;
   align-items: center;
   border-radius: 4px;
+  padding-bottom: 4px;
 }
 
 .counter:not(.group) {
@@ -123,6 +136,14 @@
   display: flex;
   flex-direction: row;
   gap: 20px;
+}
+
+.score.winner {
+  font-weight: 700;
+}
+
+.score.loser {
+  font-weight: 300;
 }
 
 .group_score {

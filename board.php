@@ -11,9 +11,56 @@
 </head>
 
 <body>
-    <h2>Live Board Result</h2>
-
     <script> 
+        $(document).ready(function() {
+
+        $set_count = 1;
+        $show_team_score = 0;
+        $sets = $('.set');
+
+        function update_set() {
+            $.each($sets, function(i, set) {
+                if (i+1 < $set_count) {
+                    $(this).show();
+                    $(this).removeClass('active');
+                    // highlight winner team in finished sets
+                    $scores = $(this).find('p.score');
+                    if ($($scores[0]).text() >= $($scores[1]).text()) {
+                        $($scores[0]).addClass('winner');
+                        $($scores[0]).removeClass('loser');
+                        $($scores[1]).removeClass('winner');
+                        $($scores[1]).addClass('loser');
+                    } else {
+                        $($scores[0]).addClass('loser');
+                        $($scores[0]).removeClass('winner');
+                        $($scores[1]).removeClass('loser');
+                        $($scores[1]).addClass('winner');
+                    }
+                } else if (i+1 == $set_count) {
+                    $(this).show();
+                    $(this).addClass('active');
+                    $scores = $(this).find('p.score');
+                    $($scores[0]).removeClass('winner');
+                    $($scores[0]).removeClass('loser');
+                    $($scores[1]).removeClass('winner');
+                    $($scores[1]).removeClass('loser');
+                } else if (i+1 > $set_count) {
+                    $(this).hide();
+                    $(this).removeClass('active');
+                }
+            });
+        }
+
+        function update_team_counter() {
+            if ($show_team_score == 1) {
+                $('.group_score').show();
+                $('.group-indicator').show();
+            } else {
+                $('.group_score').hide();
+                $('.group-indicator').hide();
+            }
+        }
+        
         setInterval(function () {
             $.ajax({
                 type: "GET",
@@ -31,10 +78,18 @@
                     $('#score_b_2').text(data[0]['B_Score_2']);
                     $('#score_b_3').text(data[0]['B_Score_3']);
                     $('#game').text(data[0]['Game']);
-                    // any other updates you need to make
+                    $set_count = data[0]['Set_Count'];
+                    $show_team_score = data[0]['Show_Team_Score'];
+                    console.log($show_team_score);
                 }
             });
+
+            update_set();
+            update_team_counter();
+
         }, 1000); // request every 1 seconds
+
+        });
     </script>
 
 

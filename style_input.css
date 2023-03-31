@@ -1,0 +1,14 @@
+input {
+  min-width: 0;
+  background-color: #ffffff22;
+  border: none;
+  border-bottom: 1px solid #00000044;
+}
+
+.top input, .bottom input {
+  font-size: 17px;
+}
+
+.center input {
+  font-size: 30px;
+}
