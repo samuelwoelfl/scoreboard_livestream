@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scoreboards</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -59,6 +60,68 @@ foreach ($scoreboards as $b) {
 
 
 ?>
+
+<div class="board">
+    <div class="top">
+        <div class="content">
+            <p class="occasion"><?php echo "$occasion" ?></p>
+        </div>
+        <div class="group-indicator"></div>
+    </div>
+    <div class="center">
+        <div class="teams">
+            <div class="team a_team">
+                <p class="a_teamname"><?php echo "$a_teamname" ?></p>  
+            </div>
+            <div class="team b_team">
+                <p class="a_teamname"><?php echo "$b_teamname" ?></p>
+            </div>
+        </div>
+        <div class="scores">
+            <div class="group_score">
+                <div class="counter group">
+                    <p>0</p>
+                </div>
+                <div class="counter group">
+                    <p>1</p>
+                </div>
+            </div>
+            <div class="team_score">
+                <div class="set active">
+                    <div class="counter a_team set1">
+                        <p class="a_score1">1</p>
+                    </div>
+                    <div class="counter b_team set1">
+                        <p class="b_score1">2</p>
+                    </div>
+                </div>
+                <div class="set">
+                    <div class="counter a_team set2">
+                        <p class="a_score2"><?php echo "$a_score2" ?></p>
+                    </div>
+                    <div class="counter b_team set1">
+                        <p class="b_score2"><?php echo "$b_score2" ?></p>
+                    </div>
+                </div>
+                <div class="set">
+                    <div class="counter a_team set1">
+                        <p class="a_score3"><?php echo "$a_score3" ?></p>
+                    </div>
+                    <div class="counter b_team set1">
+                        <p class="b_score3"><?php echo "$b_score3" ?></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="content">
+            <p class="occasion"><?php echo "$game" ?></p>
+            <span class="divider"></span>
+            <p class="occasion"><?php echo "$game" ?></p>
+        </div>
+    </div>
+</div>
 
 
 <h3>Test Bottom</h3>

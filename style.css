@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 500;
+}
+
+:root {
+  --yellow: #F2C650;
+  --red: #C55151;
+  --white: #ffffff;
+  --text-primary: #000000;
+  --light-2: #FDF8E9;
+  --red-1: rgba(197, 81, 81, 0.2);
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.15));
+  margin: 40px 0;
+}
+
+.top, .bottom {
+  height: 34px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.top .content, .bottom .content {
+  padding: 6px 16px;
+  max-height: 100%;
+  display: flex;
+}
+
+.top .content {
+  background-color: var(--yellow);
+  border-radius: 8px 8px 0px 0px;
+}
+
+.bottom .content {
+  background-color: var(--light-2);
+  border-radius: 0px 0px 8px 8px;
+  flex-direction: row;
+}
+
+.top .content p {
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.bottom .content p {
+  font-size: 17px;
+  color: var(--text-primary);
+}
+
+.center {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8px 10px 8px 16px;
+  background-color: var(--white);
+  border-radius: 0px 8px 8px 0px;
+}
+
+.center * {
+  font-family: 'Antonio';
+}
+
+.teams {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+  margin-right: 36px;
+}
+
+.teams .team {
+  flex-grow: 1;
+}
+
+.teams .team p {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.counter {
+  font-size: 30px;
+  font-weight: 600;
+  height: 47px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+}
+
+.counter:not(.group) {
+  width: 48px;
+  background-color: var(--light-2);
+}
+
+.counter.group {
+  width: 36px;
+  background-color: var(--red-1);
+}
+
+.active .counter {
+  border: 1px solid var(--yellow);
+}
+
+.scores {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.group_score {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.team_score {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.team_score .set {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
