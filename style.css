@@ -24,13 +24,21 @@ html, body {
   --red-1: rgba(197, 81, 81, 0.2);
 }
 
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+}
+
 .board {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.15));
-  margin: 20px;
+  margin: 20px 0px 0px 20px;
 }
 
 .top, .bottom {
@@ -39,12 +47,15 @@ html, body {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: 12px;
 }
 
 .top .content, .bottom .content {
-  padding: 6px 16px;
+  padding: 6px 16px 8px 16px;
   max-height: 100%;
   display: flex;
+  max-width: 270px;
+  overflow: hidden;
 }
 
 .top .content {
@@ -56,6 +67,13 @@ html, body {
   background-color: var(--light-2);
   border-radius: 0px 0px 8px 8px;
   flex-direction: row;
+  gap: 8px;
+}
+
+.teamname, .text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .top .content p {
@@ -66,6 +84,13 @@ html, body {
 .bottom .content p {
   font-size: 17px;
   color: var(--text-primary);
+}
+
+.divider {
+  height: 17px;
+  width: 2px;
+  background: #00000033;
+  margin-top: 2px;
 }
 
 .center {
@@ -90,11 +115,14 @@ html, body {
   justify-content: space-around;
   align-items: flex-start;
   gap: 8px;
-  margin-right: 36px;
+  margin-right: 24px;
+  min-width: 230px;
+  max-width: 280px;
 }
 
 .teams .team {
   padding-bottom: 1px;
+  max-width: 100%;
 }
 
 .teams .team:last-child {
@@ -104,6 +132,7 @@ html, body {
 .teams .team p {
   font-size: 30px;
   font-weight: 700;
+  max-width: 100%;
 }
 
 .counter {
@@ -164,5 +193,51 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.button {
+  font-size: 30px;
+  font-weight: 600;
+  height: 47px;
+  width: 48px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 4px;
+  padding-bottom: 4px;
+  color: var(--white);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.controls .team_container {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.button.add {
+  background-color: #04b904;
+}
+
+.button.remove {
+  background-color: var(--red);
+  transition: .1s ease;
+}
+
+.button:hover {
+  opacity: .8;
+}
+
+.button:active {
+  opacity: .6;
+  transform: scale(.95);
 }
 

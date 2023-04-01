@@ -19,6 +19,10 @@
             $show_team_score = 0;
             $sets = $('.set');
             $inputs = $('input:not([type=submit]), textarea');
+            $add_point_a_button = $('#add_point_a');
+            $remove_point_a_button = $('#remove_point_a');
+            $add_point_b_button = $('#add_point_b');
+            $remove_point_b_button = $('#remove_point_b');
 
             function update_set() {
                 $.each($sets, function(i, set) {
@@ -77,10 +81,19 @@
                     $('#score_a_1').val(data[0]['A_Score_1']);
                     $('#score_a_2').val(data[0]['A_Score_2']);
                     $('#score_a_3').val(data[0]['A_Score_3']);
+                    $('#score_a_4').val(data[0]['A_Score_4']);
+                    $('#score_a_5').val(data[0]['A_Score_5']);
+                    $('#score_a_6').val(data[0]['A_Score_6']);
+                    $('#score_a_7').val(data[0]['A_Score_7']);
                     $('#score_b_1').val(data[0]['B_Score_1']);
                     $('#score_b_2').val(data[0]['B_Score_2']);
                     $('#score_b_3').val(data[0]['B_Score_3']);
+                    $('#score_b_4').val(data[0]['B_Score_4']);
+                    $('#score_b_5').val(data[0]['B_Score_5']);
+                    $('#score_b_6').val(data[0]['B_Score_6']);
+                    $('#score_b_7').val(data[0]['B_Score_7']);
                     $('#game').val(data[0]['Game']);
+                    $('#mode').val(data[0]['Mode']);
                     $set_count = data[0]['Set_Count'];
                     $('#set_counter').val($set_count);
                     $show_team_score = data[0]['Show_Team_Score'];
@@ -92,13 +105,7 @@
                 }
             });
 
-            setTimeout(function() {
-                update_set();
-                update_team_counter();
-            }, 500)
-
-            $inputs.on('input', function() {
-
+            function update_count() {
                 $set_count = $('#set_counter').val();
 
                 if ($('#show_team_score').is(":checked")) {
@@ -113,14 +120,23 @@
                     data: {
                         occasion: $('#occasion').val(),
                         game: $('#game').val(),
+                        mode: $('#mode').val(),
                         a_teamname: $('#a_teamname').val(),
                         b_teamname: $('#b_teamname').val(),
                         score_a_1: $('#score_a_1').val(),
                         score_a_2: $('#score_a_2').val(),
                         score_a_3: $('#score_a_3').val(),
+                        score_a_4: $('#score_a_4').val(),
+                        score_a_5: $('#score_a_5').val(),
+                        score_a_6: $('#score_a_6').val(),
+                        score_a_7: $('#score_a_7').val(),
                         score_b_1: $('#score_b_1').val(),
                         score_b_2: $('#score_b_2').val(),
                         score_b_3: $('#score_b_3').val(),
+                        score_b_4: $('#score_b_4').val(),
+                        score_b_5: $('#score_b_5').val(),
+                        score_b_6: $('#score_b_6').val(),
+                        score_b_7: $('#score_b_7').val(),
                         set_count: $('#set_counter').val(),
                         show_team_score: $show_team_score,
                     },
@@ -132,24 +148,89 @@
 
                 update_set();
                 update_team_counter();
+            }
+
+
+            setTimeout(function() {
+                update_set();
+                update_team_counter();
+            }, 500)
+
+
+            $inputs.on('input', function() {
+                update_count();
+            });
+
+
+            $add_point_a_button.click(function() {
+                active_set = 0;
+                $.each($sets, function(i, set) {
+                    if (this.classList.contains('active')) {
+                        active_set = i+1;
+                        score_to_change = $(this).find('.score')[0];
+                        score_now = Number($(score_to_change).val());
+                        $(score_to_change).val(score_now + 1);
+                    }
+                });
+                update_count();
+            });
+
+
+            $remove_point_a_button.click(function() {
+                active_set = 0;
+                $.each($sets, function(i, set) {
+                    if (this.classList.contains('active')) {
+                        active_set = i+1;
+                        score_to_change = $(this).find('.score')[0];
+                        score_now = Number($(score_to_change).val());
+                        $(score_to_change).val(score_now - 1);
+                    }
+                });
+                update_count();
+            });
+
+            $add_point_b_button.click(function() {
+                active_set = 0;
+                $.each($sets, function(i, set) {
+                    if (this.classList.contains('active')) {
+                        active_set = i+1;
+                        score_to_change = $(this).find('.score')[1];
+                        score_now = Number($(score_to_change).val());
+                        $(score_to_change).val(score_now + 1);
+                    }
+                });
+                update_count();
+            });
+
+            $remove_point_b_button.click(function() {
+                active_set = 0;
+                $.each($sets, function(i, set) {
+                    if (this.classList.contains('active')) {
+                        active_set = i+1;
+                        score_to_change = $(this).find('.score')[1];
+                        score_now = Number($(score_to_change).val());
+                        $(score_to_change).val(score_now - 1);
+                    }
+                });
+                update_count();
             });
         });
     </script>
 
 
-
+    <div class="wrapper">
     <div class="board">
         <div class="top">
             <div class="content">
                 <input type="text" class="text" id="occasion" value="occasion"></input>
             </div>
-            <div class="group_container">
+            <!-- <div class="group_container">
                 <span>Liga:</span>
                 <input type="checkbox" id="show_team_score" checked>
-            </div>
+            </div> -->
             <div class="set_counter_container">
                 <span>Satz:</span>
-                <input type="number" id="set_counter" min="1" max="3">
+                <input type="number" id="set_counter" min="1" max="7">
             </div>
         </div>
         <div class="center">
@@ -183,16 +264,48 @@
                         <div class="counter a_team set2">
                             <input type="number" class="score" id="score_a_2" value="0"></input>
                         </div>
-                        <div class="counter b_team set1">
+                        <div class="counter b_team set2">
                             <input type="number" class="score" id="score_b_2" value="0"></input>
                         </div>
                     </div>
                     <div class="set">
-                        <div class="counter a_team set1">
+                        <div class="counter a_team set3">
                             <input type="number" class="score" id="score_a_3" value="0"></input>
                         </div>
-                        <div class="counter b_team set1">
+                        <div class="counter b_team set3">
                             <input type="number" class="score" id="score_b_3" value="0"></input>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set4">
+                            <input type="number" class="score" id="score_a_4" value="0"></input>
+                        </div>
+                        <div class="counter b_team set4">
+                            <input type="number" class="score" id="score_b_4" value="0"></input>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set5">
+                            <input type="number" class="score" id="score_a_5" value="0"></input>
+                        </div>
+                        <div class="counter b_team set5">
+                            <input type="number" class="score" id="score_b_5" value="0"></input>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set6">
+                            <input type="number" class="score" id="score_a_6" value="0"></input>
+                        </div>
+                        <div class="counter b_team set6">
+                            <input type="number" class="score" id="score_b_6" value="0"></input>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set7">
+                            <input type="number" class="score" id="score_a_7" value="0"></input>
+                        </div>
+                        <div class="counter b_team set7">
+                            <input type="number" class="score" id="score_b_7" value="0"></input>
                         </div>
                     </div>
                 </div>
@@ -205,6 +318,17 @@
                 <input type="text" class="text" id="mode" value="Game Mode"></input>
             </div>
         </div>
+    </div>
+    <div class="controls">
+        <div class="team_container">
+            <button class="button add" id="add_point_a">+1</button>
+            <button class="button remove" id="remove_point_a">-1</button>
+        </div>
+        <div class="team_container">
+            <button class="button add" id="add_point_b">+1</button>
+            <button class="button remove" id="remove_point_b">-1</button>
+        </div>
+    </div>
     </div>
 
 

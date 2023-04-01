@@ -25,7 +25,7 @@
                     $(this).removeClass('active');
                     // highlight winner team in finished sets
                     $scores = $(this).find('p.score');
-                    if ($($scores[0]).text() >= $($scores[1]).text()) {
+                    if (Number($($scores[0]).text()) >= Number($($scores[1]).text())) {
                         $($scores[0]).addClass('winner');
                         $($scores[0]).removeClass('loser');
                         $($scores[1]).removeClass('winner');
@@ -74,10 +74,19 @@
                     $('#score_a_1').text(data[0]['A_Score_1']);
                     $('#score_a_2').text(data[0]['A_Score_2']);
                     $('#score_a_3').text(data[0]['A_Score_3']);
+                    $('#score_a_4').text(data[0]['A_Score_4']);
+                    $('#score_a_5').text(data[0]['A_Score_5']);
+                    $('#score_a_6').text(data[0]['A_Score_6']);
+                    $('#score_a_7').text(data[0]['A_Score_7']);
                     $('#score_b_1').text(data[0]['B_Score_1']);
                     $('#score_b_2').text(data[0]['B_Score_2']);
                     $('#score_b_3').text(data[0]['B_Score_3']);
+                    $('#score_b_4').text(data[0]['B_Score_4']);
+                    $('#score_b_5').text(data[0]['B_Score_5']);
+                    $('#score_b_6').text(data[0]['B_Score_6']);
+                    $('#score_b_7').text(data[0]['B_Score_7']);
                     $('#game').text(data[0]['Game']);
+                    $('#mode').text(data[0]['Mode']);
                     $set_count = data[0]['Set_Count'];
                     $show_team_score = data[0]['Show_Team_Score'];
                     console.log($show_team_score);
@@ -121,26 +130,58 @@
                 <div class="team_score">
                     <div class="set active">
                         <div class="counter a_team set1">
-                            <p class="score" id="score_a_1">1</p>
+                            <p class="score" id="score_a_1"></p>
                         </div>
                         <div class="counter b_team set1">
-                            <p class="score" id="score_b_1">2</p>
+                            <p class="score" id="score_b_1"></p>
                         </div>
                     </div>
                     <div class="set">
                         <div class="counter a_team set2">
                             <p class="score" id="score_a_2"></p>
                         </div>
-                        <div class="counter b_team set1">
+                        <div class="counter b_team set2">
                             <p class="score" id="score_b_2"></p>
                         </div>
                     </div>
                     <div class="set">
-                        <div class="counter a_team set1">
+                        <div class="counter a_team set3">
                             <p class="score" id="score_a_3"></p>
                         </div>
-                        <div class="counter b_team set1">
+                        <div class="counter b_team set3">
                             <p class="score" id="score_b_3"></p>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set4">
+                            <p class="score" id="score_a_4"></p>
+                        </div>
+                        <div class="counter b_team set4">
+                            <p class="score" id="score_b_4"></p>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set5">
+                            <p class="score" id="score_a_5"></p>
+                        </div>
+                        <div class="counter b_team set5">
+                            <p class="score" id="score_b_5"></p>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set6">
+                            <p class="score" id="score_a_6"></p>
+                        </div>
+                        <div class="counter b_team set6">
+                            <p class="score" id="score_b_6"></p>
+                        </div>
+                    </div>
+                    <div class="set">
+                        <div class="counter a_team set7">
+                            <p class="score" id="score_a_7"></p>
+                        </div>
+                        <div class="counter b_team set7">
+                            <p class="score" id="score_b_7"></p>
                         </div>
                     </div>
                 </div>
