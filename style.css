@@ -21,6 +21,7 @@ html, body {
   --white: #ffffff;
   --text-primary: #000000;
   --light-2: #FDF8E9;
+  --light-3: #FBF2D8;
   --red-1: rgba(197, 81, 81, 0.2);
 }
 
@@ -54,7 +55,7 @@ html, body {
   padding: 6px 16px 8px 16px;
   max-height: 100%;
   display: flex;
-  max-width: 270px;
+  max-width: 350px;
   overflow: hidden;
 }
 
@@ -64,7 +65,7 @@ html, body {
 }
 
 .bottom .content {
-  background-color: var(--light-2);
+  background-color: var(--light-3);
   border-radius: 0px 0px 8px 8px;
   flex-direction: row;
   gap: 8px;
@@ -115,9 +116,9 @@ html, body {
   justify-content: space-around;
   align-items: flex-start;
   gap: 8px;
-  margin-right: 24px;
-  min-width: 230px;
-  max-width: 280px;
+  margin-right: 28px;
+  min-width: 260px;
+  max-width: 350px;
 }
 
 .teams .team {
@@ -149,7 +150,7 @@ html, body {
 
 .counter:not(.group) {
   width: 48px;
-  background-color: var(--light-2);
+  background-color: var(--light-3);
 }
 
 .counter.group {

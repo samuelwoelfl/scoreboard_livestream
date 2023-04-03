@@ -12,3 +12,7 @@ input {
 .center input {
   font-size: 30px;
 }
+
+.teams .team input {
+  width: 100%;
+}
