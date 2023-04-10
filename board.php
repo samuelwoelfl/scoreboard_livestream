@@ -16,6 +16,7 @@
 
         $set_count = 1;
         $show_team_score = 0;
+        $show_color = 0;
         $sets = $('.set');
 
         function update_set() {
@@ -51,6 +52,7 @@
             });
         }
 
+
         function update_team_counter() {
             if ($show_team_score == 1) {
                 $('.group_score').show();
@@ -60,6 +62,16 @@
                 $('.group-indicator').hide();
             }
         }
+
+
+        function update_color() {
+            if ($show_color == 1) {
+                $('.color-indicator').show();
+            } else {
+                $('.color-indicator').hide();
+            }
+        }
+
         
         setInterval(function () {
             $.ajax({
@@ -89,12 +101,16 @@
                     $('#mode').text(data[0]['Mode']);
                     $set_count = data[0]['Set_Count'];
                     $show_team_score = data[0]['Show_Team_Score'];
-                    console.log($show_team_score);
+                    $show_color = data[0]['Show_Color'];
+                    console.log($show_color);
+                    $('#a_color').css("background-color", data[0]['A_Color']);
+                    $('#b_color').css("background-color", data[0]['B_Color']);
                 }
             });
 
             update_set();
             update_team_counter();
+            update_color();
 
         }, 1000); // request every 1 seconds
 
@@ -102,6 +118,7 @@
     </script>
 
 
+    <div class="wrapper">
     <div class="board">
         <div class="top">
             <div class="content">
@@ -112,9 +129,11 @@
         <div class="center">
             <div class="teams">
                 <div class="team">
+                    <div class="color-indicator" id="a_color"></div>
                     <p class="teamname" id="a_teamname">A Teamname</p>
                 </div>
                 <div class="team">
+                    <div class="color-indicator" id="b_color"></div>
                     <p class="teamname" id="b_teamname">B Teamname</p>
                 </div>
             </div>
@@ -194,6 +213,7 @@
                 <p class="text" id="mode">Game Mode</p>
             </div>
         </div>
+    </div>
     </div>
 
 

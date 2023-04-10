@@ -1,8 +1,55 @@
-input {
+html, body {
+  background-color: #2B2E38;
+}
+
+.board {
+  filter: drop-shadow(1px 3px 12px rgba(0, 0, 0, 0.50));
+}
+
+.wrapper {
+  margin: 15px 15px 0px 15px;
+}
+
+.top {
+  gap: 4px;
+  width: 350px;
+}
+
+.set_counter_container {
+  background: var(--light-3);
+  padding: 2px 2px 1px 6px;
+  border-radius: 7px 7px 7px 1px;
+  margin-bottom: 3px;
+  width: 38%;
+}
+
+input:focus {
+  outline: none;
+  -moz-outline: none;
+  box-shadow: inset 0px 0px 0px 1px #000000aa;
+}
+
+input:not([type='color']) {
   min-width: 0;
-  background-color: #ffffff22;
+  background-color: #00000011;
+  border-radius: 4px;
+  padding: 0px 0px 3px 7px;
   border: none;
-  border-bottom: 1px solid #00000044;
+  /* box-shadow: inset 0px 0px 0px 1px #00000011; */
+}
+
+.top .content input {
+  background-color: #ffffff77;
+  width: 100%;
+}
+
+.bottom input {
+  background-color: #ffffffcc;
+}
+
+input[type='number'] {
+  padding-left: 3px;
+  height: 100%;
 }
 
 .top input, .bottom input {
@@ -11,8 +58,109 @@ input {
 
 .center input {
   font-size: 30px;
+  font-weight: 700;
+}
+
+.top .content, .bottom .content {
+  padding: 4px 5px 4px 5px;
+  max-height: 100%;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+
+.center {
+  padding: 6px 8px 6px 8px;
+  margin-bottom: -2px;
+}
+
+.center .counter {
+  padding-bottom: 0px;
+  padding: 1px;
+}
+
+.bottom .content {
+    gap: 4px;
+}
+
+.teams {
+  gap: 6px;
+}
+
+.teams .team {
+  gap: 6px;
+}
+
+.teams .team:last-child {
+  padding-bottom: 0;
 }
 
 .teams .team input {
   width: 100%;
+}
+
+.teams .team input.color-indicator {
+  min-width: 0;
+  border: none;
+  width: 24px;
+  height: 100%;
+  margin-top: 0;
+  padding: 1px 2px;
+  background: #00000013;
+  border-radius: 3px;
+}
+
+.settings-container {
+  width: 175px;
+  margin-left: 15px;
+  margin-top: 15px;
+  border-radius: 8px;
+  padding: 14px 16px 16px 16px;
+  background-color: var(--white);
+  filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.08));
+}
+
+.settings-container h3 {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.settings *:not(:last-child) {
+  margin-bottom: 4px;
+}
+
+.settings * {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+}
+
+.settings * span {
+  margin-top: 2px;
+}
+
+.settings #reset_scores {
+  margin-top: 5px;
+}
+
+button {
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 12px 7px 12px;
+  transition: .2s ease;
+  background-color: var(--red);
+  color: var(--white);
+}
+
+button:hover {
+  cursor: pointer;
+  opacity: .8;
+}
+
+button:active {
+  transform: scale(0.95);
 }
