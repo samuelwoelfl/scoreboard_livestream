@@ -33,13 +33,17 @@
 
             // upload local data as any input values changes
             $('input:not([type=submit]), textarea').on('input', function() {
-                upload_local_data();
+                upload_local_data([this]);
             });
 
 
             // interaction for the score buttons
             $('.controls .button').click(function() {
-                $button = $(this);
+                var $button = $(this);
+                var active_set_elem = $('.set.active'); // check which set is active - which determines which score will be changed
+                var change = Number($button.attr('change')); // set the change amount based on the attribute on the button
+                var score_elem;
+                var team;
 
                 // check for which team the button is
                 if ($button.hasClass('team_a')) {
@@ -48,20 +52,12 @@
                     team = 1;
                 }
 
-                // set the change amount based on the attribute on the button
-                change = Number($button.attr('change'));
-
-                // check which set is active - which determines which score will be changed
-                $.each($('.set'), function(i, set) {
-                    if (this.classList.contains('active')) {
-                        score_elem = $(this).find('.score')[team]; // find correct score element based on team
-                        score_now = Number($(score_elem).val()); // check score right now
-                        $(score_elem).val(score_now + change); // update to new score
-                    }
-                });
-
+                score_elem = active_set_elem.find('.score')[team] // find correct score element based on team
+                score_now = Number($(score_elem).val()); // check score right now
+                $(score_elem).val(score_now + change); // update to new score
+                
                 // upload the new score
-                upload_local_data();
+                upload_local_data([score_elem]);
             });
 
 

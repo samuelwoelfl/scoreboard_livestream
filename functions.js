@@ -204,7 +204,7 @@ function update_color_indicator_visibility() {
 
 
 // function that uploads all the local data to the database
-function upload_local_data() {
+function upload_local_data(elemList) {
     active_set = $('#Set_Count').val();
 
     if ($('#show_team_score').is(":checked")) {
@@ -218,6 +218,28 @@ function upload_local_data() {
     } else {
         show_color = 0
     }
+
+    // go through element list
+    // TODO: wenn es keine elemList gibt, alle aktualisieren 
+    console.log("elemList: ", elemList);
+    var dataObject = {};
+    $.each($(elemList), function(i, elem) {
+        var $elem = $(elem);
+        var id = $elem.attr("id");
+        var value = $elem.val();
+        dataObject[id] = value;
+    });
+    console.log(dataObject);
+
+    // check if dataObject has entries and if so upload them
+    if (Object.keys(dataObject).length > 0) {
+        console.log("hat daten");
+        
+    // if the dataObject has no entries, upload all data
+    } else {
+        console.log("hat keine daten");
+    }
+    
 
     $.ajax({
         type: 'POST',
