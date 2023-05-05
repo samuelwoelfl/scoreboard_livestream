@@ -182,11 +182,11 @@ function update_team_counter_visibility() {
     if (show_team_score == 1) {
         $('.group_score').show();
         $('.group-indicator').show();
-        $('#show_team_score').prop("checked", true);
+        $('#Show_Team_Score').prop("checked", true);
     } else {
         $('.group_score').hide();
         $('.group-indicator').hide();
-        $('#show_team_score').prop("checked", false);
+        $('#Show_Team_Score').prop("checked", false);
     }
 }
 
@@ -195,10 +195,10 @@ function update_team_counter_visibility() {
 function update_color_indicator_visibility() {
     if (show_color == 1) {
         $('.color-indicator').show();
-        $('#show_color').prop("checked", true);
+        $('#Show_Color').prop("checked", true);
     } else {
         $('.color-indicator').hide();
-        $('#show_color').prop("checked", false);
+        $('#Show_Color').prop("checked", false);
     }
 }
 
@@ -207,71 +207,87 @@ function update_color_indicator_visibility() {
 function upload_local_data(elemList) {
     active_set = $('#Set_Count').val();
 
-    if ($('#show_team_score').is(":checked")) {
+    if ($('#Show_Team_Score').is(":checked")) {
         show_team_score = 1
     } else {
         show_team_score = 0
     }
 
-    if ($('#show_color').is(":checked")) {
+    if ($('#Show_Color').is(":checked")) {
         show_color = 1
     } else {
         show_color = 0
     }
 
     // go through element list
-    // TODO: wenn es keine elemList gibt, alle aktualisieren 
-    console.log("elemList: ", elemList);
+    // TODO: wenn es keine elemList gibt, alle aktualisieren
+    
+
+    if (typeof elemList == 'undefined') {
+        elemList = $("*[database-variable]");
+    }
+    // console.log("elemList: ", elemList);
+    
     var dataObject = {};
     $.each($(elemList), function(i, elem) {
         var $elem = $(elem);
+        var type = $elem.attr("type");
         var id = $elem.attr("id");
-        var value = $elem.val();
+        var value;
+        console.log($elem, type);
+        if (type == "checkbox") {
+            console.log("ja, checkbox");
+            if ($elem.is(":checked")) {
+                value = 1;
+            } else {
+                value = 0;
+            }
+        } else {
+            value = $elem.val();
+        }
         dataObject[id] = value;
     });
     console.log(dataObject);
 
-    // check if dataObject has entries and if so upload them
-    if (Object.keys(dataObject).length > 0) {
-        console.log("hat daten");
-        
-    // if the dataObject has no entries, upload all data
-    } else {
-        console.log("hat keine daten");
-    }
-    
-
     $.ajax({
         type: 'POST',
         url: 'update_data.php',
-        data: {
-            Occasion: $('#Occasion').val(),
-            Game: $('#Game').val(),
-            Mode: $('#Mode').val(),
-            A_Teamname: $('#A_Teamname').val(),
-            B_Teamname: $('#B_Teamname').val(),
-            A_Score_1: $('#A_Score_1').val(),
-            A_Score_2: $('#A_Score_2').val(),
-            A_Score_3: $('#A_Score_3').val(),
-            A_Score_4: $('#A_Score_4').val(),
-            A_Score_5: $('#A_Score_5').val(),
-            A_Score_6: $('#A_Score_6').val(),
-            A_Score_7: $('#A_Score_7').val(),
-            B_Score_1: $('#B_Score_1').val(),
-            B_Score_2: $('#B_Score_2').val(),
-            B_Score_3: $('#B_Score_3').val(),
-            B_Score_4: $('#B_Score_4').val(),
-            B_Score_5: $('#B_Score_5').val(),
-            B_Score_6: $('#B_Score_6').val(),
-            B_Score_7: $('#B_Score_7').val(),
-            Set_Count: $('#Set_Count').val(),
-            Show_Team_Score: show_team_score,
-            Show_Color: show_color,
-            A_Color: $('#A_Color').val(),
-            B_Color: $('#B_Color').val(),
-        },
+        data: dataObject,
         dataType: 'json',
     });
+    
+
+    // $.ajax({
+    //     type: 'POST',
+    //     url: 'update_data.php',
+    //     data: {
+    //         Occasion: $('#Occasion').val(),
+    //         Game: $('#Game').val(),
+    //         Mode: $('#Mode').val(),
+    //         A_Teamname: $('#A_Teamname').val(),
+    //         B_Teamname: $('#B_Teamname').val(),
+    //         A_Score_1: $('#A_Score_1').val(),
+    //         A_Score_2: $('#A_Score_2').val(),
+    //         A_Score_3: $('#A_Score_3').val(),
+    //         A_Score_4: $('#A_Score_4').val(),
+    //         A_Score_5: $('#A_Score_5').val(),
+    //         A_Score_6: $('#A_Score_6').val(),
+    //         A_Score_7: $('#A_Score_7').val(),
+    //         B_Score_1: $('#B_Score_1').val(),
+    //         B_Score_2: $('#B_Score_2').val(),
+    //         B_Score_3: $('#B_Score_3').val(),
+    //         B_Score_4: $('#B_Score_4').val(),
+    //         B_Score_5: $('#B_Score_5').val(),
+    //         B_Score_6: $('#B_Score_6').val(),
+    //         B_Score_7: $('#B_Score_7').val(),
+    //         Set_Count: $('#Set_Count').val(),
+    //         Show_Team_Score: show_team_score,
+    //         Show_Color: show_color,
+    //         A_Color: $('#A_Color').val(),
+    //         B_Color: $('#B_Color').val(),
+    //     },
+    //     dataType: 'json',
+    // });
 
     update_set_visibilities();
     update_team_counter_visibility();
