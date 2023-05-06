@@ -15,6 +15,14 @@
     <script> 
         $(document).ready(function() {
 
+            var urlParams = new URLSearchParams(window.location.search);
+            var url_id = urlParams.get('channel');
+            if (url_id == null) {
+                console.log('test');
+                url_id = 1;
+            }
+            console.log(url_id);
+
             // initialize variables for global usage
             active_set = 1;
             show_team_score = 0;
@@ -22,7 +30,7 @@
 
             // update the page with the live data in the given interval
             setInterval(function () {
-                insert_live_data("board");
+                insert_live_data(url_id, "board");
                 update_set_visibilities();
                 update_team_counter_visibility();
                 update_color_indicator_visibility();

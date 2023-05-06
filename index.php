@@ -20,9 +20,10 @@
             active_set = 1;
             show_team_score = 0;
             show_color = 0;
+            var $channel_input = $("#channel");
 
             // insert live data on first load to get up to date
-            insert_live_data("admin");
+            insert_live_data(1, "admin");
             // apply all the special variables - with a bit delay so the database values are safely loaded
             setTimeout(function() {
                 update_set_visibilities();
@@ -31,9 +32,16 @@
             }, 750)
 
 
+            $channel_input.change(function() {
+                var selectedValue = $(this).val();
+                console.log("Selected value: " + selectedValue);
+                change_channel(selectedValue, "admin");
+            });
+
+
             // upload local data as any input values changes
             $('input:not([type=submit]), textarea').on('input', function() {
-                upload_local_data([this]);
+                upload_local_data($channel_input.val(), [this]);
             });
 
 
@@ -57,7 +65,7 @@
                 $(score_elem).val(score_now + change); // update to new score
                 
                 // upload the new score
-                upload_local_data([score_elem]);
+                upload_local_data($channel_input.val(), [score_elem]);
             });
 
 
@@ -76,7 +84,7 @@
                 $('#Set_Count').val(1);
 
                 // upload the reset changes
-                upload_local_data();
+                upload_local_data($channel_input.val());
             });
 
         });
@@ -197,6 +205,13 @@
     <div class="settings-container">
         <h3>Settings</h3>
         <div class="settings">
+            <div class="setting_entry color_container">
+                <span>Channel:</span>
+                <select id="channel">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
             <div class="setting_entry color_container">
                 <span>Farben:</span>
                 <input type="checkbox" id="Show_Color" database-variable checked>

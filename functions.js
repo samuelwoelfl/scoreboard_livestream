@@ -51,9 +51,13 @@ function removeAccessibilityBorder(elem) {
 
 
 // function that inserts the data from the database in the html
-function insert_live_data(type) {
+function insert_live_data(board_id, type) {
+    // receive data from GET request
     $.ajax({
         type: "GET",
+        data: {
+            ID: board_id,
+        },
         url: "get_data.php",
         success: function (data) {
             
@@ -204,8 +208,8 @@ function update_color_indicator_visibility() {
 
 
 // function that uploads all the local data to the database
-function upload_local_data(elemList) {
-    active_set = $('#Set_Count').val();
+function upload_local_data(board_id, elemList) {
+    active_set = $('#Set_Count').val();    
 
     if ($('#Show_Team_Score').is(":checked")) {
         show_team_score = 1
@@ -219,16 +223,13 @@ function upload_local_data(elemList) {
         show_color = 0
     }
 
-    // go through element list
-    // TODO: wenn es keine elemList gibt, alle aktualisieren
-    
-
+ 
     if (typeof elemList == 'undefined') {
         elemList = $("*[database-variable]");
     }
-    // console.log("elemList: ", elemList);
     
     var dataObject = {};
+    dataObject['ID'] = board_id;
     $.each($(elemList), function(i, elem) {
         var $elem = $(elem);
         var type = $elem.attr("type");
@@ -255,41 +256,19 @@ function upload_local_data(elemList) {
         data: dataObject,
         dataType: 'json',
     });
-    
-
-    // $.ajax({
-    //     type: 'POST',
-    //     url: 'update_data.php',
-    //     data: {
-    //         Occasion: $('#Occasion').val(),
-    //         Game: $('#Game').val(),
-    //         Mode: $('#Mode').val(),
-    //         A_Teamname: $('#A_Teamname').val(),
-    //         B_Teamname: $('#B_Teamname').val(),
-    //         A_Score_1: $('#A_Score_1').val(),
-    //         A_Score_2: $('#A_Score_2').val(),
-    //         A_Score_3: $('#A_Score_3').val(),
-    //         A_Score_4: $('#A_Score_4').val(),
-    //         A_Score_5: $('#A_Score_5').val(),
-    //         A_Score_6: $('#A_Score_6').val(),
-    //         A_Score_7: $('#A_Score_7').val(),
-    //         B_Score_1: $('#B_Score_1').val(),
-    //         B_Score_2: $('#B_Score_2').val(),
-    //         B_Score_3: $('#B_Score_3').val(),
-    //         B_Score_4: $('#B_Score_4').val(),
-    //         B_Score_5: $('#B_Score_5').val(),
-    //         B_Score_6: $('#B_Score_6').val(),
-    //         B_Score_7: $('#B_Score_7').val(),
-    //         Set_Count: $('#Set_Count').val(),
-    //         Show_Team_Score: show_team_score,
-    //         Show_Color: show_color,
-    //         A_Color: $('#A_Color').val(),
-    //         B_Color: $('#B_Color').val(),
-    //     },
-    //     dataType: 'json',
-    // });
 
     update_set_visibilities();
     update_team_counter_visibility();
     update_color_indicator_visibility();
+}
+
+
+function change_channel(channel, type) {
+    insert_live_data(channel, type);
+    // apply all the special variables - with a bit delay so the database values are safely loaded
+    setTimeout(function() {
+        update_set_visibilities();
+        update_team_counter_visibility();
+        update_color_indicator_visibility();
+    }, 200)
 }
