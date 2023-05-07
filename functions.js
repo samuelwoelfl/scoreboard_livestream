@@ -270,5 +270,5 @@ function change_channel(channel, type) {
         update_set_visibilities();
         update_team_counter_visibility();
         update_color_indicator_visibility();
-    }, 200)
+    }, 500)
 }

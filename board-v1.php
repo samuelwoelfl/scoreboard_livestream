@@ -1,44 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php include "header.php" ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scoreboards</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="functions.js"></script>
-</head>
+    <link rel="stylesheet" href="style-v1.css">
 
-<body>
-    <script> 
-        $(document).ready(function() {
-
-            var urlParams = new URLSearchParams(window.location.search);
-            var url_id = urlParams.get('channel');
-            if (url_id == null) {
-                console.log('test');
-                url_id = 1;
-            }
-            console.log(url_id);
-
-            // initialize variables for global usage
-            active_set = 1;
-            show_team_score = 0;
-            show_color = 0;
-
-            // update the page with the live data in the given interval
-            setInterval(function () {
-                insert_live_data(url_id, "board");
-                update_set_visibilities();
-                update_team_counter_visibility();
-                update_color_indicator_visibility();
-
-            }, 250); // request every 1/4 seconds
-
-        });
-    </script>
+<?php include "body.php" ?>
 
 
     <div class="wrapper">
