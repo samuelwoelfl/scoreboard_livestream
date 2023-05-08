@@ -1,8 +1,8 @@
-<?php include "header.php" ?>
+<?php include "board-header-start.php" ?>
 
     <link rel="stylesheet" href="style-v1.css">
 
-<?php include "body.php" ?>
+<?php include "board-header-end.php" ?>
 
 
     <div class="wrapper">

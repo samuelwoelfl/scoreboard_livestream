@@ -7,7 +7,6 @@
             var urlParams = new URLSearchParams(window.location.search);
             var url_id = urlParams.get('channel');
             if (url_id == null) {
-                console.log('test');
                 url_id = 1;
             }
             console.log(url_id);
