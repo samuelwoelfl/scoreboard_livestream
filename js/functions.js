@@ -1,5 +1,4 @@
 
-
 // helper funtion to dertermine if a value is a number
 function isNumeric(value) {
     return /^-?\d+$/.test(value);
@@ -58,7 +57,7 @@ function insert_live_data(board_id, type) {
         data: {
             ID: board_id,
         },
-        url: "get_data.php",
+        url: "../php/get_data.php",
         success: function (data) {
             
             // Go through all entries in the database response
@@ -252,7 +251,7 @@ function upload_local_data(board_id, elemList) {
 
     $.ajax({
         type: 'POST',
-        url: 'update_data.php',
+        url: '../php/update_data.php',
         data: dataObject,
         dataType: 'json',
     });

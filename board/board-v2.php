@@ -1,6 +1,6 @@
 <?php include "board-header-start.php" ?>
 
-    <link rel="stylesheet" href="style-v2.css">
+    <link rel="stylesheet" href="css/style-v2.css">
 
 <?php include "board-header-end.php" ?>
 

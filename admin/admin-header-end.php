@@ -1,4 +1,4 @@
-    <link rel="stylesheet" href="style_input.css">
+    <link rel="stylesheet" href="css/style_input.css">
 </head>
 
 <body>
