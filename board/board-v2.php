@@ -16,8 +16,8 @@
                     </div>
                     <div class="name">
                         <div class="content">
-                            <p class="teamname" id="A_Teamname">A Teamname</p>
-                            <p class="teammembers" id="A_Players">N. Alt & D. Ameziane</p>
+                            <p class="teamname text" id="A_Teamname">A Teamname</p>
+                            <p class="players text" id="A_Players">N. Alt & D. Ameziane</p>
                         </div>
                     </div>
                 </div>
@@ -34,8 +34,8 @@
                 <div class="team right">
                     <div class="name">
                         <div class="content">
-                            <p class="teamname" id="B_Teamname">A Teamname</p>
-                            <p class="teammembers" id="B_Players">N. Alt & D. Ameziane</p>
+                            <p class="teamname text" id="B_Teamname">A Teamname</p>
+                            <p class="players text" id="B_Players">N. Alt & D. Ameziane</p>
                         </div>
                     </div>
                     <div class="score">

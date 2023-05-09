@@ -1,7 +1,13 @@
 
-// helper funtion to dertermine if a value is a number
+// helper funtion to determine if a value is a number
 function isNumeric(value) {
     return /^-?\d+$/.test(value);
+}
+
+
+// helper function to determine if a text overflows
+function isEllipsisActive(e) {
+    return (e.offsetWidth < e.scrollWidth);
 }
 
 
@@ -74,7 +80,6 @@ function insert_live_data(board_id, type) {
                         } else {
                             a_score = data[0]['A_Score_' + active_set];
                             b_score = data[0]['B_Score_' + active_set];
-                            console.log(a_score, b_score);
                             $('#A_Score_Active').text(a_score);
                             $('#B_Score_Active').text(b_score);
                         }
@@ -111,6 +116,12 @@ function insert_live_data(board_id, type) {
                                 } else {
                                     if (type == "board") {
                                         $(elem).text(value);
+                                        // make text smaller if it overflows
+                                        console.log($(elem).text(), isEllipsisActive($(elem)));
+                                        while(isEllipsisActive($(elem))) {
+                                            fontSize = pareseInt($(elem).css('font-size'));
+                                            $(elem).css('font-size', fontSize - 1 + "px")
+                                        }
                                     } else if (type == "admin") {
                                         $(elem).val(value);
                                     }
@@ -253,9 +264,7 @@ function upload_local_data(board_id, elemList) {
         var type = $elem.attr("type");
         var id = $elem.attr("id");
         var value;
-        console.log($elem, type);
         if (type == "checkbox") {
-            console.log("ja, checkbox");
             if ($elem.is(":checked")) {
                 value = 1;
             } else {
@@ -266,7 +275,6 @@ function upload_local_data(board_id, elemList) {
         }
         dataObject[id] = value;
     });
-    console.log(dataObject);
 
     $.ajax({
         type: 'POST',
