@@ -71,6 +71,12 @@ function insert_live_data(board_id, type) {
                         active_set = value;
                         if (type == "admin") {
                             $('#Set_Count').val(active_set);
+                        } else {
+                            a_score = data[0]['A_Score_' + active_set];
+                            b_score = data[0]['B_Score_' + active_set];
+                            console.log(a_score, b_score);
+                            $('#A_Score_Active').text(a_score);
+                            $('#B_Score_Active').text(b_score);
                         }
                     } else if (key == "Show_Team_Score") {
                         show_team_score = value;
@@ -121,7 +127,10 @@ function insert_live_data(board_id, type) {
 
 
 // helper function to update the active set
-function update_set_visibilities() {
+function update_set_visibilities_and_counter() {
+
+    var a_sets_won = 0;
+    var b_sets_won = 0;
 
     // go through all html .set elements
     $.each($('.set'), function(i, set) {
@@ -146,11 +155,13 @@ function update_set_visibilities() {
             if (score_1 > score_2) {
                 $score_team_a.removeClass('loser').addClass('winner');
                 $score_team_b.removeClass('winner').addClass('loser');
+                a_sets_won += 1;
 
             // if second team has the higher score
             } else if (score_1 < score_2) {
                 $score_team_a.removeClass('winner').addClass('loser');
                 $score_team_b.removeClass('loser').addClass('winner');
+                b_sets_won += 1;
 
             // if scores are equal
             } else {
@@ -177,6 +188,14 @@ function update_set_visibilities() {
             $set.removeClass('active');
         }
     });
+
+    set_set_counter(a_sets_won, b_sets_won);
+}
+
+
+function set_set_counter(a_sets_won, b_sets_won) {
+    $('#a_sets_won').text(a_sets_won);
+    $('#b_sets_won').text(b_sets_won);
 }
 
 
@@ -256,7 +275,7 @@ function upload_local_data(board_id, elemList) {
         dataType: 'json',
     });
 
-    update_set_visibilities();
+    update_set_visibilities_and_counter();
     update_team_counter_visibility();
     update_color_indicator_visibility();
 }
@@ -266,7 +285,7 @@ function change_channel(channel, type) {
     insert_live_data(channel, type);
     // apply all the special variables - with a bit delay so the database values are safely loaded
     setTimeout(function() {
-        update_set_visibilities();
+        update_set_visibilities_and_counter();
         update_team_counter_visibility();
         update_color_indicator_visibility();
     }, 500)

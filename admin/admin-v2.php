@@ -1,7 +1,7 @@
 <?php include "admin-header-start.php" ?>
 
-    <link rel="stylesheet" href="../css/style-v1.css">
-    <link rel="stylesheet" href="../css/style-v1_input.css">
+    <link rel="stylesheet" href="../css/style-v2.css">
+    <link rel="stylesheet" href="../css/style-v2_input.css">
 
 <?php include "admin-header-end.php" ?>
 
@@ -9,35 +9,29 @@
 
     <div class="wrapper">
         <div class="board">
+
             <div class="top">
                 <div class="content">
-                    <input type="text" class="text" id="Occasion" value="Occasion" database-variable></input>
-                </div>
-                <div class="set_counter_container">
-                    <span>Satz:</span>
-                    <input type="number" id="Set_Count" min="1" max="7" database-variable>
+                    <input type="text" class="text" id="Game" value="Game" database-variable></input>
+                    <div class="set_counter_container">
+                        <span>Satz:</span>
+                        <input type="number" id="Set_Count" min="1" max="7" database-variable>
+                    </div>
                 </div>
             </div>
+
             <div class="center">
                 <div class="teams">
                     <div class="team">
-                        <input type="color" class="color-indicator" id="A_Color" database-variable></input>
                         <input type="text" class="teamname" id="A_Teamname" value="A Teamname" database-variable></input>
+                        <input type="text" class="players" id="A_Players" value="A Players" database-variable></input>
                     </div>
                     <div class="team">
-                        <input type="color" class="color-indicator" id="B_Color" database-variable></input>
                         <input type="text" class="teamname" id="B_Teamname" value="B Teamname" database-variable></input>
+                        <input type="text" class="players" id="B_Players" value="B Players" database-variable></input>
                     </div>
                 </div>
                 <div class="scores">
-                    <div class="group_score">
-                        <div class="counter group">
-                            <p>0</p>
-                        </div>
-                        <div class="counter group">
-                            <p>1</p>
-                        </div>
-                    </div>
                     <div class="team_score">
                         <div class="set active">
                             <div class="counter a_team set1">
@@ -98,14 +92,16 @@
                     </div>
                 </div>
             </div>
+
             <div class="bottom">
                 <div class="content">
-                    <input type="text" class="text" id="Game" value="" database-variable></input>
-                    <span class="divider"></span>
+                    <input type="text" class="text" id="Occasion" value="" database-variable></input>
                     <input type="text" class="text" id="Mode" value="" database-variable></input>
                 </div>
             </div>
+
         </div>
+
         <div class="controls">
             <div class="team_container">
                 <button class="button add team_a" id="add_point_a" change="+1">+1</button>

@@ -1,4 +1,3 @@
-    <link rel="stylesheet" href="css/style_input.css">
 </head>
 
 <body>
@@ -20,10 +19,10 @@
             $channel_input.val(url_id);
 
             // insert live data on first load to get up to date
-            insert_live_data(1, "admin");
+            insert_live_data(url_id, "admin");
             // apply all the special variables - with a bit delay so the database values are safely loaded
             setTimeout(function() {
-                update_set_visibilities();
+                update_set_visibilities_and_counter();
                 update_team_counter_visibility();
                 update_color_indicator_visibility();
             }, 750)

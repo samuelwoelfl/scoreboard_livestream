@@ -3,7 +3,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once('dbconnect.inc.php');
+require_once('../dbconnect.inc.php');
 
 
 // $select_scoreboards = $db->prepare("SELECT * FROM Scoreboards");

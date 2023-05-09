@@ -17,13 +17,16 @@
   --black: #000000;
 }
 
+.hidden {
+  opacity: 0;
+}
+
 .wrapper {
   width: 100vw;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
 }
 
 .board {
@@ -32,7 +35,7 @@
   justify-content: flex-start;
   align-items: center;
   gap: 5px;
-  margin: 10px;
+  margin: 15px;
 }
 
 .top {
@@ -191,9 +194,17 @@
   margin-top: -31.5px;
 }
 
-.bottom .content * {
+.bottom .content p {
   color: var(--yellow);
   font-size: 14px;
   font-weight: 400;
+}
+
+.bottom .content .divider {
+  display: block;
+  height: 16px;
+  width: 1px;
+  background-color: var(--yellow);
+  margin: 1px 10px 0 10px;
 }
 

@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 var_dump($_POST);
 
 // import database connection file
-require_once('dbconnect.inc.php');
+require_once('../dbconnect.inc.php');
 
 // $_POST['ID'] = 1;
 // $_POST['Name'] = "Hallo";
