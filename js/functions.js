@@ -117,7 +117,7 @@ function insert_live_data(board_id, type) {
                                     if (type == "board") {
                                         $(elem).text(value);
                                         // make text smaller if it overflows
-                                        console.log($(elem).text(), isEllipsisActive($(elem)));
+                                        // console.log($(elem).text(), isEllipsisActive($(elem)));
                                         while(isEllipsisActive($(elem))) {
                                             fontSize = pareseInt($(elem).css('font-size'));
                                             $(elem).css('font-size', fontSize - 1 + "px")

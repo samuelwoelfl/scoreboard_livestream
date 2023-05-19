@@ -58,10 +58,23 @@
 
                 score_elem = active_set_elem.find('.score')[team] // find correct score element based on team
                 score_now = Number($(score_elem).val()); // check score right now
-                $(score_elem).val(score_now + change); // update to new score
-                
-                // upload the new score
-                upload_local_data($channel_input.val(), [score_elem]);
+                if (score_now + change >= 0) {
+                    $(score_elem).val(score_now + change); // update to new score
+                    upload_local_data($channel_input.val(), [score_elem]); // upload the new score
+                }
+            });
+
+
+            $('.set_controls_container .button').click(function() {
+                var $button = $(this);
+                var $set_counter = $('#Set_Count');
+                var change = Number($button.attr('change'));
+
+                set_now = Number($set_counter.val()); // check set right now
+                if (set_now + change > 0 && set_now + change <= 7) {
+                    $set_counter.val(set_now + change); // update to new set
+                    upload_local_data($channel_input.val(), [$set_counter]); // upload the new set
+                }
             });
 
 

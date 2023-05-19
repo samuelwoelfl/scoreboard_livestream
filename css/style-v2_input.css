@@ -16,13 +16,15 @@ html, body {
 }
 
 .top {
-  width: 340px;
+  width: auto;
   height: auto;
-  background-color: var(--black);
+  gap: 6px;
 }
 
 .top .content {
-  width: 100%;
+  width: 340px;
+  height: auto;
+  background-color: var(--black);
   display: flex;
   padding: 4px;
   gap: 12px;
@@ -30,6 +32,25 @@ html, body {
 
 .top .content .text {
   flex-grow: 1;
+}
+
+.top .set_counter_container {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  width: 110px;
+}
+
+.top .set_controls_container {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.top .set_controls_container .button {
+  height: 30px !important;
+  font-size: 20px !important;
+  padding: 0px !important;
 }
 
 input:focus {
@@ -131,20 +152,21 @@ select option {
 }
 
 .bottom {
-  width: 340px;
+  width: auto;
   border: none;
   height: auto;
+  gap: 6px;
+}
+
+.bottom .content {
+  width: 340px;
+  gap: 4px;
+  margin-top: 0;
   background-color: var(--black);
   padding: 4px;
 }
 
-.bottom .content {
-  width: 100%;
-  gap: 4px;
-  margin-top: 0;
-}
-
-.bottom .content > * {
+.bottom .content .inner > * {
   flex-grow: 1;
 }
 
@@ -218,9 +240,8 @@ button:active {
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  height: 100%;
-  margin-left: -5px;
+  justify-content: space-around;
+  min-height: 100%;
 }
 
 .controls .team_container {
@@ -236,6 +257,10 @@ button:active {
 .button.remove {
   background-color: #C55151;
   transition: .1s ease;
+}
+
+.button.neutral {
+  background-color: #6e6e6e;
 }
 
 .button:hover {

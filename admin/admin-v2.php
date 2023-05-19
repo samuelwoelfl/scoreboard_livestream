@@ -18,6 +18,10 @@
                         <input type="number" id="Set_Count" min="1" max="7" database-variable>
                     </div>
                 </div>
+                <div class="set_controls_container">
+                    <button class="button neutral" change="+1">+1</button>
+                    <button class="button neutral" change="-1">-1</button>
+                </div>
             </div>
 
             <div class="center">
@@ -91,6 +95,19 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="controls">
+            
+                    <div class="team_container">
+                        <button class="button add team_a" id="add_point_a" change="+1">+1</button>
+                        <button class="button remove team_a" id="remove_point_a" change="-1">-1</button>
+                    </div>
+                    <div class="team_container">
+                        <button class="button add team_b" id="add_point_b" change="+1">+1</button>
+                        <button class="button remove team_b" id="remove_point_b" change="-1">-1</button>
+                    </div>
+                    
+                </div>
             </div>
 
             <div class="bottom">
@@ -98,20 +115,12 @@
                     <input type="text" class="text" id="Occasion" value="" database-variable></input>
                     <input type="text" class="text" id="Mode" value="" database-variable></input>
                 </div>
+                <button id="reset_scores">Reset Scores</button>
             </div>
 
         </div>
 
-        <div class="controls">
-            <div class="team_container">
-                <button class="button add team_a" id="add_point_a" change="+1">+1</button>
-                <button class="button remove team_a" id="remove_point_a" change="-1">-1</button>
-            </div>
-            <div class="team_container">
-                <button class="button add team_b" id="add_point_b" change="+1">+1</button>
-                <button class="button remove team_b" id="remove_point_b" change="-1">-1</button>
-            </div>
-        </div>
+        
     </div>
 
     <?php include "admin-settings.php" ?>

@@ -12,15 +12,17 @@ html, body {
 
 .top {
   gap: 4px;
-  width: 350px;
 }
 
 .set_counter_container {
   background: var(--light-3);
   padding: 2px 2px 1px 6px;
-  border-radius: 7px 7px 7px 1px;
-  margin-bottom: 3px;
-  width: 38%;
+  border-radius: 4px;
+  margin-bottom: 1px;
+  width: 135px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
 }
 
 input:focus {
@@ -43,8 +45,25 @@ input:not([type='color']) {
   width: 100%;
 }
 
+.top .set_controls_container {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.top .set_controls_container .button {
+  height: 26px !important;
+  font-size: 20px !important;
+  padding: 0px !important;
+}
+
 .bottom input {
   background-color: #ffffffcc;
+}
+
+.bottom button {
+  margin-top: 6px;
+  height: 28px;
 }
 
 input[type='number'] {
@@ -56,9 +75,17 @@ input[type='number'] {
   font-size: 17px;
 }
 
+.center {
+  margin-bottom: -2px;
+}
+
 .center input {
   font-size: 30px;
   font-weight: 700;
+}
+
+.top, .bottom {
+  gap: 6px;
 }
 
 .top .content, .bottom .content {
@@ -69,7 +96,7 @@ input[type='number'] {
   overflow: hidden;
 }
 
-.center {
+.center .inner {
   padding: 6px 8px 6px 8px;
   margin-bottom: -2px;
 }
@@ -184,6 +211,7 @@ button:active {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-left: 14px
 }
 
 .controls .team_container {
@@ -199,6 +227,10 @@ button:active {
 .button.remove {
   background-color: var(--red);
   transition: .1s ease;
+}
+
+.button.neutral {
+  background-color: #6e6e6e;
 }
 
 .button:hover {
