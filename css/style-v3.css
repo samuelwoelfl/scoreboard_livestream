@@ -9,13 +9,15 @@
   color: var(--text-primary);
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 :root {
   --team_a: #8628E4;
   --team_b: #C8FDCA;
-  --background: #000000f1;
+  --background: #000000;
   --text-primary: #ffffff;
+  --text-dark: #000000;
 }
 
 html, body {
@@ -32,14 +34,15 @@ html, body {
 }
 
 .wrapper {
-  padding: 20px;
-  height: calc(100% - 20px);
+  padding: 45px;
+  padding-bottom: 55px;
+  height: 100%;
 }
 
 .board {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 50px;
   height: 100%;
 }
 
@@ -49,20 +52,25 @@ html, body {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding: 20px 10px;
+  padding: 16px 0px;
 }
 
 .top .content {
   display: flex;
   flex-direction: row;
+  align-items: center;
+}
+
+.top .text {
+  font-size: 5.5vh;
 }
 
 .top .divider {
   display: block;
-  height: 16px;
-  width: 1px;
-  background-color: #ffffffaa;
-  margin: 5px 10px 0 10px;
+  height: 58%;
+  width: 4px;
+  background-color: #ffffff33;
+  margin: 7px 25px 0 25px;
 }
 
 .bottom {
@@ -74,27 +82,36 @@ html, body {
 }
 
 .team {
-  width: 49%;
+  width: 48%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 24px;
 }
 
-.team_a .name, .team_a .score p {
+.team_a .name, .team_a .score .active_card {
   background-color: var(--team_a);
 }
 
-.team_a .score span {
-  border: 5px solid var(--team_a);
+.team_a .teamname, .team_a .active_card p {
+  color: var(--text-primary);
 }
 
-.team_b .name, .team_b .score p {
+.team_a .sets_card {
+  border: 10px solid var(--team_a);
+}
+
+.team_b .name, .team_b .active_card {
   background-color: var(--team_b);
 }
 
-.team_b .score span {
-  border: 5px solid var(--team_b);
+.team_b .teamname, .team_b .active_card p {
+  color: var(--text-dark);
+}
+
+
+.team_b .sets_card {
+  border: 10px solid var(--team_b);
 }
 
 .team .name {
@@ -102,11 +119,11 @@ html, body {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 5px;
+  padding: 15px 5px;
 }
 
 .team .name p {
-  font-size: 5em;
+  font-size: 6.3vh;
 }
 
 .team .score {
@@ -115,26 +132,27 @@ html, body {
   justify-content: space-between;
   align-items: flex-start;
   height: 100%;
-  gap: 10px;
+  gap: 24px;
 }
 
-.team .score p {
+.team .score .active_card {
   flex-grow: 1;
   height: 100%;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  font-size: 28em;
+  font-size: 39.7vh;
+  padding-bottom: 25px;
 }
 
-.team .score span {
-  width: 270px;
-  height: 42%;
+.team .score .sets_card {
+  width: 250px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  font-size: 14em;
+  font-size: 19.8vh;
+  padding-bottom: 15px;
 }
 
