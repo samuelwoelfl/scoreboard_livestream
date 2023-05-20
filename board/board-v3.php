@@ -8,42 +8,52 @@
     <div class="wrapper">
         <div class="board">
 
-            <div class="top">
-                <div class="content">
-                    <p class="text" id="Game">Occasion</p>
-                    <span class="divider"></span>
-                    <p class="text" id="Mode">Game Mode</p>
+        <div class="top">
+            <div class="content">
+                <p class="text" id="Game">Game</p>
+                <span class="divider"></span>
+                <p class="text" id="Mode">Mode</p>
+            </div>
+        </div>
+
+        <div class="bottom">
+
+            <div class="team team_a">
+                <div class="name">
+                    <p class="teamname text" id="A_Teamname">A Teamname</p>
+                </div>
+                <div class="score">
+                    <div class="active_card">
+                      <p id="A_Score_Active">0</p>
+                    </div>
+                    <div class="sets_card">
+                      <span id="a_sets_won">0</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="bottom">
-
-                <div class="team team_a">
-                    <div class="name">
-                        <p class="teamname text" id="A_Teamname">A Teamname</p>
-                    </div>
-                    <div class="score">
-                        <p id="A_Score_Active"></p>
-                        <span id="a_sets_won">0</span>
-                    </div>
+            <div class="team team_b">
+                <div class="name">
+                    <p class="teamname text" id="B_Teamname">B Teamname</p>
                 </div>
-
-                <div class="team team_b">
-                    <div class="name">
-                        <p class="teamname text" id="B_Teamname">A Teamname</p>
-                    </div>
-                    <div class="score">
-                        <span id="b_sets_won">0</span>
-                        <p id="B_Score_Active"></p>
-                    </div>
+                <div class="score">
+                  <div class="sets_card">
+                    <span id="b_sets_won">0</span>
+                  </div>
+                  <div class="active_card">
+                    <p id="B_Score_Active">0</p>
+                  </div>
                 </div>
-                
-            </div>           
+            </div>
+            
+        </div>  
 
         </div>
     </div>
 
     <div class="hidden">
+        <div class="color-indicator" id="A_Color"></div>
+        <div class="color-indicator" id="B_Color"></div>
         <div class="team_score">
             <div class="set active">
                 <div class="counter a_team set1">

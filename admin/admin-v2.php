@@ -28,11 +28,18 @@
                 <div class="teams">
                     <div class="team">
                         <input type="text" class="teamname" id="A_Teamname" value="A Teamname" database-variable></input>
-                        <input type="text" class="players" id="A_Players" value="A Players" database-variable></input>
+                        <div class="container">
+                            <input type="text" class="players" id="A_Players" value="A Players" database-variable></input>
+                            <input type="color" class="color-indicator" id="A_Color" database-variable></input>
+                        </div>
+                        
                     </div>
                     <div class="team">
                         <input type="text" class="teamname" id="B_Teamname" value="B Teamname" database-variable></input>
-                        <input type="text" class="players" id="B_Players" value="B Players" database-variable></input>
+                        <div class="container">
+                            <input type="text" class="players" id="B_Players" value="B Players" database-variable></input>
+                            <input type="color" class="color-indicator" id="B_Color" database-variable></input>
+                        </div>
                     </div>
                 </div>
                 <div class="scores">

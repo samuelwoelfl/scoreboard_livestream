@@ -133,6 +133,24 @@
   border-radius: 2px;
   margin-top: 5px;
   background-color: var(--text-primary);
+  border: 0px;
+  box-sizing: border-box;
+  margin-left: 0;
+}
+
+#A_Color {
+  background-color: var(--A_Color);
+}
+
+#B_Color {
+  background-color: var(--B_Color);
+}
+
+.teams .team .color-indicator.light {
+  border: 1px solid #bbbbbb;
+  box-sizing: content-box;
+  margin-left: -1px;
+  width: 5px;
 }
 
 .teams .team p {

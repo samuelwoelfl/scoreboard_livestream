@@ -142,9 +142,25 @@ select option {
   font-size: 26px;
 }
 
+.team .container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.team input[type="color"] {
+  width: 36px !important;
+  background-color: #ffffff2b;
+  border: none;
+}
+
 .team .players {
   font-size: 16px;
   font-weight: 300;
+  flex-grow: 1;
 }
 
 .teams .team input {

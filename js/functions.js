@@ -32,26 +32,13 @@ function isLight(hexColor) {
     return (r * 299 + g * 587 + b * 114) / 1000 > 230;
 }
 
+function isLighter(hexColor) {
+    var r = parseInt(hexColor.substr(1, 2), 16);
+    var g = parseInt(hexColor.substr(3, 2), 16);
+    var b = parseInt(hexColor.substr(5, 2), 16);
 
-// helper function to store all the css changes for the accessibility border centralized
-function addAccessibilityBorder(elem) {
-    var $elem = $(elem);
-    $elem.css("border", "1px solid #bbbbbb");
-    $elem.css("box-sizing", "content-box");
-    $elem.css("margin-left", "-1px");
-    $elem.css("width", "5px");
-    // $elem.css("margin-right", "-1px");
-}
-
-
-// helper function to store all the css changes before the accessibility border centralized
-function removeAccessibilityBorder(elem) {
-    var $elem = $(elem);
-    $elem.css("border", "0px");
-    $elem.css("box-sizing", "border-box");
-    $elem.css("margin-left", "0px");
-    $elem.css("width", "6px");
-    // $elem.css("margin-right", "0px");
+    // change the value at the end of the formula to change the lightness threshold - lower is darker
+    return (r * 299 + g * 587 + b * 114) / 1000 > 130;
 }
 
 
@@ -102,12 +89,24 @@ function insert_live_data(board_id, type) {
                                 // Handle team colors
                                 if (key.toLowerCase().includes("color")) {
                                     if (type == "board") {
-                                        $(elem).css("background-color", value);
+                                        $('html').css("--" + id, value)
+
                                         if (isLight(rgb2hex(value))) {
-                                            addAccessibilityBorder(elem);
+                                            $(elem).addClass('light');
                                         } else {
-                                            removeAccessibilityBorder(elem);
+                                            $(elem).removeClass('light');
                                         }
+
+                                        if (isLighter(rgb2hex(value))) {
+                                            console.log("yes: " + "team_" + id[0].toLowerCase());
+                                            $(".team_" + id[0].toLowerCase()).addClass('lighter');
+                                        } else {
+                                            $(".team_" + id[0].toLowerCase()).removeClass('lighter');
+                                        }
+
+                                        // if (id == "A_Color") {
+                                        //     $('#team_a').addClass
+                                        // }
                                     } else if (type == "admin") {
                                         $(elem).val(value);
                                     }
