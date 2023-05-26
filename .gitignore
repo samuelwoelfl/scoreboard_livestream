@@ -1,3 +1,4 @@
 .vscode
+.htaccess
 dbconnect.inc.php
 -- old --

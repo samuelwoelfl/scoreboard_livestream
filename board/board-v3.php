@@ -1,6 +1,7 @@
 <?php include "board-header-start.php" ?>
 
     <link rel="stylesheet" href="../css/style-v3.css">
+    <link rel="manifest" href="../manifest.json">
 
 <?php include "board-header-end.php" ?>
 
