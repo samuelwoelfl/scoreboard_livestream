@@ -84,7 +84,7 @@
                 // reset all score values
                 $.each($("*[id]"), function(i, elem) {
                     var id = $(elem).attr("id");
-                    if (id.toLowerCase().includes('score') && !id.toLowerCase().includes('show')) {
+                    if (id.toLowerCase().includes('score') && !id.toLowerCase().includes('show') && !id.toLowerCase().includes('team')) {
                         $(elem).val(0);
                     }
                 });
