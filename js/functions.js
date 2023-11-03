@@ -1,4 +1,3 @@
-
 // helper funtion to determine if a value is a number
 function isNumeric(value) {
     return /^-?\d+$/.test(value);
