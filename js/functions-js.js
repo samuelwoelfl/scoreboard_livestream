@@ -1,57 +1,134 @@
 // import firebase config
 import {
-    get
+    get,
+    ref,
+    update
 } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-database.js";
+
 import {
     db,
-    matchRef,
-    teamsRef
 } from "../js/firebase_config.js";
 
 // initialize variables for global usage
 var active_set = 1;
 var show_team_score = 0;
-var show_color = 0;
+var show_color = 1;
+var page_type, page_channel, matchRef;
 
 
 $(document).ready(function () {
 
+    // check if it's board or admin page
+    page_type = $('html').attr("type");
+
     // read URL params for channel selection
+    var $channel_input = $("#channel");
     var urlParams = new URLSearchParams(window.location.search);
-    var url_id = urlParams.get('channel');
-    if (url_id == null) {
-        url_id = 1;
+    var url_id = urlParams.get('channel') || 1;
+
+    // change channel on first load
+    page_channel = url_id;
+    matchRef = ref(db, `match-${page_channel}`);
+    if (page_type == "admin") {
+        $channel_input.val(url_id);
     }
 
-    // update the page with the live data in the given interval
-    setInterval(function () {
-        insert_live_data(url_id, "board");
-        update_set_visibilities_and_counter();
-        update_team_counter_visibility();
-        update_color_indicator_visibility();
+    // insert live data on first load to get up to date
+    insert_live_data(page_channel, page_type);
 
-    }, 2250); // request every 1/4 seconds
+    // auto reload for live data input
+    if (page_type == "board") {
+        setInterval(function () {
+            reload();
+        }, 250); // request every 1/4 seconds
+    } else if (page_type == "admin") {
+        setInterval(function () {
+            update_set_visibilities_and_counter();
+            update_team_counter_visibility();
+            update_color_indicator_visibility();
+        }, 250); // request every 1/4 seconds
+    }
 
+    // Channel input dropdown listener
+    $channel_input.change(function () {
+        page_channel = $(this).val();
+        reload();
+    });
+
+    // upload local data as any input values changes
+    $('input:not([type=submit]), textarea').on('input', function () {
+        upload_local_data([this]);
+    });
+
+    // interaction for the score buttons
+    $('.controls .button').click(function () {
+        var $button = $(this);
+        var active_set_elem = $(
+            '.set.active'); // check which set is active - which determines which score will be changed
+        var change = Number($button.attr(
+            'change')); // set the change amount based on the attribute on the button
+
+        var team;
+        // check for which team the button is
+        if ($button.hasClass('team_a')) {
+            team = 0;
+        } else {
+            team = 1;
+        }
+
+        var score_elem = active_set_elem.find('.score')[team] // find correct score element based on team
+        var score_now = Number($(score_elem).val()); // check score right now
+        if (score_now + change >= 0) {
+            $(score_elem).val(score_now + change); // update to new score
+            upload_local_data([score_elem]); // upload the new score
+        }
+    });
+
+    // interaction for the set buttons
+    $('.set_controls_container .button').click(function () {
+        var $button = $(this);
+        var $set_counter = $('#Set_Count');
+        var change = Number($button.attr('change'));
+
+        var set_now = Number($set_counter.val()); // check set right now
+        if (set_now + change > 0 && set_now + change <= 7) {
+            $set_counter.val(set_now + change); // update to new set
+            upload_local_data([$set_counter]); // upload the new set
+        }
+    });
+
+    // function for the reset scores button
+    $('#reset_scores').click(function () {
+
+        // reset all score values
+        $.each($("*[id]"), function (i, elem) {
+            var id = $(elem).attr("id");
+            if (id.toLowerCase().includes('score') && !id.toLowerCase().includes(
+                    'show') && !id.toLowerCase().includes('team')) {
+                $(elem).val(0);
+            }
+        });
+
+        // reset the set count
+        $('#Set_Count').val(1);
+
+        // upload the reset changes
+        upload_local_data();
+    });
 });
 
 
-
-
-async function getData(db) {
+async function getData() {
+    matchRef = ref(db, `match-${page_channel}`);
     var matchData = await get(matchRef);
     var matchDataObject = matchData.val(); // Assuming your data is an object
     return matchDataObject;
 }
 
+
 // helper funtion to determine if a value is a number
 function isNumeric(value) {
     return /^-?\d+$/.test(value);
-}
-
-
-// helper function to determine if a text overflows
-function isEllipsisActive(e) {
-    return (e.offsetWidth < e.scrollWidth);
 }
 
 
@@ -67,27 +144,16 @@ function rgb2hex(rgb) {
 }
 
 
-// helper function to check if a color is "light"
-function isLight(hexColor) {
+function getColorBrightness(hexColor) {
     var r = parseInt(hexColor.substr(1, 2), 16);
     var g = parseInt(hexColor.substr(3, 2), 16);
     var b = parseInt(hexColor.substr(5, 2), 16);
 
-    // change the value at the end of the formula to change the lightness threshold - lower is darker
-    return (r * 299 + g * 587 + b * 114) / 1000 > 230;
+    return (r * 299 + g * 587 + b * 114) / 1000;
 }
 
 
-function isLighter(hexColor) {
-    var r = parseInt(hexColor.substr(1, 2), 16);
-    var g = parseInt(hexColor.substr(3, 2), 16);
-    var b = parseInt(hexColor.substr(5, 2), 16);
-
-    // change the value at the end of the formula to change the lightness threshold - lower is darker
-    return (r * 299 + g * 587 + b * 114) / 1000 > 130;
-}
-
-
+// helper function the returns the paths and values to json objects
 function getPathsAndValues(obj, currentPath = []) {
     const result = {};
 
@@ -107,117 +173,68 @@ function getPathsAndValues(obj, currentPath = []) {
 
 
 // function that inserts the data from the database in the html
-async function insert_live_data(board_id, type) {
+async function insert_live_data(channel, type) {
+    // console.log("inserting live data for ", type, " and channel ", channel);
 
     // receive data from firebase
     var data = await getData(db);
     var pathsAndValues = getPathsAndValues(data);
-    console.log(pathsAndValues);
 
     $.each((pathsAndValues), function (keys, value) {
-        // console.log(keys);
-        var cssSelector;
 
+        // convert cssSelector to string
+        var cssSelector;
         if (keys.includes(',')) {
             var keysList = keys.split(',');
             cssSelector = keysList.map(key => `[fb-data="${key}"]`).join(' ');
         } else {
             cssSelector = `[fb-data="${keys}"]`;
         }
-        
-        // console.log(cssSelector);
+
+        // get according element in html
         var $elem = $(cssSelector);
-        console.log($elem, value);
-        $elem.text(value);
 
-        if (type == "board") {
-            $elem.text(value);
-        } else if (type == "admin") {
-            $elem.val(value);
+        // get for which team the value is for
+        var team;
+        if (cssSelector.includes('team_a')) {
+            team = "a";
+        } else {
+            team = "b";
         }
-    });
 
-    
-
-
-    // Go through all entries in the database response
-    $.each((data), function (key, value) {
-
-        // console.log(key, value);
-        // Only use real DB returns - DB also returns values with a number count instead of key name (e.g. 0: 'teamname')
-        if (!isNumeric(key)) {
-
-            // Handle background special variables
-            if (key == "Set_Count") {
-                active_set = value;
-                if (type == "admin") {
-                    $('#Set_Count').val(active_set);
-                } else {
-                    a_score = data[0]['A_Score_' + active_set];
-                    b_score = data[0]['B_Score_' + active_set];
-                    $('#A_Score_Active').text(a_score);
-                    $('#B_Score_Active').text(b_score);
-                }
-            } else if (key == "Show_Team_Score") {
-                show_team_score = value;
-            } else if (key == "Show_Color") {
-                show_color = value;
-
-                // Handly everything else
-            } else {
-                // Go through all html elements that have an id
-                $.each($("*[id]"), function (j, elem) {
-
-                    // extract id value
-                    var id = $(elem).attr("id")
-
-                    // Check if element id matches key name
-                    if (id == key) {
-
-                        // Handle team colors
-                        if (key.toLowerCase().includes("color")) {
-                            if (type == "board") {
-                                $('html').css("--" + id, value)
-
-                                if (isLight(rgb2hex(value))) {
-                                    $(elem).addClass('light');
-                                } else {
-                                    $(elem).removeClass('light');
-                                }
-
-                                if (isLighter(rgb2hex(value))) {
-                                    console.log("yes: " + "team_" + id[0].toLowerCase());
-                                    $(".team_" + id[0].toLowerCase()).addClass('lighter');
-                                } else {
-                                    $(".team_" + id[0].toLowerCase()).removeClass('lighter');
-                                }
-
-                                // if (id == "A_Color") {
-                                //     $('#team_a').addClass
-                                // }
-                            } else if (type == "admin") {
-                                $(elem).val(value);
-                            }
-
-                            // Handle everything else
-                        } else {
-                            if (type == "board") {
-                                $(elem).text(value);
-                                // make text smaller if it overflows
-                                // console.log($(elem).text(), isEllipsisActive($(elem)));
-                                while (isEllipsisActive($(elem))) {
-                                    fontSize = pareseInt($(elem).css('font-size'));
-                                    $(elem).css('font-size', fontSize - 1 + "px")
-                                }
-                            } else if (type == "admin") {
-                                $(elem).val(value);
-                            }
-                        }
-
+        if (cssSelector.includes('active_set')) {
+            active_set = value;
+            $elem.val(active_set);
+        } else if (cssSelector.includes('show_color')) {
+            show_color = value;
+        } else if (cssSelector.includes('show_group_score')) {
+            show_team_score = value;
+        } else {
+            if (type == "board") {
+                if (cssSelector.includes('color')) {
+                    $('html').css("--" + team.toUpperCase() + "_Color", value)
+                    // add "light" class if color is light to preserve readabiltiy
+                    if (getColorBrightness(rgb2hex(value)) >= 230) {
+                        $elem.addClass('light');
+                    } else {
+                        $elem.removeClass('light');
                     }
-                });
+                } else if (cssSelector.includes(`set_${active_set}`)){
+                    $elem.text(value);
+                    if (cssSelector.includes('team_a')) {
+                        $('#A_Score_Active').text(value);
+                    } else if (cssSelector.includes('team_b')) {
+                        $('#B_Score_Active').text(value);
+                    }
+                } else {
+                    $elem.text(value);
+                }
+            } else if (type == "admin") {
+                $elem.val(value);
             }
+
         }
+
     });
 }
 
@@ -314,7 +331,7 @@ function update_color_indicator_visibility() {
     if (show_color == 1) {
         $('.color-indicator').show();
         $('#Show_Color').prop("checked", true);
-    } else {
+    } else if (show_color == 0) {
         $('.color-indicator').hide();
         $('#Show_Color').prop("checked", false);
     }
@@ -322,7 +339,14 @@ function update_color_indicator_visibility() {
 
 
 // function that uploads all the local data to the database
-function upload_local_data(board_id, elemList) {
+function upload_local_data(elemList) {
+
+    // upload all if there are no specific elements
+    if (typeof elemList == 'undefined') {
+        elemList = $("*[fb-data]");
+    }
+
+    // set all the relevant vars for this page
     active_set = $('#Set_Count').val();
 
     if ($('#Show_Team_Score').is(":checked")) {
@@ -333,49 +357,60 @@ function upload_local_data(board_id, elemList) {
 
     if ($('#Show_Color').is(":checked")) {
         show_color = 1
-    } else {
+    } else if ($('#Show_Color').is(":checkbox")) {
         show_color = 0
     }
 
-
-    if (typeof elemList == 'undefined') {
-        elemList = $("*[database-variable]");
-    }
-
-    var dataObject = {};
-    dataObject['ID'] = board_id;
+    // upload all data to firebase
+    const newData = {};
     $.each($(elemList), function (i, elem) {
-        var $elem = $(elem);
-        var type = $elem.attr("type");
-        var id = $elem.attr("id");
         var value;
-        if (type == "checkbox") {
-            if ($elem.is(":checked")) {
+
+        if ($(elem).is(":checkbox")) {
+            if ($(elem).is(":checked")) {
                 value = 1;
             } else {
                 value = 0;
             }
         } else {
-            value = $elem.val();
+            value = $(elem).val();
         }
-        dataObject[id] = value;
+
+        if (value !== "") {
+            var html_parents = $(elem).parents();
+            var attrs_list = [];
+            $.each($(html_parents), function (j, parent) {
+                var fb_data = $(parent).attr("fb-data");
+                if (fb_data !== undefined) {
+                    attrs_list.unshift(fb_data)
+                }
+
+            });
+            attrs_list.push($(elem).attr("fb-data"))
+            var dbSelector = attrs_list.join('/')
+            var path_to_variable = `/match-${page_channel}/${dbSelector}`;
+            newData[path_to_variable] = value;
+        }
     });
 
-    $.ajax({
-        type: 'POST',
-        url: '../php/update_data.php',
-        data: dataObject,
-        dataType: 'json',
-    });
+    console.log(newData);
 
-    update_set_visibilities_and_counter();
-    update_team_counter_visibility();
-    update_color_indicator_visibility();
+    update(ref(db), newData)
+        .then(function () {
+            // console.log("User data updated successfully.");
+            update_set_visibilities_and_counter();
+            update_team_counter_visibility();
+            update_color_indicator_visibility();
+        })
+        .catch(function (error) {
+            console.error("Error updating user data:", error);
+        });
 }
 
 
-function change_channel(channel, type) {
-    insert_live_data(channel, type);
+// reload every data
+function reload() {
+    insert_live_data(page_channel, page_type);
     // apply all the special variables - with a bit delay so the database values are safely loaded
     setTimeout(function () {
         update_set_visibilities_and_counter();

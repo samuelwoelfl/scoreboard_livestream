@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" type="admin">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboards</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="../js/firebase_config.js"></script>
+    <script type="module" src="../js/functions-js.js"></script>
+
+    <link rel="stylesheet" href="../css/style-v1.css">
+    <link rel="stylesheet" href="../css/style-v1_input.css">
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="board">
+            <div class="top">
+                <div class="content">
+                    <input type="text" class="text" id="Occasion" value="Occasion" database-variable
+                        fb-data="tournament_name"></input>
+                </div>
+                <div class="set_counter_container">
+                    <span>Satz:</span>
+                    <input type="number" id="Set_Count" min="1" max="7" database-variable fb-data="active_set">
+                </div>
+                <div class="set_controls_container">
+                    <button class="button neutral" change="+1">+1</button>
+                    <button class="button neutral" change="-1">-1</button>
+                </div>
+            </div>
+            <div class="center">
+                <div class="teams" fb-data="teams_info">
+                    <div class="team" fb-data="team_a">
+                        <input type="color" class="color-indicator" id="A_Color" database-variable
+                            fb-data="color"></input>
+                        <input type="text" class="teamname" id="A_Teamname" value="A Teamname" database-variable
+                            fb-data="name"></input>
+                    </div>
+                    <div class="team" fb-data="team_b">
+                        <input type="color" class="color-indicator" id="B_Color" database-variable
+                            fb-data="color"></input>
+                        <input type="text" class="teamname" id="B_Teamname" value="B Teamname" database-variable
+                            fb-data="name"></input>
+                    </div>
+                </div>
+                <div class="scores" fb-data="score">
+                    <div class="group_score" fb-data="squad_score">
+                        <div class="counter group">
+                            <input type="number" class="score" id="A_Score_Team" value="0" database-variable fb-data="team_a_score"></input>
+                        </div>
+                        <div class="counter group">
+                            <input type="number" class="score" id="B_Score_Team" value="0" database-variable fb-data="team_b_score"></input>
+                        </div>
+                    </div>
+                    <div class="team_score">
+                        <div class="set active" fb-data="set_1">
+                            <div class="counter a_team">
+                                <input type="number" class="score" id="A_Score_1" value="0" database-variable  fb-data="team_a_score"></input>
+                            </div>
+                            <div class="counter b_team">
+                                <input type="number" class="score" id="B_Score_1" value="0" database-variable  fb-data="team_b_score"></input>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_2">
+                            <div class="counter a_team">
+                                <input type="number" class="score" id="A_Score_1" value="0" database-variable  fb-data="team_a_score"></input>
+                            </div>
+                            <div class="counter b_team">
+                                <input type="number" class="score" id="B_Score_1" value="0" database-variable  fb-data="team_b_score"></input>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_3">
+                            <div class="counter a_team">
+                                <input type="number" class="score" id="A_Score_1" value="0" database-variable  fb-data="team_a_score"></input>
+                            </div>
+                            <div class="counter b_team">
+                                <input type="number" class="score" id="B_Score_1" value="0" database-variable  fb-data="team_b_score"></input>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_4">
+                            <div class="counter a_team">
+                                <input type="number" class="score" id="A_Score_1" value="0" database-variable  fb-data="team_a_score"></input>
+                            </div>
+                            <div class="counter b_team">
+                                <input type="number" class="score" id="B_Score_1" value="0" database-variable  fb-data="team_b_score"></input>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_5">
+                            <div class="counter a_team">
+                                <input type="number" class="score" id="A_Score_1" value="0" database-variable  fb-data="team_a_score"></input>
+                            </div>
+                            <div class="counter b_team">
+                                <input type="number" class="score" id="B_Score_1" value="0" database-variable  fb-data="team_b_score"></input>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_6">
+                            <div class="counter a_team">
+                                <input type="number" class="score" id="A_Score_1" value="0" database-variable  fb-data="team_a_score"></input>
+                            </div>
+                            <div class="counter b_team">
+                                <input type="number" class="score" id="B_Score_1" value="0" database-variable  fb-data="team_b_score"></input>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_7">
+                            <div class="counter a_team">
+                                <input type="number" class="score" id="A_Score_1" value="0" database-variable  fb-data="team_a_score"></input>
+                            </div>
+                            <div class="counter b_team">
+                                <input type="number" class="score" id="B_Score_1" value="0" database-variable  fb-data="team_b_score"></input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <div class="team_container">
+                        <button class="button add team_a" id="add_point_a" change="+1">+1</button>
+                        <button class="button remove team_a" id="remove_point_a" change="-1">-1</button>
+                    </div>
+                    <div class="team_container">
+                        <button class="button add team_b" id="add_point_b" change="+1">+1</button>
+                        <button class="button remove team_b" id="remove_point_b" change="-1">-1</button>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom">
+                <div class="content">
+                    <input type="text" class="text" id="Game" value="" database-variable fb-data="phase"></input>
+                    <span class="divider"></span>
+                    <input type="text" class="text" id="Mode" value="" database-variable fb-data="format"></input>
+                </div>
+                <button id="reset_scores">Reset Scores</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="settings-container" fb-data="admin_settings">
+        <h3>Settings</h3>
+        <div class="settings">
+
+            <!-- <div class="setting_entry">
+            <button id="reset_scores">Reset Scores</button>
+        </div> -->
+
+            <div class="setting_entry color_container">
+                <span>Farben:</span>
+                <input type="checkbox" id="Show_Color" database-variable checked fb-data="show_color">
+            </div>
+
+            <div class="setting_entry group_container">
+                <span>Liga (tbd):</span>
+                <input type="checkbox" id="Show_Team_Score" database-variable fb-data="show_group_score">
+            </div>
+
+            <div class="setting_entry color_container">
+                <span>Channel:</span>
+                <select id="channel">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

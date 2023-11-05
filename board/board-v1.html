@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" type="board">
 
 <head>
     <meta charset="UTF-8">
@@ -12,9 +12,6 @@
     <script type="module" src="../js/functions-js.js"></script>
 
     <link rel="stylesheet" href="../css/style-v1.css">
-
-    <!-- <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-database.js"></script> -->
 
 </head>
 
@@ -30,18 +27,18 @@
             <div class="center">
                 <div class="teams" fb-data="teams_info">
                     <div class="team" fb-data="team_a">
-                        <div class="color-indicator" fb-data="color"></div>
+                        <div class="color-indicator" id="A_Color" fb-data="color"></div>
                         <p class="teamname" fb-data="name">A Teamname</p>
                     </div>
                     <div class="team" fb-data="team_b">
-                        <div class="color-indicator" fb-data="color"></div>
+                        <div class="color-indicator" id="B_Color" fb-data="color"></div>
                         <p class="teamname" fb-data="name">B Teamname</p>
                     </div>
                 </div>
 
                 <div class="scores" fb-data="score">
 
-                    <div class="group_score" fb-data="group_score">
+                    <div class="group_score" fb-data="squad_score">
                         <div class="group-indicator">
                             <svg width="18" height="18" viewBox="0 0 24 21" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -58,7 +55,7 @@
                         </div>
                     </div>
                     
-                    <div class="team_score" fb-data="game_score">
+                    <div class="team_score">
                         <div class="set active" fb-data="set_1">
                             <div class="counter a_team">
                                 <p class="score" fb-data="team_a_score"></p>

@@ -22,5 +22,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const db = getDatabase(app);
-export const matchRef = ref(db, 'match');
-export const teamsRef = ref(db, 'match/teams_info')
+// export const matchRef = ref(db, 'match');
+// export const teamsRef = ref(db, 'match/teams_info')
