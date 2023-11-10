@@ -389,6 +389,14 @@ function upload_local_data(elemList) {
             attrs_list.push($(elem).attr("fb-data"))
             var dbSelector = attrs_list.join('/')
             var path_to_variable = `/match-${page_channel}/${dbSelector}`;
+            if (path_to_variable.includes('score') || path_to_variable.includes('active_set')) {
+                try {
+                    value = parseInt(value);
+                    // console.log(value, " converted to int");
+                } catch (error) {
+                    // console.log(value, " can't be converted to string");
+                }
+            }
             newData[path_to_variable] = value;
         }
     });
