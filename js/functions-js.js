@@ -14,10 +14,15 @@ var active_set = 1;
 var show_team_score = 0;
 var show_color = 1;
 var page_type, page_channel, matchRef;
+var authenticated = 0;
 
 
 $(document).ready(function () {
+    handleAuthentication();
+});
 
+
+function initialize() {
     // check if it's board or admin page
     page_type = $('html').attr("type");
 
@@ -115,7 +120,31 @@ $(document).ready(function () {
         // upload the reset changes
         upload_local_data();
     });
-});
+}
+
+
+function handleAuthentication() {
+    $('.wrapper').hide();
+    $('.settings-container').hide();
+    $('#auth').show();
+
+    var $submitButton = $('#auth #submit');
+
+    $submitButton.click(function () {
+        var user = $('#auth #account').val();
+        var password = $('#auth #password').val();
+        
+        if (user == 'RoundnetGermany' && password == 'test') {
+            console.log('erfolg');
+            $('#auth').hide();
+            $('.wrapper').show();
+            $('.settings-container').show();
+            initialize();
+        } else {
+            console.log('nicht erfolgreich')
+        }
+    })
+}
 
 
 async function getData() {
@@ -219,7 +248,7 @@ async function insert_live_data(channel, type) {
                     } else {
                         $elem.removeClass('light');
                     }
-                } else if (cssSelector.includes(`set_${active_set}`)){
+                } else if (cssSelector.includes(`set_${active_set}`)) {
                     $elem.text(value);
                     if (cssSelector.includes('team_a')) {
                         $('#A_Score_Active').text(value);
