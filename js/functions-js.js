@@ -9,16 +9,27 @@ import {
     db,
 } from "../js/firebase_config.js";
 
+
+// Database references
+var usersRef = ref(db, 'users');
+
 // initialize variables for global usage
 var active_set = 1;
 var show_team_score = 0;
 var show_color = 1;
 var page_type, page_channel, matchRef;
 var authenticated = 0;
+var auth_channels;
+var $banner;
 
 
 $(document).ready(function () {
     handleAuthentication();
+    $banner = $('.banner');
+
+    $('.banner_close_button').click(function () {
+        $banner.fadeOut(100);
+    });
 });
 
 
@@ -29,17 +40,26 @@ function initialize() {
     // read URL params for channel selection
     var $channel_input = $("#channel");
     var urlParams = new URLSearchParams(window.location.search);
-    var url_id = urlParams.get('channel') || 1;
+    var url_id = urlParams.get('channel');
 
     // change channel on first load
-    page_channel = url_id;
-    matchRef = ref(db, `match-${page_channel}`);
+    page_channel = url_id || 1;
+    if (!auth_channels.includes(page_channel)) {
+        page_channel = auth_channels[0];
+        showToast("🎚️", `The selected channel is not available for your account - you got redirecte to channel ${page_channel}`)
+    }
+    // set authenticated channels in selector
+    $channel_input.empty();
+    $.each(auth_channels, function (i, c) {
+        $channel_input.append($('<option></option>').val(c).html(c));
+    })
+    // set select in admin page to active channel
     if (page_type == "admin") {
-        $channel_input.val(url_id);
+        $channel_input.val(page_channel);
     }
 
     // insert live data on first load to get up to date
-    insert_live_data(page_channel, page_type);
+    insert_live_data(page_type);
 
     // auto reload for live data input
     if (page_type == "board") {
@@ -57,6 +77,7 @@ function initialize() {
     // Channel input dropdown listener
     $channel_input.change(function () {
         page_channel = $(this).val();
+        // showToast("🎚️", `Channel successfully changed to ${page_channel} - data is loaded`, 1500)
         reload();
     });
 
@@ -67,91 +88,140 @@ function initialize() {
 
     // interaction for the score buttons
     $('.controls .button').click(function () {
-        var $button = $(this);
-        var active_set_elem = $(
-            '.set.active'); // check which set is active - which determines which score will be changed
-        var change = Number($button.attr(
-            'change')); // set the change amount based on the attribute on the button
+        if (channel_authenticated()) {
+            var $button = $(this);
+            var active_set_elem = $(
+                '.set.active'); // check which set is active - which determines which score will be changed
+            var change = Number($button.attr(
+                'change')); // set the change amount based on the attribute on the button
 
-        var team;
-        // check for which team the button is
-        if ($button.hasClass('team_a')) {
-            team = 0;
-        } else {
-            team = 1;
-        }
+            var team;
+            // check for which team the button is
+            if ($button.hasClass('team_a')) {
+                team = 0;
+            } else {
+                team = 1;
+            }
 
-        var score_elem = active_set_elem.find('.score')[team] // find correct score element based on team
-        var score_now = Number($(score_elem).val()); // check score right now
-        if (score_now + change >= 0) {
-            $(score_elem).val(score_now + change); // update to new score
-            upload_local_data([score_elem]); // upload the new score
+            var score_elem = active_set_elem.find('.score')[team] // find correct score element based on team
+            var score_now = Number($(score_elem).val()); // check score right now
+            if (score_now + change >= 0) {
+                $(score_elem).val(score_now + change); // update to new score
+                upload_local_data([score_elem]); // upload the new score
+            }
         }
     });
 
     // interaction for the set buttons
     $('.set_controls_container .button').click(function () {
-        var $button = $(this);
-        var $set_counter = $('#Set_Count');
-        var change = Number($button.attr('change'));
+        if (channel_authenticated()) {
+            var $button = $(this);
+            var $set_counter = $('#Set_Count');
+            var change = Number($button.attr('change'));
 
-        var set_now = Number($set_counter.val()); // check set right now
-        if (set_now + change > 0 && set_now + change <= 7) {
-            $set_counter.val(set_now + change); // update to new set
-            upload_local_data([$set_counter]); // upload the new set
+            var set_now = Number($set_counter.val()); // check set right now
+            if (set_now + change > 0 && set_now + change <= 7) {
+                $set_counter.val(set_now + change); // update to new set
+                upload_local_data([$set_counter]); // upload the new set
+            }
         }
     });
 
     // function for the reset scores button
     $('#reset_scores').click(function () {
+        if (channel_authenticated()) {
+            // reset all score values
+            $.each($("*[id]"), function (i, elem) {
+                var id = $(elem).attr("id");
+                if (id.toLowerCase().includes('score') && !id.toLowerCase().includes(
+                        'show') && !id.toLowerCase().includes('team')) {
+                    $(elem).val(0);
+                }
+            });
 
-        // reset all score values
-        $.each($("*[id]"), function (i, elem) {
-            var id = $(elem).attr("id");
-            if (id.toLowerCase().includes('score') && !id.toLowerCase().includes(
-                    'show') && !id.toLowerCase().includes('team')) {
-                $(elem).val(0);
-            }
-        });
+            // reset the set count
+            $('#Set_Count').val(1);
 
-        // reset the set count
-        $('#Set_Count').val(1);
-
-        // upload the reset changes
-        upload_local_data();
+            // upload the reset changes
+            upload_local_data();
+        }
     });
 }
 
 
-function handleAuthentication() {
+async function handleAuthentication() {
     $('.wrapper').hide();
     $('.settings-container').hide();
+
+    // prepare select
+    var $select = $('select#account');
+    $select.append($('<option></option>').val("").html("-- Please select --"));
+    // insert users from db
+    var users = await getUsers();
+    $.each((users), function (name, data) {
+        var username = data["display_name"];
+        $select.append($('<option></option>').val(name).html(username));
+    });
+    // show prepared auth
     $('#auth').show();
 
-    var $submitButton = $('#auth #submit');
-
-    $submitButton.click(function () {
-        var user = $('#auth #account').val();
+    $('form#login').on('submit', function(e){
+        e.preventDefault();
+        var username = $('#auth #account').val();
         var password = $('#auth #password').val();
-        
-        if (user == 'RoundnetGermany' && password == 'test') {
-            console.log('erfolg');
-            $('#auth').hide();
-            $('.wrapper').show();
-            $('.settings-container').show();
-            initialize();
-        } else {
-            console.log('nicht erfolgreich')
+        try {
+            var db_password = users[username]["password"];
+            if (password == db_password) {
+                $('#auth').hide();
+                $('.wrapper').show();
+                $('.settings-container').show();
+                authenticated = 1;
+                auth_channels = users[username]["channels"].split(',');
+                showToast("✅", `Successfully logged in - you're account got the channels ${auth_channels} - you got redirected to channel ${page_channel}`)
+                console.log(username);
+                localStorage.setItem('username', username);
+                localStorage.setItem('password', password);
+                initialize();
+            } else {
+                showToast("❌", "The entered password is wrong");
+            }
+        } catch (error) {
+            showToast("🧍‍♂️", "You have to select a user")
         }
-    })
+     });
+}
+
+
+function active_session() {
+    localStorage.getItem(username);
+    return username
+}
+
+
+function channel_authenticated() {
+    if (auth_channels.includes(page_channel)) {
+        return true
+    } else {
+        showToast("❌", "You're not authenticated for this channel")
+        return false
+    }
 }
 
 
 async function getData() {
-    matchRef = ref(db, `match-${page_channel}`);
-    var matchData = await get(matchRef);
-    var matchDataObject = matchData.val(); // Assuming your data is an object
-    return matchDataObject;
+    if (channel_authenticated()) {
+        matchRef = ref(db, `match-${page_channel}`);
+        var matchData = await get(matchRef);
+        var matchDataObject = matchData.val(); // Assuming your data is an object
+        return matchDataObject;
+    }
+}
+
+
+async function getUsers() {
+    var usersData = await get(usersRef);
+    var usersDataObject = usersData.val(); // Assuming your data is an object
+    return usersDataObject;
 }
 
 
@@ -202,11 +272,11 @@ function getPathsAndValues(obj, currentPath = []) {
 
 
 // function that inserts the data from the database in the html
-async function insert_live_data(channel, type) {
-    // console.log("inserting live data for ", type, " and channel ", channel);
+async function insert_live_data(type) {
+    // console.log("inserting live data for ", type, " and channel ", page_channel);
 
     // receive data from firebase
-    var data = await getData(db);
+    var data = await getData();
     var pathsAndValues = getPathsAndValues(data);
 
     $.each((pathsAndValues), function (keys, value) {
@@ -370,88 +440,108 @@ function update_color_indicator_visibility() {
 // function that uploads all the local data to the database
 function upload_local_data(elemList) {
 
-    // upload all if there are no specific elements
-    if (typeof elemList == 'undefined') {
-        elemList = $("*[fb-data]");
-    }
+    // check if selected channel is allowed
+    if (channel_authenticated()) {
+        // upload all if there are no specific elements
+        if (typeof elemList == 'undefined') {
+            elemList = $("*[fb-data]");
+        }
 
-    // set all the relevant vars for this page
-    active_set = $('#Set_Count').val();
+        // set all the relevant vars for this page
+        active_set = $('#Set_Count').val();
 
-    if ($('#Show_Team_Score').is(":checked")) {
-        show_team_score = 1
-    } else {
-        show_team_score = 0
-    }
-
-    if ($('#Show_Color').is(":checked")) {
-        show_color = 1
-    } else if ($('#Show_Color').is(":checkbox")) {
-        show_color = 0
-    }
-
-    // upload all data to firebase
-    const newData = {};
-    $.each($(elemList), function (i, elem) {
-        var value;
-
-        if ($(elem).is(":checkbox")) {
-            if ($(elem).is(":checked")) {
-                value = 1;
-            } else {
-                value = 0;
-            }
+        if ($('#Show_Team_Score').is(":checked")) {
+            show_team_score = 1
         } else {
-            value = $(elem).val();
+            show_team_score = 0
         }
 
-        if (value !== "") {
-            var html_parents = $(elem).parents();
-            var attrs_list = [];
-            $.each($(html_parents), function (j, parent) {
-                var fb_data = $(parent).attr("fb-data");
-                if (fb_data !== undefined) {
-                    attrs_list.unshift(fb_data)
-                }
+        if ($('#Show_Color').is(":checked")) {
+            show_color = 1
+        } else if ($('#Show_Color').is(":checkbox")) {
+            show_color = 0
+        }
 
-            });
-            attrs_list.push($(elem).attr("fb-data"))
-            var dbSelector = attrs_list.join('/')
-            var path_to_variable = `/match-${page_channel}/${dbSelector}`;
-            if (path_to_variable.includes('score') || path_to_variable.includes('active_set')) {
-                try {
-                    value = parseInt(value);
-                    // console.log(value, " converted to int");
-                } catch (error) {
-                    // console.log(value, " can't be converted to string");
+        // upload all data to firebase
+        const newData = {};
+        $.each($(elemList), function (i, elem) {
+            var value;
+
+            if ($(elem).is(":checkbox")) {
+                if ($(elem).is(":checked")) {
+                    value = 1;
+                } else {
+                    value = 0;
                 }
+            } else {
+                value = $(elem).val();
             }
-            newData[path_to_variable] = value;
-        }
-    });
 
-    console.log(newData);
+            if (value !== "") {
+                var html_parents = $(elem).parents();
+                var attrs_list = [];
+                $.each($(html_parents), function (j, parent) {
+                    var fb_data = $(parent).attr("fb-data");
+                    if (fb_data !== undefined) {
+                        attrs_list.unshift(fb_data)
+                    }
 
-    update(ref(db), newData)
-        .then(function () {
-            // console.log("User data updated successfully.");
-            update_set_visibilities_and_counter();
-            update_team_counter_visibility();
-            update_color_indicator_visibility();
-        })
-        .catch(function (error) {
-            console.error("Error updating user data:", error);
+                });
+                attrs_list.push($(elem).attr("fb-data"))
+                var dbSelector = attrs_list.join('/')
+                var path_to_variable = `/match-${page_channel}/${dbSelector}`;
+                if (path_to_variable.includes('score') || path_to_variable.includes('active_set')) {
+                    try {
+                        value = parseInt(value);
+                        // console.log(value, " converted to int");
+                    } catch (error) {
+                        // console.log(value, " can't be converted to string");
+                    }
+                }
+                newData[path_to_variable] = value;
+            }
         });
+
+        // console.log(newData);
+
+        update(ref(db), newData)
+            .then(function () {
+                // console.log("User data updated successfully.");
+                update_set_visibilities_and_counter();
+                update_team_counter_visibility();
+                update_color_indicator_visibility();
+            })
+            .catch(function (error) {
+                console.error("Error updating user data:", error);
+            });
+    }
 }
 
 
 // reload every data
 function reload() {
-    insert_live_data(page_channel, page_type);
+    insert_live_data(page_type);
     // apply all the special variables - with a bit delay so the database values are safely loaded
     setTimeout(function () {
         update_set_visibilities_and_counter();
         update_team_counter_visibility();
         update_color_indicator_visibility();
     }, 500)
+}
+
+
+function showToast(emoji, message, duration) {
+    // get the show duration set by a custom attribute in html for easier manipulation
+    // let showDuration = $banner.attr('show-duration');
+    // set the animation-duration of the cooldown ring to the show duration so that it shows how long the banner will stay
+    var showDuration = duration || 5000;
+    // console.log(emoji, message, showDuration);
+    $banner.find('.icon').html(emoji);
+    $banner.find('.progress-ring_circle').css('animation-duration', `${showDuration / 1000}s`);
+    $banner.find('p').html(message);
+    $banner.fadeIn(100);
+    // fade out banner after the set show duration it not already closed manually
+    setTimeout(function () {
+        $banner.fadeOut(100);
+    }, showDuration);
 }
