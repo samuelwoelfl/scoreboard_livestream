@@ -150,6 +150,8 @@ function initialize() {
 
 
 async function handleAuthentication() {
+    console.log("active session: " + active_session());
+
     $('.wrapper').hide();
     $('.settings-container').hide();
 
@@ -158,6 +160,7 @@ async function handleAuthentication() {
     $select.append($('<option></option>').val("").html("-- Please select --"));
     // insert users from db
     var users = await getUsers();
+    // get users from db
     $.each((users), function (name, data) {
         var username = data["display_name"];
         $select.append($('<option></option>').val(name).html(username));
@@ -165,36 +168,46 @@ async function handleAuthentication() {
     // show prepared auth
     $('#auth').show();
 
-    $('form#login').on('submit', function(e){
+    $('form#login').on('submit', function (e) {
         e.preventDefault();
         var username = $('#auth #account').val();
         var password = $('#auth #password').val();
-        try {
-            var db_password = users[username]["password"];
-            if (password == db_password) {
-                $('#auth').hide();
-                $('.wrapper').show();
-                $('.settings-container').show();
-                authenticated = 1;
-                auth_channels = users[username]["channels"].split(',');
-                showToast("✅", `Successfully logged in - you're account got the channels ${auth_channels} - you got redirected to channel ${page_channel}`)
-                console.log(username);
-                localStorage.setItem('username', username);
-                localStorage.setItem('password', password);
-                initialize();
-            } else {
-                showToast("❌", "The entered password is wrong");
-            }
-        } catch (error) {
-            showToast("🧍‍♂️", "You have to select a user")
+        login(username, password);
+    });
+}
+
+
+async function login(username, password) {
+    // get users from db
+    var users = await getUsers();
+    // try login
+    try {
+        var db_password = users[username]["password"];
+        if (password == db_password) {
+            $('#auth').hide();
+            $('.wrapper').show();
+            $('.settings-container').show();
+            authenticated = 1;
+            auth_channels = users[username]["channels"].split(',');
+            showToast("✅", `Successfully logged in - you're account got the channels ${auth_channels} - you got redirected to channel ${page_channel}`)
+            console.log("set usename:" + usename);
+            localStorage.setItem('username', username);
+            console.log("set password:" + password);
+            localStorage.setItem('password', password);
+            initialize();
+        } else {
+            showToast("❌", "The entered password is wrong");
         }
-     });
+    } catch (error) {
+        showToast("🧍‍♂️", "You have to select a user")
+    }
 }
 
 
 function active_session() {
-    localStorage.getItem(username);
-    return username
+    var username = localStorage.getItem("username");
+    var password = localStorage.getItem("password");
+    return username, password
 }
 
 
