@@ -2,6 +2,10 @@ html, body {
   background-color: #2B2E38;
 }
 
+body {
+  display: none;
+}
+
 .board {
   filter: drop-shadow(1px 3px 12px rgba(0, 0, 0, 0.50));
 }

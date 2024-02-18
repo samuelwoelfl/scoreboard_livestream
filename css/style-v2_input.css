@@ -2,6 +2,10 @@ html, body {
   background-color: #464646;
 }
 
+body {
+  display: none;
+}
+
 .wrapper {
   justify-content: flex-start;
 }

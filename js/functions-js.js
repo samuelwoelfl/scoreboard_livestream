@@ -20,12 +20,29 @@ var show_color = 1;
 var page_type, page_channel, matchRef;
 var authenticated = 0;
 var auth_channels;
-var $banner;
+var $banner, $logoutButton;
 
 
 $(document).ready(function () {
-    handleAuthentication();
+    $('#auth').hide();
+    $('body').css("display", "block")
+
+    // check if it's board or admin page
+    page_type = $('html').attr("type");
+
+    if (page_type == 'board') {
+        authenticated = 1;
+        auth_channels = Array.from({
+            length: 30
+        }, (_, i) => String(i + 1));
+        initialize();
+    } else {
+        handleAuthentication();
+    }
+
+
     $banner = $('.banner');
+    $logoutButton = $('button#logout');
 
     $('.banner_close_button').click(function () {
         $banner.fadeOut(100);
@@ -34,8 +51,6 @@ $(document).ready(function () {
 
 
 function initialize() {
-    // check if it's board or admin page
-    page_type = $('html').attr("type");
 
     // read URL params for channel selection
     var $channel_input = $("#channel");
@@ -43,9 +58,13 @@ function initialize() {
     var url_id = urlParams.get('channel');
 
     // change channel on first load
-    page_channel = url_id || 1;
+    console.log(url_id);
+    page_channel = url_id || auth_channels[0];
+    console.log(page_channel);
+    console.log(auth_channels);
     if (!auth_channels.includes(page_channel)) {
         page_channel = auth_channels[0];
+        console.log(page_channel);
         showToast("🎚️", `The selected channel is not available for your account - you got redirecte to channel ${page_channel}`)
     }
     // set authenticated channels in selector
@@ -146,42 +165,59 @@ function initialize() {
             upload_local_data();
         }
     });
+
+    // logout button
+    $('#logout').click(function () {
+        localStorage.clear();
+        location.reload();
+    })
 }
 
 
 async function handleAuthentication() {
-    console.log("active session: " + active_session());
+    // console.log("active session: " + active_session());
 
     $('.wrapper').hide();
     $('.settings-container').hide();
 
-    // prepare select
-    var $select = $('select#account');
-    $select.append($('<option></option>').val("").html("-- Please select --"));
-    // insert users from db
-    var users = await getUsers();
-    // get users from db
-    $.each((users), function (name, data) {
-        var username = data["display_name"];
-        $select.append($('<option></option>').val(name).html(username));
-    });
-    // show prepared auth
-    $('#auth').show();
+    await login(active_session()[0], active_session()[1], true);
 
-    $('form#login').on('submit', function (e) {
-        e.preventDefault();
-        var username = $('#auth #account').val();
-        var password = $('#auth #password').val();
-        login(username, password);
-    });
+    // console.log(authenticated);
+
+    if (authenticated == 0) {
+        // prepare select
+        var $select = $('select#account');
+        $select.append($('<option></option>').val("").html("-- Please select --"));
+        // insert users from db
+        var users = await getUsers();
+        // get users from db
+        $.each((users), function (name, data) {
+            var username = data["display_name"];
+            $select.append($('<option></option>').val(name).html(username));
+        });
+        // show prepared auth
+        $('#auth').show();
+
+        $('form#login').on('submit', function (e) {
+            e.preventDefault();
+            var username = $('#auth #account').val();
+            var password = $('#auth #password').val();
+            login(username, password);
+        });
+    }
 }
 
 
-async function login(username, password) {
+async function login(username, password, mute) {
     // get users from db
     var users = await getUsers();
+    // console.log(users, username);
     // try login
-    try {
+    if (username == null || username == "") {
+        if (!mute) {
+            showToast("🧍‍♂️", "You have to select a user")
+        }
+    } else {
         var db_password = users[username]["password"];
         if (password == db_password) {
             $('#auth').hide();
@@ -189,17 +225,18 @@ async function login(username, password) {
             $('.settings-container').show();
             authenticated = 1;
             auth_channels = users[username]["channels"].split(',');
-            showToast("✅", `Successfully logged in - you're account got the channels ${auth_channels} - you got redirected to channel ${page_channel}`)
-            console.log("set usename:" + usename);
-            localStorage.setItem('username', username);
-            console.log("set password:" + password);
-            localStorage.setItem('password', password);
+            $logoutButton.html(`${users[username]["display_name"]} - Logout`);
+
             initialize();
+
+            if (!mute) {
+                showToast("✅", `Successfully logged in - you're account got the channels ${auth_channels} - you got redirected to channel ${page_channel}`)
+            }
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
         } else {
             showToast("❌", "The entered password is wrong");
         }
-    } catch (error) {
-        showToast("🧍‍♂️", "You have to select a user")
     }
 }
 
@@ -207,7 +244,7 @@ async function login(username, password) {
 function active_session() {
     var username = localStorage.getItem("username");
     var password = localStorage.getItem("password");
-    return username, password
+    return [username, password]
 }
 
 
@@ -286,7 +323,7 @@ function getPathsAndValues(obj, currentPath = []) {
 
 // function that inserts the data from the database in the html
 async function insert_live_data(type) {
-    // console.log("inserting live data for ", type, " and channel ", page_channel);
+    console.log("inserting live data for ", type, " and channel ", page_channel);
 
     // receive data from firebase
     var data = await getData();
@@ -544,17 +581,19 @@ function reload() {
 
 
 function showToast(emoji, message, duration) {
-    // get the show duration set by a custom attribute in html for easier manipulation
-    // let showDuration = $banner.attr('show-duration');
-    // set the animation-duration of the cooldown ring to the show duration so that it shows how long the banner will stay
-    var showDuration = duration || 5000;
-    // console.log(emoji, message, showDuration);
-    $banner.find('.icon').html(emoji);
-    $banner.find('.progress-ring_circle').css('animation-duration', `${showDuration / 1000}s`);
-    $banner.find('p').html(message);
-    $banner.fadeIn(100);
-    // fade out banner after the set show duration it not already closed manually
-    setTimeout(function () {
-        $banner.fadeOut(100);
-    }, showDuration);
+    try {
+        // set the animation-duration of the cooldown ring to the show duration so that it shows how long the banner will stay
+        var showDuration = duration || 5000;
+        // console.log(emoji, message, showDuration);
+        $banner.find('.icon').html(emoji);
+        $banner.find('.progress-ring_circle').css('animation-duration', `${showDuration / 1000}s`);
+        $banner.find('p').html(message);
+        $banner.fadeIn(100);
+        // fade out banner after the set show duration it not already closed manually
+        setTimeout(function () {
+            $banner.fadeOut(100);
+        }, showDuration);
+    } catch (error) {
+        console.log("Banner shown: " + message);
+    }
 }
