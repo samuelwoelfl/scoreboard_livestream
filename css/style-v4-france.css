@@ -8,12 +8,12 @@
 }
 
 :root {
-  --blue: rgba(48, 94, 212, 0.8);
+  --blue: #597EE0;
   --red: #F80000;
-  --white: rgba(48, 94, 212, 0.2);
+  --white: #D7DFF7;
   --text-primary: #000000;
-  --light-red: rgba(248, 0, 0, 0.4);
-  --red-1: rgba(197, 81, 81, 0.2);
+  --light-red: #FF9798;
+  --red-1: #D0C2D8;
 }
 
 .wrapper {
@@ -23,6 +23,7 @@
   align-items: center;
   gap: 10px;
   margin: 20px 20px 0px 20px;
+  opacity: 0.98;
 }
 
 .board {
@@ -50,16 +51,23 @@
   overflow: hidden;
 }
 
+.top .content .text, .bottom .content .text {
+  height:100%
+}
+
 .top .content {
   background-color: var(--blue);
-  border-radius: 8px 8px 0px 0px;
+  border-radius: 5px 5px 0px 0px;
+  box-shadow: inset 0px -10px 10px -10px rgba(0, 0, 0, 0.4);
 }
 
 .bottom .content {
   background-color: var(--light-red);
-  border-radius: 0px 0px 8px 8px;
+  border-radius: 0px 0px 5px 5px;
   flex-direction: row;
   gap: 8px;
+  margin-top: 2px;
+  box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .teamname, .text {
@@ -92,7 +100,7 @@
   justify-content: flex-start;
   padding: 8px 10px 8px 16px;
   background-color: var(--white);
-  border-radius: 0px 8px 8px 0px;
+  border-radius: 0px 5px 5px 0px;
   margin-top: -1px;
   margin-bottom: -1px;
 }
@@ -217,7 +225,7 @@
   margin-top: -42px;
   padding: 8px 9px 6px 9px;
   background-color: var(--red);
-  border-radius: 8px 8px 0px 0px;
+  border-radius: 5px 5px 0px 0px;
 }
 
 .team_score {
