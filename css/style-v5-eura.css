@@ -8,12 +8,12 @@
 }
 
 :root {
-  --blue: #597EE0;
-  --red: #F80000;
-  --white: #D7DFF7;
+  --blue: #2f2d2d;
+  --red: #c7d222;
+  --white: #f9f9f9;
   --text-primary: #000000;
-  --light-red: #FF9798;
-  --red-1: #D0C2D8;
+  --light-red: #d6d32f;
+  --red-1: #dbdaaf;
 }
 
 .wrapper {
@@ -51,8 +51,13 @@
   overflow: hidden;
 }
 
-.top .content .text, .bottom .content .text {
+.top .content .text, .content .text {
+  color:#f9f9f9;
   height:100%
+}
+
+.bottom{
+  color: #2f2d2d
 }
 
 .top .content {
