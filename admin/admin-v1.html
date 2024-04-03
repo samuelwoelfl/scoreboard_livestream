@@ -66,14 +66,22 @@
                     <div class="team" fb-data="team_a">
                         <input type="color" class="color-indicator" id="A_Color" database-variable
                             fb-data="color"></input>
-                        <input type="text" class="teamname" id="A_Teamname" value="A Teamname" database-variable
+                        <div class="name">
+                            <input type="text" class="teamname" id="A_Teamname" value="A Teamname" database-variable
                             fb-data="name"></input>
+                        <input type="text" class="players" id="A_Players" value="A Players" database-variable
+                            fb-data="player_names"></input>
+                        </div>
                     </div>
                     <div class="team" fb-data="team_b">
                         <input type="color" class="color-indicator" id="B_Color" database-variable
                             fb-data="color"></input>
-                        <input type="text" class="teamname" id="B_Teamname" value="B Teamname" database-variable
+                        <div class="name">
+                            <input type="text" class="teamname" id="B_Teamname" value="B Teamname" database-variable
                             fb-data="name"></input>
+                        <input type="text" class="players" id="B_Players" value="B Players" database-variable
+                            fb-data="player_names"></input>
+                        </div>
                     </div>
                 </div>
                 <div class="scores" fb-data="score">
@@ -197,7 +205,12 @@
             </div>
 
             <div class="setting_entry group_container">
-                <span>Liga (tbd):</span>
+                <span>Spielernamen:</span>
+                <input type="checkbox" id="Show_Players" database-variable fb-data="show_player_names">
+            </div>
+
+            <div class="setting_entry group_container">
+                <span>Liga:</span>
                 <input type="checkbox" id="Show_Team_Score" database-variable fb-data="show_group_score">
             </div>
 

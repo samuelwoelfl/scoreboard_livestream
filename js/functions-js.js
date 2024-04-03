@@ -17,6 +17,7 @@ var usersRef = ref(db, 'users');
 var active_set = 1;
 var show_team_score = 0;
 var show_color = 1;
+var show_player_names = 1;
 var page_type, page_channel, matchRef;
 var authenticated = 0;
 var auth_channels;
@@ -90,6 +91,7 @@ function initialize() {
             update_set_visibilities_and_counter();
             update_team_counter_visibility();
             update_color_indicator_visibility();
+            update_player_names_visibility();
         }, 250); // request every 1/4 seconds
     }
 
@@ -358,9 +360,12 @@ async function insert_live_data(type) {
             show_color = value;
         } else if (cssSelector.includes('show_group_score')) {
             show_team_score = value;
+        } else if (cssSelector.includes('show_player_names')) {
+            show_player_names = value;
         } else {
             if (type == "board") {
                 if (cssSelector.includes('color')) {
+                    console.log($elem);
                     $('html').css("--" + team.toUpperCase() + "_Color", value)
                     // add "light" class if color is light to preserve readabiltiy
                     if (getColorBrightness(rgb2hex(value)) >= 230) {
@@ -486,6 +491,19 @@ function update_color_indicator_visibility() {
     }
 }
 
+// helper function to update if the player names colors get shown
+function update_player_names_visibility() {
+    if (show_player_names == 1) {
+        $('body').attr('players', 'show');
+        $('.players').show();
+        $('#Show_Players').prop("checked", true);
+    } else if (show_player_names == 0) {
+        $('body').attr('players', 'hidden');
+        $('.players').hide();
+        $('#Show_Players').prop("checked", false);
+    }
+}
+
 
 // function that uploads all the local data to the database
 function upload_local_data(elemList) {
@@ -510,6 +528,12 @@ function upload_local_data(elemList) {
             show_color = 1
         } else if ($('#Show_Color').is(":checkbox")) {
             show_color = 0
+        }
+
+        if ($('#Show_Players').is(":checked")) {
+            show_player_names = 1
+        } else if ($('#Show_Players').is(":checkbox")) {
+            show_player_names = 0
         }
 
         // upload all data to firebase
@@ -560,6 +584,7 @@ function upload_local_data(elemList) {
                 update_set_visibilities_and_counter();
                 update_team_counter_visibility();
                 update_color_indicator_visibility();
+                update_player_names_visibility();
             })
             .catch(function (error) {
                 console.error("Error updating user data:", error);
@@ -576,6 +601,7 @@ function reload() {
         update_set_visibilities_and_counter();
         update_team_counter_visibility();
         update_color_indicator_visibility();
+        update_player_names_visibility();
     }, 500)
 }
 

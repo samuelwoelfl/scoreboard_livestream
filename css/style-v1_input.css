@@ -222,15 +222,17 @@ button:active {
   display: flex;
   flex-direction: row;
   gap: 4px;
+  flex-grow: 1;
 }
 
 .button.add {
   background-color: #04b904;
+  height: 100%;
 }
 
 .button.remove {
   background-color: var(--red);
-  transition: .1s ease;
+  height: 100%;
 }
 
 .button.neutral {
