@@ -365,13 +365,24 @@ async function insert_live_data(type) {
         } else {
             if (type == "board") {
                 if (cssSelector.includes('color')) {
-                    console.log($elem);
+                    var $team_div = $elem.closest(".team");
+                    var brightness = getColorBrightness(rgb2hex(value));
+
+                    if (brightness <= 23) {
+                        value = "#222222";
+                    }
                     $('html').css("--" + team.toUpperCase() + "_Color", value)
                     // add "light" class if color is light to preserve readabiltiy
-                    if (getColorBrightness(rgb2hex(value)) >= 230) {
+                    
+                    if (brightness >= 230) {
                         $elem.addClass('light');
+                        $team_div.addClass('light');
+                    } else if (brightness >= 150) {
+                        $elem.removeClass('light');
+                        $team_div.addClass('light');
                     } else {
                         $elem.removeClass('light');
+                        $team_div.removeClass('light');
                     }
                 } else if (cssSelector.includes(`set_${active_set}`)) {
                     $elem.text(value);
