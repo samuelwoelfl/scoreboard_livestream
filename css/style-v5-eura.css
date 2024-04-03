@@ -64,8 +64,8 @@
 .top .content {
   background-color: var(--blue);
   border-radius: 0;
-  gap: 8px
-  /* box-shadow: inset 0px -10px 10px -10px rgba(0, 0, 0, 0.4); */
+  gap: 8px;
+  box-shadow: inset 0px -10px 10px -10px rgba(0, 0, 0, 1);
 }
 
 .bottom .content {
@@ -74,7 +74,7 @@
   flex-direction: row;
   gap: 8px;
   margin-top: 2px;
-  /* box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.3); */
+  box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .teamname, .text {
