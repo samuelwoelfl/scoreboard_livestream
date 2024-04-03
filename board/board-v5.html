@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" type="board">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboards</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="../js/firebase_config.js"></script>
+    <script type="module" src="../js/functions-js.js"></script>
+
+    <link rel="stylesheet" href="../css/style-v5.css">
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="board">
+            <div class="top">
+                <div class="content">
+                    <img src="../img/1drb.svg" alt="">
+                    <p class="text" fb-data="tournament_name">Occasion</p>
+                </div>
+            </div>
+            <div class="center">
+                <div class="teams" fb-data="teams_info">
+                    <div class="team" fb-data="team_a">
+                        <div class="color-indicator" id="A_Color" fb-data="color"></div>
+                        <div class="name">
+                            <p class="teamname" fb-data="name">A Teamname</p>
+                            <p class="players text" id="A_Players" fb-data="player_names">N. Alt & D. Ameziane</p>
+                        </div>
+                    </div>
+                    <div class="team" fb-data="team_b">
+                        <div class="color-indicator" id="B_Color" fb-data="color"></div>
+                        <div class="name">
+                            <p class="teamname" fb-data="name">B Teamname</p>
+                            <p class="players text" id="B_Players" fb-data="player_names">N. Alt & D. Ameziane</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scores" fb-data="score">
+
+                    <div class="group_score" fb-data="squad_score">
+                        <div class="group-indicator">
+                            <svg width="18" height="18" viewBox="0 0 24 21" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M12 12C13.0609 12 14.0783 11.5786 14.8284 10.8284C15.5786 10.0783 16 9.06087 16 8C16 6.93913 15.5786 5.92172 14.8284 5.17157C14.0783 4.42143 13.0609 4 12 4C10.9391 4 9.92172 4.42143 9.17157 5.17157C8.42143 5.92172 8 6.93913 8 8C8 9.06087 8.42143 10.0783 9.17157 10.8284C9.92172 11.5786 10.9391 12 12 12ZM12 12C10.4087 12 8.88258 12.6321 7.75736 13.7574C6.63214 14.8826 6 16.4087 6 18V21M12 12C13.5913 12 15.1174 12.6321 16.2426 13.7574C17.3679 14.8826 18 16.4087 18 18V21M13 4C13.404 2.336 15.015 1 17 1C19.172 1 20.98 2.79 21 5C20.98 7.21 19.172 9 17 9M17 9H16M17 9C20.288 9 23 11.686 23 15V17M11 4C10.596 2.336 8.985 1 7 1C4.828 1 3.02 2.79 3 5C3.02 7.21 4.828 9 7 9M7 9H8M7 9C3.712 9 1 11.686 1 15V17"
+                                    stroke="white" stroke-width="2" />
+                            </svg>
+                        </div>
+                        <div class="counter group">
+                            <p class="score" fb-data="team_a_score"></p>
+                        </div>
+                        <div class="counter group">
+                            <p class="score" fb-data="team_b_score"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="team_score">
+                        <div class="set active" fb-data="set_1">
+                            <div class="counter a_team">
+                                <p class="score" fb-data="team_a_score"></p>
+                            </div>
+                            <div class="counter b_team">
+                                <p class="score" fb-data="team_b_score"></p>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_2">
+                            <div class="counter a_team">
+                                <p class="score" fb-data="team_a_score"></p>
+                            </div>
+                            <div class="counter b_team">
+                                <p class="score" fb-data="team_b_score"></p>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_3">
+                            <div class="counter a_team">
+                                <p class="score" fb-data="team_a_score"></p>
+                            </div>
+                            <div class="counter b_team">
+                                <p class="score" fb-data="team_b_score"></p>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_4">
+                            <div class="counter a_team">
+                                <p class="score" fb-data="team_a_score"></p>
+                            </div>
+                            <div class="counter b_team">
+                                <p class="score" fb-data="team_b_score"></p>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_5">
+                            <div class="counter a_team">
+                                <p class="score" fb-data="team_a_score"></p>
+                            </div>
+                            <div class="counter b_team">
+                                <p class="score" fb-data="team_b_score"></p>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_6">
+                            <div class="counter a_team">
+                                <p class="score" fb-data="team_a_score"></p>
+                            </div>
+                            <div class="counter b_team">
+                                <p class="score" fb-data="team_b_score"></p>
+                            </div>
+                        </div>
+                        <div class="set" fb-data="set_7">
+                            <div class="counter a_team">
+                                <p class="score" fb-data="team_a_score"></p>
+                            </div>
+                            <div class="counter b_team">
+                                <p class="score" fb-data="team_b_score"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom">
+                <div class="content">
+                    <p class="text" id="Game" fb-data="phase">Game Name</p>
+                    <span class="divider"></span>
+                    <p class="text" id="Mode" fb-data="format">Game Mode</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</body>
+
+</html>
