@@ -11,7 +11,7 @@
 :root {
   --blue: #597EE0;
   --red: #F80000;
-  --white: #e9edfa;
+  --white: #ffffff;
   --text-primary: #000000;
   --light-red: #FF9798;
   --red-1: #D0C2D8;
@@ -109,7 +109,6 @@
 .center * {
   font-family: 'Oswald';
   /* text-transform: uppercase; */
-  font-weight: 400 !important;
 }
 
 .teams {
@@ -165,13 +164,13 @@
 
 .teams .team .teamname {
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 400;
   max-width: 100%;
 }
 
 .teams .team .players {
   font-size: 18px;
-  font-weight: 300;
+  font-weight: 400;
   opacity: .8;
   margin-top: 9px;
   margin-left: 10px
