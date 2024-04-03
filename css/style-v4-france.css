@@ -1,16 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Antonio:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap');
-
+/* @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap');
 
 * {
-  font-family: 'Barlow', sans-serif;
-  font-weight: 500;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 400;
 }
 
 :root {
   --blue: #597EE0;
   --red: #F80000;
-  --white: #D7DFF7;
+  --white: #e9edfa;
   --text-primary: #000000;
   --light-red: #FF9798;
   --red-1: #D0C2D8;
@@ -31,7 +32,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  filter: drop-shadow(1px 3px 20px rgba(48, 94, 212, 0.4));
+  filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.15));
 }
 
 .top, .bottom {
@@ -44,7 +45,7 @@
 }
 
 .top .content, .bottom .content {
-  padding: 6px 16px 8px 16px;
+  padding: 4px 16px 8px 16px;
   max-height: 100%;
   display: flex;
   max-width: 288px;
@@ -52,22 +53,22 @@
 }
 
 .top .content .text, .bottom .content .text {
-  height:100%
+  height: 100%;
 }
 
 .top .content {
   background-color: var(--blue);
-  border-radius: 5px 5px 0px 0px;
-  box-shadow: inset 0px -10px 10px -10px rgba(0, 0, 0, 0.4);
+  border-radius: 0px;
+  /* box-shadow: inset 0px -10px 10px -10px rgba(0, 0, 0, 0.4); */
 }
 
 .bottom .content {
   background-color: var(--light-red);
-  border-radius: 0px 0px 5px 5px;
+  border-radius: 0px;
   flex-direction: row;
   gap: 8px;
   margin-top: 2px;
-  box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.3);
+  /* box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.3); */
 }
 
 .teamname, .text {
@@ -90,7 +91,7 @@
   height: 17px;
   width: 2px;
   background: #00000033;
-  margin-top: 2px;
+  margin-top: 5px;
 }
 
 .center {
@@ -100,13 +101,15 @@
   justify-content: flex-start;
   padding: 8px 10px 8px 16px;
   background-color: var(--white);
-  border-radius: 0px 5px 5px 0px;
+  border-radius: 0px;
   margin-top: -1px;
   margin-bottom: -1px;
 }
 
 .center * {
-  font-family: 'Antonio';
+  font-family: 'Oswald';
+  /* text-transform: uppercase; */
+  font-weight: 400 !important;
 }
 
 .teams {
@@ -137,7 +140,7 @@
 .teams .team .color-indicator {
   width: 6px;
   height: 77%;
-  border-radius: 2px;
+  border-radius: 0px;
   margin-top: 5px;
   background-color: var(--text-primary);
   border: 0px;
@@ -170,8 +173,8 @@
   font-size: 18px;
   font-weight: 300;
   opacity: .8;
-  margin-top: 12px;
-  margin-left:10px
+  margin-top: 9px;
+  margin-left: 10px
 }
 
 .counter {
@@ -182,7 +185,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  border-radius: 4px;
+  border-radius: 0px;
   padding-bottom: 4px;
 }
 
@@ -197,7 +200,7 @@
 }
 
 .active .counter {
-  border: 2px solid var(--blue);
+  border: 2px solid var(--red);
 }
 
 .scores {
@@ -225,7 +228,7 @@
   margin-top: -42px;
   padding: 8px 9px 6px 9px;
   background-color: var(--red);
-  border-radius: 5px 5px 0px 0px;
+  border-radius: 0px;
 }
 
 .team_score {
