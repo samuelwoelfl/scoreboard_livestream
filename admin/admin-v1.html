@@ -20,14 +20,16 @@
 
     <div id="auth">
         <div class="content">
-            <h3>Please Login</h3>
-            <form id="login">
-                <label for="account">Account</label>
-                <select name="account" id="account"></select>
-                <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Passwort">
-                <button id="submit" type="submit">Login</button>
-            </form>
+            <div class="inner">
+                <h3>Please Login</h3>
+                <form id="login">
+                    <label for="account">Username</label>
+                    <input type="text" name="username" id="username" placeholder="Username">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" placeholder="Passwort">
+                    <button id="submit" type="submit">Login</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -45,16 +47,15 @@
         </svg>
     </div>
 
-    <div class="wrapper">
+    <div class="wrapper" id="scoreboard">
         <div class="board">
             <div class="top">
                 <div class="content">
-                    <input type="text" class="text" id="Occasion" value="Occasion" database-variable
-                        fb-data="tournament_name"></input>
+                    <input type="text" class="text" id="Occasion" value="Occasion" fb-data="tournament_name"></input>
                 </div>
                 <div class="set_counter_container">
                     <span>Satz:</span>
-                    <input type="number" id="Set_Count" min="1" max="7" database-variable fb-data="active_set">
+                    <input type="number" id="Set_Count" min="1" max="7" fb-data="active_set">
                 </div>
                 <div class="set_controls_container">
                     <button class="button neutral" change="+1">+1</button>
@@ -62,128 +63,112 @@
                 </div>
             </div>
             <div class="center">
-                <div class="teams" fb-data="teams_info">
-                    <div class="team" fb-data="team_a">
-                        <input type="color" class="color-indicator" id="A_Color" database-variable
-                            fb-data="color"></input>
+                <div class="teams">
+                    <div class="team">
+                        <input type="color" class="color-indicator" id="A_Color" fb-data="teams_info.team_a.color"></input>
                         <div class="name">
-                            <input type="text" class="teamname" id="A_Teamname" value="A Teamname" database-variable
-                            fb-data="name"></input>
-                        <input type="text" class="players" id="A_Players" value="A Players" database-variable
-                            fb-data="player_names"></input>
+                            <input type="text" class="teamname" id="A_Teamname" value="A Teamname"
+                                fb-data="teams_info.team_a.name"></input>
+                            <input type="text" class="players" id="A_Players" value="A Players"
+                                fb-data="teams_info.team_a.player_names"></input>
                         </div>
                     </div>
-                    <div class="team" fb-data="team_b">
-                        <input type="color" class="color-indicator" id="B_Color" database-variable
-                            fb-data="color"></input>
+                    <div class="team">
+                        <input type="color" class="color-indicator" id="B_Color" fb-data="teams_info.team_b.color"></input>
                         <div class="name">
-                            <input type="text" class="teamname" id="B_Teamname" value="B Teamname" database-variable
-                            fb-data="name"></input>
-                        <input type="text" class="players" id="B_Players" value="B Players" database-variable
-                            fb-data="player_names"></input>
+                            <input type="text" class="teamname" id="B_Teamname" value="B Teamname"
+                                fb-data="teams_info.team_b.name"></input>
+                            <input type="text" class="players" id="B_Players" value="B Players"
+                                fb-data="teams_info.team_b.player_names"></input>
                         </div>
                     </div>
                 </div>
-                <div class="scores" fb-data="score">
-                    <div class="group_score" fb-data="squad_score">
+                <div class="scores">
+                    <div class="group_score">
                         <div class="counter group">
-                            <input type="number" class="score" id="A_Score_Team" value="0" database-variable
-                                fb-data="team_a_score"></input>
+                            <input type="number" class="score" id="A_Score_Team" value="0"
+                                fb-data="score.squad_score.team_a_score"></input>
                         </div>
                         <div class="counter group">
-                            <input type="number" class="score" id="B_Score_Team" value="0" database-variable
-                                fb-data="team_b_score"></input>
+                            <input type="number" class="score" id="B_Score_Team" value="0"
+                                fb-data="score.squad_score.team_b_score"></input>
                         </div>
                     </div>
                     <div class="team_score">
-                        <div class="set active" fb-data="set_1">
+                        <div class="set active">
                             <div class="counter a_team">
-                                <input type="number" class="score" id="A_Score_1" value="0" database-variable
-                                    fb-data="team_a_score"></input>
+                                <input type="number" class="score" id="A_Score_1" value="0" fb-data="score.set_1.team_a_score">
                             </div>
                             <div class="counter b_team">
-                                <input type="number" class="score" id="B_Score_1" value="0" database-variable
-                                    fb-data="team_b_score"></input>
+                                <input type="number" class="score" id="B_Score_1" value="0" fb-data="score.set_1.team_b_score">
                             </div>
                         </div>
-                        <div class="set" fb-data="set_2">
+                        <div class="set">
                             <div class="counter a_team">
-                                <input type="number" class="score" id="A_Score_1" value="0" database-variable
-                                    fb-data="team_a_score"></input>
+                                <input type="number" class="score" id="A_Score_2" value="0" fb-data="score.set_2.team_a_score">
                             </div>
                             <div class="counter b_team">
-                                <input type="number" class="score" id="B_Score_1" value="0" database-variable
-                                    fb-data="team_b_score"></input>
+                                <input type="number" class="score" id="B_Score_2" value="0" fb-data="score.set_2.team_b_score">
                             </div>
                         </div>
-                        <div class="set" fb-data="set_3">
+                        <div class="set">
                             <div class="counter a_team">
-                                <input type="number" class="score" id="A_Score_1" value="0" database-variable
-                                    fb-data="team_a_score"></input>
+                                <input type="number" class="score" id="A_Score_3" value="0" fb-data="score.set_3.team_a_score">
                             </div>
                             <div class="counter b_team">
-                                <input type="number" class="score" id="B_Score_1" value="0" database-variable
-                                    fb-data="team_b_score"></input>
+                                <input type="number" class="score" id="B_Score_3" value="0" fb-data="score.set_3.team_b_score">
                             </div>
                         </div>
-                        <div class="set" fb-data="set_4">
+                        <div class="set">
                             <div class="counter a_team">
-                                <input type="number" class="score" id="A_Score_1" value="0" database-variable
-                                    fb-data="team_a_score"></input>
+                                <input type="number" class="score" id="A_Score_4" value="0" fb-data="score.set_4.team_a_score">
                             </div>
                             <div class="counter b_team">
-                                <input type="number" class="score" id="B_Score_1" value="0" database-variable
-                                    fb-data="team_b_score"></input>
+                                <input type="number" class="score" id="B_Score_4" value="0" fb-data="score.set_4.team_b_score">
                             </div>
                         </div>
-                        <div class="set" fb-data="set_5">
+                        <div class="set">
                             <div class="counter a_team">
-                                <input type="number" class="score" id="A_Score_1" value="0" database-variable
-                                    fb-data="team_a_score"></input>
+                                <input type="number" class="score" id="A_Score_5" value="0" fb-data="score.set_5.team_a_score">
                             </div>
                             <div class="counter b_team">
-                                <input type="number" class="score" id="B_Score_1" value="0" database-variable
-                                    fb-data="team_b_score"></input>
+                                <input type="number" class="score" id="B_Score_5" value="0" fb-data="score.set_5.team_b_score">
                             </div>
                         </div>
-                        <div class="set" fb-data="set_6">
+                        <div class="set">
                             <div class="counter a_team">
-                                <input type="number" class="score" id="A_Score_1" value="0" database-variable
-                                    fb-data="team_a_score"></input>
+                                <input type="number" class="score" id="A_Score_6" value="0" fb-data="score.set_6.team_a_score">
                             </div>
                             <div class="counter b_team">
-                                <input type="number" class="score" id="B_Score_1" value="0" database-variable
-                                    fb-data="team_b_score"></input>
+                                <input type="number" class="score" id="B_Score_6" value="0" fb-data="score.set_6.team_b_score">
                             </div>
                         </div>
-                        <div class="set" fb-data="set_7">
+                        <div class="set">
                             <div class="counter a_team">
-                                <input type="number" class="score" id="A_Score_1" value="0" database-variable
-                                    fb-data="team_a_score"></input>
+                                <input type="number" class="score" id="A_Score_7" value="0" fb-data="score.set_7.team_a_score">
                             </div>
                             <div class="counter b_team">
-                                <input type="number" class="score" id="B_Score_1" value="0" database-variable
-                                    fb-data="team_b_score"></input>
+                                <input type="number" class="score" id="B_Score_7" value="0" fb-data="score.set_7.team_b_score">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="controls">
                     <div class="team_container">
-                        <button class="button add team_a" id="add_point_a" change="+1">+1</button>
-                        <button class="button remove team_a" id="remove_point_a" change="-1">-1</button>
+                        <button class="button add team_a" id="add_point_a" team="a" change="+1">+1</button>
+                        <button class="button remove team_a" id="remove_point_a" team="a" change="-1">-1</button>
                     </div>
                     <div class="team_container">
-                        <button class="button add team_b" id="add_point_b" change="+1">+1</button>
-                        <button class="button remove team_b" id="remove_point_b" change="-1">-1</button>
+                        <button class="button add team_b" id="add_point_b" team="b" change="+1">+1</button>
+                        <button class="button remove team_b" id="remove_point_b" team="b" change="-1">-1</button>
                     </div>
                 </div>
             </div>
             <div class="bottom">
                 <div class="content">
-                    <input type="text" class="text" id="Game" value="" database-variable fb-data="phase"></input>
+                    <input type="text" class="text" id="Game" value="" fb-data="phase"></input>
                     <span class="divider"></span>
-                    <input type="text" class="text" id="Mode" value="" database-variable fb-data="format"></input>
+                    <input type="text" class="text" id="Mode" value="" fb-data="format"></input>
                 </div>
                 <button id="reset_scores">Reset Scores</button>
             </div>
@@ -191,7 +176,7 @@
 
     </div>
 
-    <div class="settings-container" fb-data="admin_settings">
+    <div class="settings-container" fb-data="">
         <h3>Settings</h3>
         <div class="settings">
 
@@ -201,17 +186,17 @@
 
             <div class="setting_entry color_container">
                 <span>Farben:</span>
-                <input type="checkbox" id="Show_Color" database-variable checked fb-data="show_color">
+                <input type="checkbox" id="Show_Color" checked fb-data="admin_settings.show_color">
             </div>
 
             <div class="setting_entry group_container">
                 <span>Spielernamen:</span>
-                <input type="checkbox" id="Show_Players" database-variable fb-data="show_player_names">
+                <input type="checkbox" id="Show_Players" fb-data="admin_settings.show_player_names">
             </div>
 
             <div class="setting_entry group_container">
                 <span>Liga:</span>
-                <input type="checkbox" id="Show_Team_Score" database-variable fb-data="show_group_score">
+                <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_group_score">
             </div>
 
             <div class="setting_entry color_container">
