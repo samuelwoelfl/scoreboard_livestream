@@ -11,26 +11,40 @@ html, body {
 }
 
 #auth {
-  width: 95%;
-  max-width: 400px;
-  padding: 24px;
-  margin: 35vh auto; 
-  margin-top: calc(50vh - (350px / 2));
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 2px 2px 30px 0px #00000055;
+  display: none;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+#auth .content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: #111111ee;
 }
 
 #auth * {
   color: #111111;
 }
 
-#auth .content {
+#auth .inner {
   display: flex;
   flex-direction: column;
+  width: 95%;
+  max-width: 400px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 2px 2px 30px 0px #00000055;
 }
 
-#auth .content form {
+#auth .inner form {
   display: flex;
   flex-direction: column;
 }
@@ -39,7 +53,7 @@ html, body {
   margin-bottom: 24px;
 }
 
-#auth > * {
+#auth .inner > * {
   width: 100%;
 }
 

@@ -2,16 +2,9 @@ html, body {
   background-color: #2B2E38;
 }
 
-body {
-  display: none;
-}
-
 .board {
-  filter: drop-shadow(1px 3px 12px rgba(0, 0, 0, 0.50));
-}
-
-.wrapper {
   margin: 15px 15px 0px 15px;
+  filter: drop-shadow(1px 3px 12px rgba(0, 0, 0, 0.50));
 }
 
 .top {
@@ -41,7 +34,6 @@ input:not([type='color']) {
   border-radius: 4px;
   padding: 0px 0px 3px 7px;
   border: none;
-  /* box-shadow: inset 0px 0px 0px 1px #00000011; */
 }
 
 .top .content input {
