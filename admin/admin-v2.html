@@ -20,14 +20,16 @@
 
     <div id="auth">
         <div class="content">
-            <h3>Please Login</h3>
-            <form id="login">
-                <label for="account">Account</label>
-                <select name="account" id="account"></select>
-                <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Passwort">
-                <button id="submit" type="submit">Login</button>
-            </form>
+            <div class="inner">
+                <h3>Please Login</h3>
+                <form id="login">
+                    <label for="account">Username</label>
+                    <input type="text" name="username" id="username" placeholder="Username">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" placeholder="Passwort">
+                    <button id="submit" type="submit">Login</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -45,7 +47,7 @@
         </svg>
     </div>
 
-    <div class="wrapper">
+    <div class="wrapper" id="scoreboard">
         <div class="board">
 
             <div class="top">
