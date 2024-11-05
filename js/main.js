@@ -149,20 +149,19 @@ async function handleAuthentication(scoreboard) {
 }
 
 
-async function signUp(username, email, password) {
-    const users = await getUsers();
-    if (users && users[username]) {
+async function signUp(email, password) {
+    var users = await getUsers();
+    if (users && users[email]) {
         showToast("❌", "Username already exists");
         return null;
     }
 
     try {
-        await set(ref(db, `users/${username}`), {
+        await set(ref(db, `users/${email}`), {
             email: email,
             password: password // Speichern des Passworts (nicht gehasht)
         });
-        console.log(`User ${username} registered with email ${email}.`);
-        return new User(username, email);
+        console.log(`User ${email} registered.`);
     } catch (error) {
         console.error("Error during registration:", error);
         showToast("⚠️", "Registration failed: " + error.message);
