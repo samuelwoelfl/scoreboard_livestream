@@ -185,8 +185,8 @@
   font-size: 18px;
   font-weight: 400;
   opacity: .8;
-  margin-top: 9px;
-  margin-left:10px
+  /* margin-top: 9px;
+  margin-left:10px */
 }
 
 .counter {
