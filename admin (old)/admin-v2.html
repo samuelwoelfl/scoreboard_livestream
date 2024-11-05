@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" type="admin">
+<html lang="en" type="input">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scoreboards</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/base.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="module" src="../js/firebase_config.js"></script>
-    <script type="module" src="../js/functions-js.js"></script>
+    <script type="module" src="../js/main.js"></script>
 
     <link rel="stylesheet" href="../css/style-v2.css">
     <link rel="stylesheet" href="../css/style-v2_input.css">
@@ -72,7 +72,7 @@
                         <div class="container">
                             <input type="text" class="players" id="A_Players" value="A Players" database-variable
                                 fb-data="player_names"></input>
-                            <input type="color" class="color-indicator" id="A_Color" database-variable
+                            <input type="color" class="color-indicator a_color" database-variable
                                 fb-data="color"></input>
                         </div>
 
@@ -83,7 +83,7 @@
                         <div class="container">
                             <input type="text" class="players" id="B_Players" value="B Players" database-variable
                                 fb-data="player_names"></input>
-                            <input type="color" class="color-indicator" id="B_Color" database-variable
+                            <input type="color" class="color-indicator b_color" database-variable
                                 fb-data="color"></input>
                         </div>
                     </div>

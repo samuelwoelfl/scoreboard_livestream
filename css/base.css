@@ -66,6 +66,9 @@ html, body {
   background-color: #ffffff;
   border: 2px solid #cccccc; 
   border-radius: 4px;
+}
+
+#auth input {
   margin-bottom: 20px;
 }
 

@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" type="board">
+<html lang="en" type="output">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scoreboards</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/base.css">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script type="module" src="../js/firebase_config.js"></script>
+    <script type="module" src="js/firebase_config.js"></script>
 
-    <link rel="stylesheet" href="../css/style-v1.css">
+    <link rel="stylesheet" href="css/style-v1.css">
 
 </head>
 
 <body>
 
-    <div class="wrapper" id="scoreboard">
+    <div class="wrapper scoreboard" theme="vertical_score">
         <div class="board">
             <div class="top">
                 <div class="content">
@@ -29,17 +29,19 @@
             <div class="center">
                 <div class="teams">
                     <div class="team">
-                        <div class="color-indicator" id="A_Color"></div>
+                        <div class="color-indicator" fb-data="teams_info.team_a.color"></div>
                         <div class="name">
                             <p class="teamname" fb-data="teams_info.team_a.name">A Teamname</p>
-                            <p class="players text" id="A_Players" fb-data="teams_info.team_a.player_names">A Player Names</p>
+                            <p class="players text" fb-data="teams_info.team_a.player_names">A Player
+                                Names</p>
                         </div>
                     </div>
                     <div class="team">
-                        <div class="color-indicator" id="B_Color" fb-data="teams_info.team_b.color"></div>
+                        <div class="color-indicator" fb-data="teams_info.team_b.color"></div>
                         <div class="name">
                             <p class="teamname" fb-data="teams_info.team_b.name">B Teamname</p>
-                            <p class="players text" id="B_Players" fb-data="teams_info.team_b.player_names">B Player Names</p>
+                            <p class="players text" id="B_Players" fb-data="teams_info.team_b.player_names">B Player
+                                Names</p>
                         </div>
                     </div>
                 </div>
@@ -62,7 +64,7 @@
                             <p class="score" fb-data="score.squad_score.team_b_score"></p>
                         </div>
                     </div>
-                    
+
                     <div class="team_score">
                         <div class="set active">
                             <div class="counter a_team">
@@ -134,7 +136,114 @@
     </div>
 
 
-    <script type="module" src="../js/functions-js.js"></script>
+
+
+
+    <div class="wrapper scoreboard" theme="horizontal_score">
+        <div class="board">
+
+            <div class="top">
+
+                <div class="team left">
+                    <div class="score">
+                        <p class="a_score_active"></p>
+                    </div>
+                    <div class="name">
+                        <div class="content">
+                            <p class="teamname text" fb-data="teams_info.team_a.name">A Teamname</p>
+                            <p class="players text" fb-data="teams_info.team_a.player_names">N. Alt & D. Ameziane</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game">
+                    <p class="text" fb-data="phase">Game Name</p>
+                    <div class="sets_counter">
+                        <span class="a_sets_won">0</span>
+                        <span>:</span>
+                        <span class="b_sets_won">0</span>
+                    </div>
+                </div>
+
+                <div class="team right">
+                    <div class="name">
+                        <div class="content">
+                            <p class="teamname text" fb-data="teams_info.team_b.name">A Teamname</p>
+                            <p class="players text" fb-data="teams_info.team_b.player_names">N. Alt & D. Ameziane</p>
+                        </div>
+                    </div>
+                    <div class="score">
+                        <p class="b_score_active"></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bottom">
+                <div class="content">
+                    <p class="text" id="Occasion" fb-data="tournament_name">Occasion</p>
+                    <span class="divider"></span>
+                    <p class="text" id="Mode" fb-data="format">Game Mode</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+    <div class="wrapper scoreboard" theme="full">
+        <div class="board">
+            
+            <div class="top">
+                <div class="content">
+                    <p lang="de" class="text" fb-data="phase">Game</p>
+                    <span class="divider"></span>
+                    <p lang="de" class="text" fb-data="format">Mode</p>
+                </div>
+            </div>
+
+            <div class="bottom">
+
+                <div class="team team_a">
+                    <div class="name">
+                        <p lang="de" class="teamname text" id="A_Teamname" fb-data="teams_info.team_a.name">A Teamname</p>
+                        <div class="color-indicator" fb-data="teams_info.team_a.color"></div>
+                    </div>
+                    <div class="score">
+                        <div class="active_card">
+                            <p class="a_score_active">0</p>
+                        </div>
+                        <div class="sets_card">
+                            <span class="a_sets_won">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team team_b">
+                    <div class="name">
+                        <p lang="de" class="teamname text" id="B_Teamname" fb-data="teams_info.team_b.name">B Teamname</p>
+                        <div class="color-indicator" fb-data="teams_info.team_b.color"></div>
+                    </div>
+                    <div class="score">
+                        <div class="sets_card">
+                            <span class="b_sets_won">0</span>
+                        </div>
+                        <div class="active_card">
+                            <p lang="de" class="b_score_active">0</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <script type="module" src="js/main.js"></script>
 
 </body>
 

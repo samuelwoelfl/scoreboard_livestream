@@ -6,12 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scoreboards</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/base.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="module" src="../js/firebase_config.js"></script>
-    <script type="module" src="../js/functions-js.js"></script>
+    <script type="module" src="../js/main.js"></script>
 
-    <link rel="stylesheet" href="../css/style-v4-france.css">
+    <link rel="stylesheet" href="../css/style-v5-eura.css">
 
 </head>
 
@@ -21,18 +21,19 @@
         <div class="board">
             <div class="top">
                 <div class="content">
+                    <!-- <img src="../img/eura_logo.webp" alt=""> -->
                     <p class="text" fb-data="tournament_name">Occasion</p>
                 </div>
             </div>
             <div class="center">
                 <div class="teams" fb-data="teams_info">
                     <div class="team" fb-data="team_a">
-                        <div class="color-indicator" id="A_Color" fb-data="color"></div>
+                        <div class="color-indicator a_color" fb-data="color"></div>
                         <p class="teamname" fb-data="name">Sushis</p>
                         <p class="players text" id="A_Players" fb-data="player_names">R. Florinda & T. Jouve</p>
                     </div>
                     <div class="team" fb-data="team_b">
-                        <div class="color-indicator" id="B_Color" fb-data="color"></div>
+                        <div class="color-indicator b_color" fb-data="color"></div>
                         <p class="teamname" fb-data="name">Hors services</p>
                         <p class="players text" id="B_Players" fb-data="player_names">H. Lacombe & S. Caux</p>
                     </div>

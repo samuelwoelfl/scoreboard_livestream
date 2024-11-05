@@ -147,11 +147,11 @@
   margin-left: 0;
 }
 
-#A_Color {
+.a_color {
   background-color: var(--A_Color);
 }
 
-#B_Color {
+.b_color {
   background-color: var(--B_Color);
 }
 
