@@ -7,6 +7,14 @@ import { Scoreboard } from "./Scoreboard.js";
 
 
 export const themes = {
+    'full': {
+        'html_structure': 'full',
+        'css_path': 'css/style-v3.css'
+    },
+    'small': {
+        'html_structure': 'vertical_score',
+        'css_path': 'css/style-v5.css'
+    },
     'rg': {
         'html_structure': 'vertical_score',
         'css_path': 'css/style-v1.css'
@@ -15,9 +23,13 @@ export const themes = {
         'html_structure': 'horizontal_score',
         'css_path': 'css/style-v2.css'
     },
-    'full': {
-        'html_structure': 'full',
-        'css_path': 'css/style-v3.css'
+    'france': {
+        'html_structure': 'vertical_score',
+        'css_path': 'css/style-v4-france.css'
+    },
+    'eura': {
+        'html_structure': 'vertical_score',
+        'css_path': 'css/style-v5-eura.css'
     },
 }
 
