@@ -149,21 +149,6 @@
   margin-left: 0;
 }
 
-[fb-data*="team_a.color"] {
-  background-color: var(--A_Color) !important;
-}
-
-[fb-data*="team_b.color"] {
-  background-color: var(--B_Color) !important;
-}
-
-.teams .team .color-indicator.light {
-  border: 1px solid #bbbbbb;
-  box-sizing: content-box;
-  margin-left: -1px;
-  width: 5px;
-}
-
 .teams .team p {
   font-size: 30px;
   font-weight: 700;
