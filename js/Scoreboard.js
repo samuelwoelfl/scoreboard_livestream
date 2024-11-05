@@ -54,8 +54,6 @@ export class Scoreboard {
                 this.insertLiveData();
             }, 300);
         }
-
-
     }
 
     updateUI() {
@@ -67,10 +65,14 @@ export class Scoreboard {
         this.updatePlayerNames();
     }
 
-    setTheme(theme) {
-        console.log('set theme:', theme);
+    setTheme(theme) {        
+        // backup theme
+        if (!(theme in themes)) {
+            theme = 'full';
+        }
 
         // set corresponding css
+        
         var css_path = themes[theme]['css_path'];
         var extensionIndex = css_path.lastIndexOf('.');
         var css_path_input = css_path.slice(0, extensionIndex) + "_input" + css_path.slice(extensionIndex);
