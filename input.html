@@ -180,26 +180,27 @@
         <h3>Settings</h3>
         <div class="settings">
 
-            <!-- <div class="setting_entry">
-            <button id="reset_scores">Reset Scores</button>
-        </div> -->
-
-            <div class="setting_entry color_container">
+            <div class="setting_entry boolean">
                 <span>Colors:</span>
-                <input type="checkbox" id="Show_Color" checked fb-data="admin_settings.show_color">
+                <input type="checkbox" id="Show_Color" fb-data="admin_settings.show_color">
             </div>
 
-            <div class="setting_entry group_container">
+            <div class="setting_entry boolean">
                 <span>Player Names:</span>
                 <input type="checkbox" id="Show_Players" fb-data="admin_settings.show_player_names">
             </div>
 
-            <div class="setting_entry group_container">
+            <div class="setting_entry boolean">
                 <span>Squad Score:</span>
                 <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_group_score">
             </div>
 
-            <div class="setting_entry color_container">
+            <div class="setting_entry boolean">
+                <span>Serve Indicator:</span>
+                <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_serve_indicator">
+            </div>
+
+            <div class="setting_entry">
                 <span>Channel:</span>
                 <select id="channel">
                     <option value="1">1</option>

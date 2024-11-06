@@ -100,7 +100,7 @@ html, body {
 .team_a p.teamname, .team_a .active_card p {
   color: var(--text-primary);
 }
-.team_a.light p.teamname, .team_a.light .active_card p {
+.team_a.light p.teamname,.team_a.light .active_card p {
   color: var(--text-dark);
 }
 
@@ -116,6 +116,19 @@ html, body {
 .team_b.light p.teamname, .team_b.light .active_card p {
   color: var(--text-dark);
 }
+
+.serve_indicator {
+  margin-right: 14px;
+}
+
+.serve_indicator.active {
+  background-color: var(--text-primary) !important;
+}
+
+.light .serve_indicator.active {
+  background-color: var(--text-dark) !important;
+}
+
 
 .team .name {
   display: flex;
