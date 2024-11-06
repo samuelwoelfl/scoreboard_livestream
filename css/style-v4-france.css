@@ -9,12 +9,12 @@
 }
 
 :root {
-  --blue: #597EE0;
-  --red: #F80000;
+  --primary: #597EE0;
+  --secondary: #F80000;
   --white: #ffffff;
   --text-primary: #000000;
   --light-red: #FF9798;
-  --red-1: #D0C2D8;
+  --secondary-1: #D0C2D8;
 }
 
 .wrapper {
@@ -23,7 +23,6 @@
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
-  margin: 20px 20px 0px 20px;
   opacity: 0.98;
 }
 
@@ -32,6 +31,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  margin: 20px 20px 0px 20px;
   filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.15));
 }
 
@@ -57,7 +57,7 @@
 }
 
 .top .content {
-  background-color: var(--blue);
+  background-color: var(--primary);
   border-radius: 4px 4px 0px 0px ;
   box-shadow: inset 0px -10px 10px -10px rgba(0, 0, 0, 0.4);
 }
@@ -147,14 +147,6 @@
   margin-left: 0;
 }
 
-.a_color {
-  background-color: var(--A_Color);
-}
-
-.b_color {
-  background-color: var(--B_Color);
-}
-
 .teams .team .color-indicator.light {
   border: 1px solid #bbbbbb;
   box-sizing: content-box;
@@ -186,6 +178,7 @@
   align-items: center;
   border-radius: 3px;
   padding-bottom: 4px;
+  flex-grow: 1;
 }
 
 .counter:not(.group) {
@@ -195,11 +188,11 @@
 
 .counter.group {
   width: 36px;
-  background-color: var(--red-1);
+  background-color: var(--secondary-1);
 }
 
 .active .counter {
-  border: 2px solid var(--red);
+  border: 2px solid var(--secondary);
 }
 
 .scores {
@@ -226,7 +219,7 @@
   position: absolute;
   margin-top: -42px;
   padding: 8px 9px 6px 9px;
-  background-color: var(--red);
+  background-color: var(--secondary);
   border-radius: 0px;
 }
 
@@ -241,7 +234,9 @@
 .team_score .set {
   display: flex;
   flex-direction: column;
+  justify-content: stretch;
   gap: 8px;
+  height: 100%;
 }
 
 .button {
@@ -276,7 +271,7 @@
 }
 
 .button.remove {
-  background-color: var(--red);
+  background-color: var(--secondary);
   transition: .1s ease;
 }
 

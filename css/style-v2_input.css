@@ -54,8 +54,8 @@ html, body {
 }
 
 input:focus {
-  outline: 1px solid var(--yellow);
-  -moz-outline: 1px solid var(--yellow);
+  outline: 1px solid var(--primary);
+  -moz-outline: 1px solid var(--primary);
 }
 
 input:not([type='color']) {
@@ -106,7 +106,7 @@ select option {
 }
 
 .set.active .counter {
-  border: 1px solid var(--yellow);
+  border: 1px solid var(--primary);
 }
 
 .center input {
@@ -133,7 +133,7 @@ select option {
   flex-direction: column;
   padding: 6px; 
   background-color: var(--black);
-  border: 1px solid var(--yellow);
+  border: 1px solid var(--primary);
   gap: 6px;
 }
 

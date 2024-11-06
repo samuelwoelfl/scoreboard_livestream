@@ -10,7 +10,7 @@
 }
 
 :root {
-  --yellow: #F2DB3F;
+  --primary: #F2DB3F;
   --background: #000000f1;
   --top-height: 105px;
   --text-primary: #ffffff;
@@ -92,12 +92,12 @@
 .team .name, .team .score {
   box-sizing: border-box;
   background-color: var(--background);
-  border: 5px solid var(--yellow);
+  border: 5px solid var(--primary);
 }
 
 /* .team .name, .team .score {
   box-sizing: border-box;
-  background-color: var(--yellow);
+  background-color: var(--primary);
   border: 5px solid var(--background);
 } */
 
@@ -156,7 +156,7 @@
   width: 100%;
   height: 100%;
   background: var(--background);
-  border: 5px solid var(--yellow);
+  border: 5px solid var(--primary);
   border-top-width: 8px;
   border-bottom-width: 3.5px;
   content: '';
@@ -178,7 +178,7 @@
 .game .sets_counter * {
   font-size: 16px;
   font-weight: 500;
-  color: var(--yellow);
+  color: var(--primary);
   /* opacity: .7; */
 }
 
@@ -203,7 +203,7 @@
 }
 
 .bottom .content p {
-  color: var(--yellow);
+  color: var(--primary);
   font-size: 14px;
   font-weight: 400;
 }
@@ -212,7 +212,7 @@
   display: block;
   height: 16px;
   width: 1px;
-  background-color: var(--yellow);
+  background-color: var(--primary);
   margin: 1px 10px 0 10px;
 }
 

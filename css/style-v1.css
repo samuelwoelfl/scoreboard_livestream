@@ -8,14 +8,14 @@
 }
 
 :root {
-  --yellow: #F2C650;
-  --red: #C55151;
+  --primary: #F2C650;
+  --secondary: #C55151;
   --special: #3C5B96;
   --white: #ffffff;
   --text-primary: #000000;
   --light-2: #FDF8E9;
   --light-3: #FBF2D8;
-  --red-1: rgba(197, 81, 81, 0.2);
+  --secondary-1: rgba(197, 81, 81, 0.2);
 }
 
 .wrapper {
@@ -24,7 +24,6 @@
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
-  /* margin: 20px 20px 0px 20px; */
 }
 
 .board {
@@ -62,7 +61,7 @@
 
 
 .bottom .content {
-  background-color: var(--yellow);
+  background-color: var(--primary);
   border-radius: 0px 0px 8px 8px;
   flex-direction: row;
   gap: 8px;
@@ -195,11 +194,11 @@ body[players='show'] .counter {
 
 .counter.group {
   width: 36px;
-  background-color: var(--red-1);
+  background-color: var(--secondary-1);
 }
 
 .active .counter {
-  border: 2px solid var(--yellow);
+  border: 2px solid var(--primary);
 }
 
 .scores {
@@ -208,8 +207,12 @@ body[players='show'] .counter {
   gap: 20px;
 }
 
+.score {
+  font-weight: 300;
+}
+
 .score.winner {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .score.loser {
@@ -226,7 +229,7 @@ body[players='show'] .counter {
   position: absolute;
   margin-top: -42px;
   padding: 8px 9px 6px 9px;
-  background-color: var(--red);
+  background-color: var(--secondary);
   border-radius: 8px 8px 0px 0px;
 }
 
@@ -278,7 +281,7 @@ body[players='show'] .counter {
 }
 
 .button.remove {
-  background-color: var(--red);
+  background-color: var(--secondary);
   transition: .1s ease;
 }
 

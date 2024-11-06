@@ -9,12 +9,12 @@
 }
 
 :root {
-  --blue: #323232;
-  --red: #F7DF30;
+  --primary: #323232;
+  --secondary: #F7DF30;
   --white: #f1f1f1;
   --text-primary: #000000;
   --light-red: #d6d32f;
-  --red-1: #dbdaaf;
+  --secondary-1: #dbdaaf;
 }
 
 .wrapper {
@@ -62,7 +62,7 @@
 }
 
 .top .content {
-  background-color: var(--blue);
+  background-color: var(--primary);
   border-radius: 0;
   gap: 8px;
   box-shadow: inset 0px -10px 10px -10px rgba(0, 0, 0, 1);
@@ -208,11 +208,11 @@
 
 .counter.group {
   width: 36px;
-  background-color: var(--red-1);
+  background-color: var(--secondary-1);
 }
 
 .active .counter {
-  border: 2px solid var(--blue);
+  border: 2px solid var(--primary);
 }
 
 .scores {
@@ -239,7 +239,7 @@
   position: absolute;
   margin-top: -42px;
   padding: 8px 9px 6px 9px;
-  background-color: var(--red);
+  background-color: var(--secondary);
   border-radius: 0;
 }
 
@@ -289,7 +289,7 @@
 }
 
 .button.remove {
-  background-color: var(--red);
+  background-color: var(--secondary);
   transition: .1s ease;
 }
 
