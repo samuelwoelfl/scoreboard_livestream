@@ -19,10 +19,10 @@ export class Scoreboard {
         this.$setScoreCounterB = $('.b_sets_won');
         this.$activeScoreCounterA = $('.a_score_active');
         this.$activeScoreCounterB = $('.b_score_active');
-        this.$settingsEntries = $('.settings-container .setting_entry.boolean input')
+        this.$settingsEntries = $('.setting_entry.boolean input')
         this.$logoutButton = $('#logout');
         // Stored variables
-        this.channel = channel;
+        this.channel = Number(channel);
         this.theme = theme;
         this.settings = {
             "show_player_names": 1,
@@ -529,7 +529,7 @@ export class Scoreboard {
 
             $.each(self.user.channels, function (i, c) {
                 self.$channelInput.append($('<option></option>').val(c).html(c));
-                if (c === self.channel) {
+                if (c == self.channel) {
                     channelExists = true;
                 }
             });
@@ -540,7 +540,7 @@ export class Scoreboard {
                 self.channel = self.user.channels[0];
                 self.$channelInput.val(self.channel);
                 setTimeout(() => {
-                    showToast("❌", `Due to authentification the channel got changed to "${self.user.channels[0]}".`, 2000);
+                    showToast("ℹ️", `Due to authentification the channel got changed to "${self.user.channels[0]}".`, 2000);
                 }, 2200);
             }
         }

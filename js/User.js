@@ -3,7 +3,7 @@ export class User {
         this.username = username;
         this.password = password;
         this.isAuthenticated = true; // Benutzer ist angemeldet
-        this.channels = channels;
+        this.channels = channels.map(Number);
         this.init();
     }
 
