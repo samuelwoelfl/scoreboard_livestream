@@ -263,7 +263,7 @@ export class Scoreboard {
 
     async uploadData(elemList) {
         // check if selected channel is allowed
-        if (this.user && this.channel && this.channel in this.user.channels) {
+        if (this.user && this.channel && this.user.channels.includes(Number(this.channel))) {
             // upload all if there are no specific elements
             if (typeof elemList == 'undefined') {
                 elemList = $("*[fb-data]");
