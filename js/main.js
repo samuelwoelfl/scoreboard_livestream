@@ -50,7 +50,11 @@ $(document).ready(async function () {
     var urlParams = new URLSearchParams(window.location.search);
     var url_channel = urlParams.get('channel');
     var url_theme = urlParams.get('theme');
-    var channel_selection = url_channel || 1;
+    if (!isNaN(parseInt(url_channel, 10))) {
+        var channel_selection = 1;
+    } else {
+        var channel_selection = url_channel
+    }
     var theme_selection = url_theme;
 
     // Type of board
