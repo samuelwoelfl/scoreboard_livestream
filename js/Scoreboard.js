@@ -40,7 +40,6 @@ export class Scoreboard {
 
     init() {
         this.initEventListeners();
-        this.setTheme(this.theme);
         this.insertLiveData();
 
         this.update_interval = setInterval(() => {
@@ -52,6 +51,7 @@ export class Scoreboard {
                 this.insertLiveData();
             }, 600);
         } else {
+            this.setTheme(this.theme);
             this.data_interval = setInterval(() => {
                 this.insertLiveData();
             }, 300);
@@ -67,8 +67,8 @@ export class Scoreboard {
         this.handleEventHistory();
     }
 
-    setTheme(theme) {        
-        // backup theme
+    setTheme(theme) {
+        // fallback theme
         if (!(theme in themes)) {
             if (this.type == 'output') {
                 theme = 'full';
