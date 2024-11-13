@@ -1,4 +1,4 @@
-import { themes, readData, getPathsAndValues, getColorBrightness, rgb2hex, writeData, showToast } from "./main.js";
+import { themes, readData, getPathsAndValues, getColorBrightness, rgb2hex, writeData, showToast, copyToClipboard } from "./main.js";
 
 export class Scoreboard {
     // Konstruktor
@@ -19,7 +19,9 @@ export class Scoreboard {
         this.$setScoreCounterB = $('.b_sets_won');
         this.$activeScoreCounterA = $('.a_score_active');
         this.$activeScoreCounterB = $('.b_score_active');
-        this.$settingsEntries = $('.setting_entry.boolean input')
+        this.$settingsEntries = $('.setting_entry.boolean input');
+        this.$urlOutputContainer = $('.url_output_container');
+        this.$urlOutput = $('.url_output');
         this.$logoutButton = $('#logout');
         // Stored variables
         this.channel = Number(channel);
@@ -103,13 +105,19 @@ export class Scoreboard {
         // Theme input dropdown listener
         this.$themeInput.change((event) => {
             this.theme = $(event.target).val();
-            this.setTheme(this.theme);
+            this.updateUrlOutput();
         });
 
         // Channel input dropdown listener
         this.$channelInput.change((event) => {
             this.channel = $(event.target).val();
             this.updateUI();
+        });
+
+        this.$urlOutputContainer.click((event) => {
+            var text = this.$urlOutput.attr('href');
+            copyToClipboard(text);
+            showToast('📋', 'Copied url to clipboard')
         });
 
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
@@ -141,6 +149,7 @@ export class Scoreboard {
 
         this.$setCounter.on('input', (event) => {
             this.event_history.push('set');
+            this.updateSets();
         })
 
         // interaction for the set buttons
@@ -482,6 +491,7 @@ export class Scoreboard {
         this.updateColorIndicatorVisibility();
         this.updatePlayerNamesVisibility();
         this.updateServeIndicatorVisibility();
+        this.updateUrlOutput();
     }
 
     updateGroupScoreVisibility() {
@@ -518,6 +528,19 @@ export class Scoreboard {
         } else if (this.settings['show_serve_indicator'] == 0) {
             $('.serve_indicator').hide();
         }
+    }
+
+    updateUrlOutput() {
+        var baseUrl = window.location.origin + window.location.pathname;
+        var newUrl = baseUrl.replace("input.html", "output.html");
+        var url_output = newUrl + '?channel=' + this.channel;
+
+        if (this.theme) {
+            url_output = url_output + '&theme=' + this.theme;
+        }
+
+        this.$urlOutput.text(url_output);
+        this.$urlOutput.attr('href', url_output);
     }
 
     updateAvailableChannels() {

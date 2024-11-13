@@ -54,7 +54,7 @@
                     <input type="text" class="text" id="Occasion" value="Occasion" fb-data="tournament_name"></input>
                 </div>
                 <div class="set_counter_container">
-                    <span>Satz:</span>
+                    <span>Set:</span>
                     <input type="number" id="Set_Count" min="1" max="7" fb-data="active_set">
                 </div>
                 <div class="set_controls_container">
@@ -170,58 +170,75 @@
                     <span class="divider"></span>
                     <input type="text" class="text" id="Mode" value="" fb-data="format"></input>
                 </div>
-                <button id="reset_scores">Reset Scores</button>
+                <button id="reset_scores" class="destructive">Reset Scores</button>
             </div>
         </div>
 
     </div>
 
-    <div class="settings-container" fb-data="">
-        <h3>Settings</h3>
-        <div class="settings">
-
-            <div class="setting_entry boolean">
-                <span>Colors:</span>
-                <input type="checkbox" id="Show_Color" fb-data="admin_settings.show_color">
+    <div class="controls">
+        <div class="container settings">
+            <h3>Settings</h3>
+            <div class="inner">
+                
+                <div class="setting_entry boolean">
+                    <span>Colors:</span>
+                    <input type="checkbox" id="Show_Color" fb-data="admin_settings.show_color">
+                </div>
+    
+                <div class="setting_entry boolean">
+                    <span>Player Names:</span>
+                    <input type="checkbox" id="Show_Players" fb-data="admin_settings.show_player_names">
+                </div>
+    
+                <div class="setting_entry boolean">
+                    <span>Squad Score:</span>
+                    <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_group_score">
+                </div>
+    
+                <div class="setting_entry boolean">
+                    <span>Serve Indicator:</span>
+                    <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_serve_indicator">
+                </div>
+    
+                <button id="logout">Logout</button>
             </div>
+        </div>
+        <div class="container output">
+            <h3>Output</h3>
+            <div class="inner">
+                <div class="setting_entry">
+                    <span>Channel:</span>
+                    <select id="channel">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+    
+                <div class="setting_entry">
+                    <span>Theme:</span>
+                    <select id="theme">
+                        <option value="full">Fullscreen</option>
+                        <option value="rg">RoundnetGermany</option>
+                        <option value="france">Roundnet France</option>
+                        <option value="tops">TopsRoundnet</option>
+                        <option value="eura">EURA</option>
+                        <option value="small">Secondary Board</option>
+                    </select>
+                </div>
 
-            <div class="setting_entry boolean">
-                <span>Player Names:</span>
-                <input type="checkbox" id="Show_Players" fb-data="admin_settings.show_player_names">
+                <div class="output_entry url">
+                    <span>Output-URL:</span>
+                    <div class="url_output_container">
+                        <a class="url_output" href="" target="_blank"></a>
+                        <i class="material-symbols-rounded">content_copy</i>
+                    </div>
+                </div>
             </div>
-
-            <div class="setting_entry boolean">
-                <span>Squad Score:</span>
-                <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_group_score">
-            </div>
-
-            <div class="setting_entry boolean">
-                <span>Serve Indicator:</span>
-                <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_serve_indicator">
-            </div>
-
-            <div class="setting_entry">
-                <span>Channel:</span>
-                <select id="channel">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                </select>
-            </div>
-
-            <div class="setting_entry">
-                <span>Theme:</span>
-                <select id="theme">
-                    <option value="rg">RoundnetGermany</option>
-                    <option value="tops">TopsRoundnet</option>
-                </select>
-            </div>
-
-            <button id="logout">Logout</button>
-
         </div>
     </div>
 </body>

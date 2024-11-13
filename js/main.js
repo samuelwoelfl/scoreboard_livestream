@@ -50,7 +50,7 @@ $(document).ready(async function () {
     var urlParams = new URLSearchParams(window.location.search);
     var url_channel = urlParams.get('channel');
     var url_theme = urlParams.get('theme');
-    if (!isNaN(parseInt(url_channel, 10))) {
+    if (isNaN(parseInt(url_channel, 10))) {
         var channel_selection = 1;
     } else {
         var channel_selection = url_channel
@@ -264,4 +264,17 @@ export function getPathsAndValues(obj, currentPath = '') {
     }
 
     return result;
+}
+
+
+// Funktion zum Kopieren des Textes in die Zwischenablage
+export function copyToClipboard(text) {
+    // Ein temporäres Input-Feld erstellen, um den Text in die Zwischenablage zu kopieren
+    var tempInput = $('<input>');
+    $('body').append(tempInput);  // Das Input-Feld zum DOM hinzufügen
+
+    tempInput.val(text).select();  // Den Text in das Input-Feld setzen und es auswählen
+    document.execCommand('copy');  // Den Text in die Zwischenablage kopieren
+
+    tempInput.remove();  // Das temporäre Input-Feld wieder entfernen
 }

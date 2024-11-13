@@ -199,6 +199,7 @@
   align-items: center;
   border-radius: 0;
   padding-bottom: 4px;
+  flex-grow: 1;
 }
 
 .counter:not(.group) {
@@ -255,6 +256,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: 100%;
 }
 
 .button {

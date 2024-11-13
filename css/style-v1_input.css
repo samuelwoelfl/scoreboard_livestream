@@ -1,10 +1,21 @@
+:root {
+  --primary: #F2C650;
+  --secondary: #C55151;
+  --white: #ffffff;
+  --text-primary: #000000;
+  --light-2: #f8f8f8;
+  --light-3: #f2f2f2;
+  --secondary-1: rgba(197, 81, 81, 0.2);
+  --ui-success: #04b904;
+  --ui-error: #e14c62;
+}
+
 html, body {
   background-color: #2B2E38;
 }
 
 .board {
   margin: 15px 15px 0px 15px;
-  filter: drop-shadow(1px 3px 12px rgba(0, 0, 0, 0.50));
 }
 
 .top {
@@ -12,7 +23,8 @@ html, body {
 }
 
 .set_counter_container {
-  background: var(--light-3);
+  background: #ffffffaa;
+  box-shadow: inset 0 0 0 2px var(--primary);
   padding: 2px 2px 1px 6px;
   border-radius: 4px;
   margin-bottom: 1px;
@@ -20,12 +32,14 @@ html, body {
   display: flex;
   flex-direction: row;
   gap: 4px;
+  color: var(--text-primary);
 }
 
 input:focus {
   outline: none;
   -moz-outline: none;
-  box-shadow: inset 0px 0px 0px 1px #000000aa;
+  box-shadow: inset 0px 0px 0px 2px var(--primary);
+  background-color: var(--white) !important;
 }
 
 input:not([type='color']) {
@@ -36,8 +50,7 @@ input:not([type='color']) {
   border: none;
 }
 
-.top .content input {
-  background-color: #ffffff77;
+.top input {
   width: 100%;
 }
 
@@ -53,8 +66,17 @@ input:not([type='color']) {
   padding: 0px !important;
 }
 
+.top .content {
+  background-color: var(--text-primary);
+}
+
+.bottom .content {
+  background-color: var(--text-primary);
+}
+
+.top input,
 .bottom input {
-  background-color: #ffffffcc;
+  background-color: #ffffffaa;
 }
 
 .bottom button {
@@ -114,6 +136,14 @@ input[type='number'] {
   padding: 1px;
 }
 
+.active .counter {
+  border: 2.5px solid var(--primary);
+}
+
+.counter.group {
+  background-color: var(--primary);
+}
+
 .bottom .content {
     gap: 4px;
 }
@@ -145,9 +175,14 @@ input[type='number'] {
   border-radius: 3px;
 }
 
-.settings-container {
+.controls {
+  margin-left: 16px;
+  display: flex;
+  flex-direction: row;
+}
+
+.controls .container {
   width: max-content;
-  margin-left: 15px;
   margin-top: 15px;
   border-radius: 8px;
   padding: 14px 16px 16px 16px;
@@ -155,20 +190,20 @@ input[type='number'] {
   filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.08));
 }
 
-.settings-container h3 {
+.controls h3 {
   font-weight: 600;
   margin-bottom: 10px;
 }
 
-.settings > *:not(:last-child) {
+.controls .inner > *:not(:last-child) {
   margin-bottom: 8px;
 }
 
-.settings > *:last-child {
+.controls .inner > *:last-child {
   margin-top: 1rem;
 }
 
-.settings > * {
+.controls .settings .inner > * {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -177,12 +212,57 @@ input[type='number'] {
   width: 100%;
 }
 
-.settings > * span {
+.controls .settings .inner > * span {
   margin-bottom: 1px;
 }
 
-.settings #reset_scores {
+.controls .settings .inner #reset_scores {
   margin-top: 5px;
+}
+
+.controls .output {
+  max-width: 240px;
+}
+
+.controls .output .inner {
+  margin-top: .6rem;
+}
+
+.controls .output_entry {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.controls .output_entry.url {
+  margin-top: 1.7rem;
+}
+
+.controls .output select {
+  height: 30px;
+  padding: 0 6px;
+}
+
+.controls .output .url_output_container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  max-width: min-content;
+}
+
+.controls .output .url_output_container a {
+  width: 100%;
+  text-wrap: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  background-color: #eeeeee;
+  padding: 4px 8px 6px 8px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: .95rem;
+  color: #000000aa;
 }
 
 button {
@@ -192,7 +272,12 @@ button {
   border-radius: 5px;
   padding: 5px 12px 7px 12px;
   transition: .2s ease;
-  background-color: var(--secondary);
+  background-color: var(--primary);
+  color: var(--text-primary);
+}
+
+button.destructive {
+  background-color: var(--ui-error);
   color: var(--white);
 }
 
@@ -204,6 +289,7 @@ button:hover {
 button:active {
   transform: scale(0.95);
 }
+
 
 .button {
   font-size: 30px;
@@ -220,14 +306,14 @@ button:active {
   color: var(--white);
 }
 
-.controls {
+.center .controls {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-left: 14px
 }
 
-.controls .team_container {
+.center .controls .team_container {
   display: flex;
   flex-direction: row;
   gap: 4px;
@@ -235,12 +321,12 @@ button:active {
 }
 
 .button.add {
-  background-color: #04b904;
+  background-color: var(--ui-success);
   height: 100%;
 }
 
 .button.remove {
-  background-color: var(--secondary);
+  background-color: var(--ui-error);
   height: 100%;
 }
 
