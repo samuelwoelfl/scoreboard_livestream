@@ -461,8 +461,6 @@ export class Scoreboard {
             var last_action = this.event_history[this.event_history.length -1];
             if (last_action.includes('score')) {
                 return last_action.slice(-1);
-            } else if (last_action.includes('set')) {
-                return null;
             } else {
                 return null;
             }
