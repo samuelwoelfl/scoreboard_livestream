@@ -51,7 +51,7 @@ export class Scoreboard {
         if (this.type == 'input') {
             this.data_interval = setInterval(() => {
                 this.insertLiveData();
-            }, 600);
+            }, 1500);
         } else {
             this.setTheme(this.theme);
             this.data_interval = setInterval(() => {
@@ -293,28 +293,25 @@ export class Scoreboard {
                     value = $(elem).val(); // Wert des Elements abrufen
                 }
 
-                // Wenn der Wert nicht leer ist, weiter verarbeiten
-                if (value !== "") {
-                    // Erstelle einen Pfad basierend auf dem fb-data Attribut
-                    let fbDataAttr = $(elem).attr("fb-data");
-                    if (fbDataAttr) {
-                        // Ersetze die Punkte im fb-data Attribut mit einem Schrägstrich
-                        let dbSelector = fbDataAttr.replace(/\./g, '/');
-                        // Erstelle den vollständigen Pfad für Firebase
-                        let path_to_variable = `/match-${self.channel}/${dbSelector}`;
+                // Erstelle einen Pfad basierend auf dem fb-data Attribut
+                let fbDataAttr = $(elem).attr("fb-data");
+                if (fbDataAttr) {
+                    // Ersetze die Punkte im fb-data Attribut mit einem Schrägstrich
+                    let dbSelector = fbDataAttr.replace(/\./g, '/');
+                    // Erstelle den vollständigen Pfad für Firebase
+                    let path_to_variable = `/match-${self.channel}/${dbSelector}`;
 
-                        // Überprüfen, ob der Wert in einen Integer umgewandelt werden kann
-                        if (path_to_variable.includes('score') || path_to_variable.includes('active_set')) {
-                            try {
-                                value = parseInt(value);
-                            } catch (error) {
-                                console.error(value, " can't be converted to integer");
-                            }
+                    // Überprüfen, ob der Wert in einen Integer umgewandelt werden kann
+                    if (path_to_variable.includes('score') || path_to_variable.includes('active_set')) {
+                        try {
+                            value = parseInt(value);
+                        } catch (error) {
+                            console.error(value, " can't be converted to integer");
                         }
-
-                        // Füge den Pfad und den Wert zum newData Objekt hinzu
-                        newData[path_to_variable] = value;
                     }
+
+                    // Füge den Pfad und den Wert zum newData Objekt hinzu
+                    newData[path_to_variable] = value;
                 }
             });
 
