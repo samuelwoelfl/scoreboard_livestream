@@ -111,6 +111,7 @@ export class Scoreboard {
         // Channel input dropdown listener
         this.$channelInput.change((event) => {
             this.channel = $(event.target).val();
+            this.insertLiveData();
             this.updateUI();
         });
 
