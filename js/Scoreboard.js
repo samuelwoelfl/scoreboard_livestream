@@ -67,6 +67,7 @@ export class Scoreboard {
         this.updateIndicators();
         this.updateSettings();
         this.handleEventHistory();
+        this.generateScoreHistory();
     }
 
     setTheme(theme) {
@@ -97,6 +98,7 @@ export class Scoreboard {
             var html_structure = themes[theme]['html_structure'];
             $('.scoreboard').hide();
             $(`.scoreboard[theme="${html_structure}"]`).show();
+            $(`.scoreboard.score_history`).show();
         }
     }
 
@@ -579,9 +581,42 @@ export class Scoreboard {
     }
 
     handleEventHistory() {
-        if (this.event_history.length > 3) {
-            this.event_history = this.event_history.slice(-3);
+        if (this.event_history.length > 50) {
+            this.event_history = this.event_history.slice(-50);
         }
         // console.log(this.event_history);
+    }
+
+    getScoreHistory(set) {
+        let self = this;
+        let slicedEventHistory = [];
+
+        if (set == undefined || set == -1) {
+            let startIndex = -1;
+            $.each(self.event_history.slice().reverse(), function (i, event) {
+                if (event['type'] == 'set' || event['type'] == 'reset') {
+                    startIndex = self.event_history.length - 1 - i;
+                    return false; // break the loop
+                }
+            });
+            slicedEventHistory = self.event_history.slice(startIndex + 1);
+        } else {
+            
+        }
+
+        return slicedEventHistory;
+    }
+
+    generateScoreHistory() {
+        let self = this;
+        let $scoreHistoryContainer = $('.score_history');
+        // $scoreHistoryContainer.empty();
+
+        // $.each(self.event_history, function (i, event) {
+        //     let $event = $('<div></div>').addClass('event');
+        //     let $eventText = $('<p></p>').text(self.generateEventText(event));
+        //     $event.append($eventText);
+        //     $scoreHistoryContainer.append($event);
+        // });
     }
 }

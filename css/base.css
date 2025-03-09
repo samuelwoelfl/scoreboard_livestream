@@ -195,3 +195,55 @@ html, body {
 .serve_indicator.active {
   border-right: 10px solid var(--primary) !important;
 }
+
+.score_history {
+  width: fit-content;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.score_history .team {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0px;
+}
+
+.score_history .team .score_item {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 10px;
+  height: 10px;
+  padding: 1rem;
+  border-radius: 0px;
+  background-color: var(--light-2);
+  border: 2px solid var(--light-3);
+  color: var(--text-secondary);
+}
+
+.score_history .team .score_item.active {
+  border: 2px solid var(--primary);
+  color: var(--text-primary);
+}
+
+.score_history .team:first-child .score_item:first-child {
+  border-radius: 6px 0px 0px 0px;
+}
+
+.score_history .team:first-child .score_item:last-child {
+  border-radius: 0px 6px 0px 0px;
+}
+
+.score_history .team:last-child .score_item:first-child {
+  border-radius: 0px 0px 0px 6px;
+}
+
+.score_history .team:last-child .score_item:last-child {
+  border-radius: 0px 0px 6px 0px;
+}
