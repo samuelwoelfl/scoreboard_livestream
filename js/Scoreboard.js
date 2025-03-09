@@ -123,7 +123,13 @@ export class Scoreboard {
 
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
             var team = this.getScoreElemDetails($(event.target))['team'];
-            this.event_history.push(`score_${team}`);
+            var score = $(event.target).val();
+            // this.event_history.push(`score_${team}_${score}`);
+            this.event_history.push({
+                type: 'score',
+                team: team,
+                score: score
+            });
             // this.event_history.push($(event.target));
         });
         
@@ -149,8 +155,12 @@ export class Scoreboard {
         });
 
         this.$setCounter.on('input', (event) => {
-            this.event_history.push('set');
             this.updateSets();
+            this.event_history.push({
+                type: 'set',
+                set: this.active_set,
+            });
+            // this.event_history.push('set_'+ this.active_set);
         })
 
         // interaction for the set buttons
@@ -184,7 +194,10 @@ export class Scoreboard {
 
             this.active_set = 1;
             this.updateSets();
-            this.event_history.push('reset');
+            // this.event_history.push('reset');
+            this.event_history.push({
+                type: 'reset',
+            });
 
             this.uploadData();
         });
@@ -210,7 +223,7 @@ export class Scoreboard {
 
             if (path.includes('event_history')) {
                 if (value.length > 0) {
-                    value = value.split(";")
+                    value = value
                 } else {
                     value = []
                 }
@@ -283,7 +296,7 @@ export class Scoreboard {
             self = this;
             const newData = {};
             this.handleEventHistory();
-            newData[`/match-${self.channel}/event_history`] = this.event_history.join(';');
+            newData[`/match-${self.channel}/event_history`] = this.event_history;
             $.each($(elemList), function (i, elem) {
                 let value;
 
@@ -457,8 +470,8 @@ export class Scoreboard {
     getServingTeam() {
         if (this.event_history.length > 0) {
             var last_action = this.event_history[this.event_history.length -1];
-            if (last_action.includes('score')) {
-                return last_action.slice(-1);
+            if (last_action['type'] == 'score') {
+                return last_action['team'];
             } else {
                 return null;
             }
@@ -569,5 +582,6 @@ export class Scoreboard {
         if (this.event_history.length > 3) {
             this.event_history = this.event_history.slice(-3);
         }
+        // console.log(this.event_history);
     }
 }
