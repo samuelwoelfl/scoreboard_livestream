@@ -23,6 +23,7 @@ export class Scoreboard {
         this.$urlOutputContainer = $('.url_output_container');
         this.$urlOutput = $('.url_output');
         this.$logoutButton = $('#logout');
+        this.$scoreHistoryContainer = $('.score_history');
         // Stored variables
         this.channel = Number(channel);
         this.theme = theme;
@@ -67,7 +68,8 @@ export class Scoreboard {
         this.updateIndicators();
         this.updateSettings();
         this.handleEventHistory();
-        this.generateScoreHistory();
+        this.updateScoreHistory();
+        this.updateOldScoreInputCounter();
     }
 
     setTheme(theme) {
@@ -124,17 +126,33 @@ export class Scoreboard {
         });
 
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
-            var team = this.getScoreElemDetails($(event.target))['team'];
-            var score = $(event.target).val();
-            // this.event_history.push(`score_${team}_${score}`);
-            this.event_history.push({
-                type: 'score',
-                team: team,
-                score: score
-            });
-            // this.event_history.push($(event.target));
+            var $target = $(event.target);
+            var team = this.getScoreElemDetails($target)['team'];
+            var newScore = Number($target.val());
+            var oldScore = Number(this.$html_frame.find('.team_score').attr(`score_${team}`));
+            console.log(oldScore, newScore);
+
+            // if its a "-" input, remove corresponding history event
+            if (newScore < oldScore) {
+                $.each(this.event_history.slice().reverse(), (index, event) => {
+                    if (event.type === 'score' && event.team === team && event.score > newScore) {
+                        this.event_history.splice(this.event_history.length - 1 - index, 1);
+                        return false; // break the loop
+                    }
+                });
+            // otherwise normally push the event
+            } else {
+                this.event_history.push({
+                    type: 'score',
+                    team: team,
+                    score: newScore
+                });
+            }
+
+            this.updateOldScoreInputCounter();
         });
         
+
         // upload local data as any input values changes
         this.$scoreboardInputs.on('input', (event) => {
             this.uploadData([$(event.target)]);
@@ -580,6 +598,11 @@ export class Scoreboard {
         }
     }
 
+    updateOldScoreInputCounter() {
+        this.$html_frame.find('.team_score').attr('score_a', this.getScore(this.active_set, 'a'));
+        this.$html_frame.find('.team_score').attr('score_b', this.getScore(this.active_set, 'b'));
+    }
+
     handleEventHistory() {
         if (this.event_history.length > 50) {
             this.event_history = this.event_history.slice(-50);
@@ -587,11 +610,11 @@ export class Scoreboard {
         // console.log(this.event_history);
     }
 
-    getScoreHistory(set) {
+    getScoreHistory(set = -1) {
         let self = this;
         let slicedEventHistory = [];
 
-        if (set == undefined || set == -1) {
+        if (set == -1) {
             let startIndex = -1;
             $.each(self.event_history.slice().reverse(), function (i, event) {
                 if (event['type'] == 'set' || event['type'] == 'reset') {
@@ -607,16 +630,38 @@ export class Scoreboard {
         return slicedEventHistory;
     }
 
-    generateScoreHistory() {
+    scoreHistoryToTeamPoints(slicedEventHistory, team) {
         let self = this;
-        let $scoreHistoryContainer = $('.score_history');
-        // $scoreHistoryContainer.empty();
+        let teamPointsList = [];
 
-        // $.each(self.event_history, function (i, event) {
-        //     let $event = $('<div></div>').addClass('event');
-        //     let $eventText = $('<p></p>').text(self.generateEventText(event));
-        //     $event.append($eventText);
-        //     $scoreHistoryContainer.append($event);
-        // });
+        let lastScore = 0;
+        $.each(slicedEventHistory, function (i, event) {
+            if(event['type'] == 'score') {
+                if (event['team'].toLowerCase() == team.toLowerCase()) {
+                    lastScore = Number(event['score']);
+                    teamPointsList.push(lastScore);
+                } else {
+                    teamPointsList.push(lastScore);
+                }
+            }
+        });
+
+        return teamPointsList;
+    }
+
+    updateScoreHistory() {
+        let self = this;
+
+        $.each(self.$scoreHistoryContainer.find('.team'), function (i, container) {
+            let $container = $(container);
+            $container.empty();
+            let team = $container.attr('team');
+            let scores_list = self.scoreHistoryToTeamPoints(self.getScoreHistory(), team);
+            $.each(scores_list, function (i, score) {
+                let status = score > (i > 0 ? scores_list[i-1] : 0) ? 'active' : ''; 
+                let element = `<div class="score_item ${status}">${score}</div>`;
+                $container.append(element);
+            });
+        });
     }
 }
