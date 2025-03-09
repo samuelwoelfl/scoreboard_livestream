@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/base.css">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script type="module" src="js/firebase_config.js"></script>
 
@@ -252,13 +253,28 @@
     </div>
 
 
-    <div class="wrapper">
-        <div class="score_history">
+    <div class="score_history">
+        <div class="teams">
+            <div class="team">
+                <div class="color-indicator" fb-data="teams_info.team_a.color"></div>
+                <div class="name">
+                    <p class="teamname" fb-data="teams_info.team_a.name">A Teamname</p>
+                </div>
+            </div>
+            <div class="team">
+                <div class="color-indicator" fb-data="teams_info.team_b.color"></div>
+                <div class="name">
+                    <p class="teamname" fb-data="teams_info.team_b.name">B Teamname</p>
+                </div>
+            </div>
+        </div>
+        <div class="scores">
             <div class="team" team="a"></div>
             <div class="team" team="b"></div>
         </div>
     </div>
 
+    <canvas id="scoreChart"></canvas>
 
     <script type="module" src="js/main.js"></script>
 

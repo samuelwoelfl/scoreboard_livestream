@@ -34,6 +34,7 @@ export class Scoreboard {
             "show_serve_indicator": 0,
         }
         this.active_set = 1;
+        this.ScoreHistoryChart = null;
         this.event_history = [];
         this.data_interval;
         this.update_interval;
@@ -44,6 +45,7 @@ export class Scoreboard {
     init() {
         this.initEventListeners();
         this.insertLiveData();
+        
 
         this.update_interval = setInterval(() => {
             this.updateUI();
@@ -59,6 +61,10 @@ export class Scoreboard {
                 this.insertLiveData();
             }, 300);
         }
+
+        setTimeout(() => {
+            this.createScoreHistoryChart();
+        }, 2000);
     }
 
     updateUI() {
@@ -652,7 +658,7 @@ export class Scoreboard {
     updateScoreHistory() {
         let self = this;
 
-        $.each(self.$scoreHistoryContainer.find('.team'), function (i, container) {
+        $.each(self.$scoreHistoryContainer.find('.scores').find('.team'), function (i, container) {
             let $container = $(container);
             $container.empty();
             let team = $container.attr('team');
@@ -663,5 +669,81 @@ export class Scoreboard {
                 $container.append(element);
             });
         });
+
+        // try {
+            let scoresTeamA = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'a');
+            let scoresTeamB = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'b');
+
+            // Daten im Chart aktualisieren
+            self.scoreChart.data.datasets[0].data = scoresTeamA;
+            self.scoreChart.data.datasets[1].data = scoresTeamB;
+            self.scoreChart.data.datasets[3].data = scoresTeamA.map((val, i) => val - scoresTeamB[i])
+            self.scoreChart.update(); // Chart aktualisieren
+
+            // console.log(scoresTeamA, scoresTeamB);
+        // } catch (TypeError) {
+        //     console.log("Chart not ready yet");
+        // }
+        
+
+
+    }
+
+    createScoreHistoryChart() {
+        let self = this;
+        let scoresTeamA = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'a');
+        let scoresTeamB = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'b');
+
+        let labels = scoresTeamA.map((_, i) => `${i + 1}`);
+        let fillData = scoresTeamA.map((val, i) => val - scoresTeamB[i]);
+
+        let ctx = document.getElementById('scoreChart').getContext('2d');
+
+        self.scoreChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Team A",
+                        data: scoresTeamA,
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim(),
+                        backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim()}22`,
+                        fill: "false"
+                    },
+                    {
+                        label: "Team B",
+                        data: scoresTeamB,
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue("--B_Color").trim(),
+                        backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue("--B_Color").trim()}22`,
+                        fill: "false"
+                    },
+                    {
+                        label: 'Füllung',
+                        data: fillData, // Differenz zwischen den Linien
+                        borderColor: 'transparent', // Unsichtbare Linie
+                        backgroundColor: (ctx) => {
+                            const { raw } = ctx;
+                            return raw >= 0 ? 'rgba(0, 255, 0, 0.5)' : 'rgba(255, 0, 0, 0.5)';
+                        },
+                        fill: true // Nur die Differenz wird gefüllt
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Runden' } },
+                    y: { title: { display: true, text: 'Punkte' }, beginAtZero: true }
+                }
+            }
+        });
+
+        let chartArea = self.scoreChart.chartArea;
+        if (!chartArea) return;
+        self.scoreChart.update();
     }
 }

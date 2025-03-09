@@ -200,12 +200,31 @@ html, body {
   width: fit-content;
   display: flex;
   flex-wrap: nowrap;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
   border-radius: 6px;
   overflow: hidden;
+  padding: 8px 12px;
+  background-color: var(--white);
+  filter: drop-shadow(1px 3px 16px rgba(0, 0, 0, 0.12));
+  margin: 20px 20px 0px 20px;
 }
 
-.score_history .team {
+.score_history * {
+  font-family: 'Antonio';
+}
+
+.score_history .scores  {
+  width: fit-content;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 0px;
+  border-radius: 6px;
+}
+
+.score_history .scores .team {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -213,37 +232,110 @@ html, body {
   gap: 0px;
 }
 
-.score_history .team .score_item {
+.score_history .scores .team .score_item {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 10px;
-  height: 10px;
-  padding: 1rem;
+  width: 28px;
+  height: 32px;
+  /* padding: 1rem; */
   border-radius: 0px;
-  background-color: var(--light-2);
+  background-color: var(--white);
   border: 2px solid var(--light-3);
   color: var(--text-secondary);
+  box-sizing: border-box;
+  margin-left: -2px; /* Collapse borders */
+  font-weight: 300;
 }
 
-.score_history .team .score_item.active {
+.score_history .scores .team:first-child .score_item.active {
+  border: 2px solid var(--A_Color);
   border: 2px solid var(--primary);
   color: var(--text-primary);
+  z-index: 10;
+  font-weight: 400;
 }
 
-.score_history .team:first-child .score_item:first-child {
+.score_history .scores .team:last-child .score_item.active {
+  border: 2px solid var(--B_Color);
+  border: 2px solid var(--primary);
+  color: var(--text-primary);
+  z-index: 10;
+  font-weight: 400;
+}
+
+.score_history .scores .team:first-child .score_item:first-child {
   border-radius: 6px 0px 0px 0px;
 }
 
-.score_history .team:first-child .score_item:last-child {
+.score_history .scores .team:first-child .score_item:last-child {
   border-radius: 0px 6px 0px 0px;
 }
 
-.score_history .team:last-child .score_item:first-child {
+.score_history .scores .team:last-child .score_item:first-child {
   border-radius: 0px 0px 0px 6px;
 }
 
-.score_history .team:last-child .score_item:last-child {
+.score_history .scores .team:last-child .score_item:last-child {
   border-radius: 0px 0px 6px 0px;
+}
+
+.score_history .teams {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 0px;
+  margin-right: 16px;
+  min-width: min-content;
+  max-width: 350px;
+}
+
+.score_history .teams .team {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding-bottom: 1px;
+  max-width: 100%;
+  gap: 6px;
+}
+
+.score_history .teams .team:last-child {
+  padding-bottom: 5px;
+}
+
+.score_history .teams .team .color-indicator {
+  width: 4px;
+  height: 77%;
+  display: block;
+  border-radius: 2px;
+  margin-top: 5px;
+  background-color: var(--text-primary);
+  border: 0px;
+  box-sizing: border-box;
+  margin-left: 0;
+}
+
+.score_history .teams .team p {
+  font-size: 20px;
+  font-weight: 600;
+  max-width: 100%;
+}
+
+.score_history .teams .team .name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0px;
+  padding: 3px 0;
+}
+
+.score_history .teams .team .name .players {
+  font-size: 18px;
+  font-weight: 300;
+  max-width: 100%;
+  /* font-family: 'Barlow', sans-serif; */
 }
