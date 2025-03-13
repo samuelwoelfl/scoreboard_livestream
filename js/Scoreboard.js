@@ -46,10 +46,14 @@ export class Scoreboard {
         this.initEventListeners();
         this.insertLiveData();
         
-
         this.update_interval = setInterval(() => {
             this.updateUI();
         }, 300);
+
+        let slow_update_interval = setInterval(() => {
+            this.updateScoreHistory();
+            this.updateScoreHistoryChart();
+        }, 2500);
 
         if (this.type == 'input') {
             this.data_interval = setInterval(() => {
@@ -61,10 +65,6 @@ export class Scoreboard {
                 this.insertLiveData();
             }, 300);
         }
-
-        setTimeout(() => {
-            this.createScoreHistoryChart();
-        }, 2000);
     }
 
     updateUI() {
@@ -74,7 +74,6 @@ export class Scoreboard {
         this.updateIndicators();
         this.updateSettings();
         this.handleEventHistory();
-        this.updateScoreHistory();
         this.updateOldScoreInputCounter();
     }
 
@@ -669,35 +668,20 @@ export class Scoreboard {
                 $container.append(element);
             });
         });
-
-        // try {
-            let scoresTeamA = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'a');
-            let scoresTeamB = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'b');
-
-            // Daten im Chart aktualisieren
-            self.scoreChart.data.datasets[0].data = scoresTeamA;
-            self.scoreChart.data.datasets[1].data = scoresTeamB;
-            self.scoreChart.data.datasets[3].data = scoresTeamA.map((val, i) => val - scoresTeamB[i])
-            self.scoreChart.update(); // Chart aktualisieren
-
-            // console.log(scoresTeamA, scoresTeamB);
-        // } catch (TypeError) {
-        //     console.log("Chart not ready yet");
-        // }
-        
-
-
     }
 
-    createScoreHistoryChart() {
+    updateScoreHistoryChart() {
         let self = this;
         let scoresTeamA = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'a');
         let scoresTeamB = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'b');
 
         let labels = scoresTeamA.map((_, i) => `${i + 1}`);
-        let fillData = scoresTeamA.map((val, i) => val - scoresTeamB[i]);
 
         let ctx = document.getElementById('scoreChart').getContext('2d');
+
+        try {
+            self.scoreChart.destroy();
+        } catch {}
 
         self.scoreChart = new Chart(ctx, {
             type: 'line',
@@ -707,43 +691,57 @@ export class Scoreboard {
                     {
                         label: "Team A",
                         data: scoresTeamA,
-                        borderColor: getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim(),
-                        backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim()}22`,
-                        fill: "false"
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        segment: {
+                            borderColor: getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim(),
+                            backgroundColor: ctx => {
+                                if (!ctx.p1 || !ctx.chart.data.datasets[1]) return '#000000'; // Fallback-Farbe
+                                const dataset2Value = ctx.chart.data.datasets[1].data[ctx.p0DataIndex]; // Wert aus Dataset 2
+                                return ctx.p1.parsed.y > dataset2Value ?
+                                `${getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim()}44` :
+                                `${getComputedStyle(document.documentElement).getPropertyValue("--B_Color").trim()}44`;
+                            },
+                        },
+                        fill: '+1',
                     },
                     {
                         label: "Team B",
                         data: scoresTeamB,
                         borderColor: getComputedStyle(document.documentElement).getPropertyValue("--B_Color").trim(),
                         backgroundColor: `${getComputedStyle(document.documentElement).getPropertyValue("--B_Color").trim()}22`,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
                         fill: "false"
-                    },
-                    {
-                        label: 'Füllung',
-                        data: fillData, // Differenz zwischen den Linien
-                        borderColor: 'transparent', // Unsichtbare Linie
-                        backgroundColor: (ctx) => {
-                            const { raw } = ctx;
-                            return raw >= 0 ? 'rgba(0, 255, 0, 0.5)' : 'rgba(255, 0, 0, 0.5)';
-                        },
-                        fill: true // Nur die Differenz wird gefüllt
                     }
                 ]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 0 // Setzt die Dauer der Animation auf 0ms, wodurch die Animation deaktiviert wird
+                },
                 plugins: {
-                    legend: { display: true }
+                    legend: { display: false }, // Versteckt die Legende
+                    tooltip: { enabled: false } // Versteckt die Tooltips
                 },
                 scales: {
-                    x: { title: { display: true, text: 'Runden' } },
-                    y: { title: { display: true, text: 'Punkte' }, beginAtZero: true }
+                    x: {
+                        display: false,
+                        title: { display: false, text: 'Punkt' },
+                        grid: { display: false }
+                    },
+                    y: {
+                        display: false,
+                        title: { display: false, text: 'Punkte' },
+                        grid: { display: false },
+                        beginAtZero: true
+                    }
                 }
             }
         });
 
-        let chartArea = self.scoreChart.chartArea;
-        if (!chartArea) return;
         self.scoreChart.update();
     }
 }
