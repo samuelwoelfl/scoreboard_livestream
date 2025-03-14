@@ -32,6 +32,7 @@ export class Scoreboard {
             "show_color": 1,
             "show_group_score": 0,
             "show_serve_indicator": 0,
+            "show_score_history": 0,
         }
         this.active_set = 1;
         this.ScoreHistoryChart = null;
@@ -530,6 +531,7 @@ export class Scoreboard {
         this.updatePlayerNamesVisibility();
         this.updateServeIndicatorVisibility();
         this.updateUrlOutput();
+        this.updateScoreHistoryVisibility();
     }
 
     updateGroupScoreVisibility() {
@@ -565,6 +567,14 @@ export class Scoreboard {
             $('.serve_indicator').show();
         } else if (this.settings['show_serve_indicator'] == 0) {
             $('.serve_indicator').hide();
+        }
+    }
+
+    updateScoreHistoryVisibility() {
+        if (this.settings['show_score_history'] == 1) {
+            $('.score_history').show();
+        } else if (this.settings['show_score_history'] == 0) {
+            $('.score_history').hide();
         }
     }
 
