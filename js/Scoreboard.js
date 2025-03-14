@@ -50,11 +50,6 @@ export class Scoreboard {
             this.updateUI();
         }, 300);
 
-        let slow_update_interval = setInterval(() => {
-            this.updateScoreHistory();
-            this.updateScoreHistoryChart();
-        }, 2500);
-
         if (this.type == 'input') {
             this.data_interval = setInterval(() => {
                 this.insertLiveData();
@@ -64,6 +59,10 @@ export class Scoreboard {
             this.data_interval = setInterval(() => {
                 this.insertLiveData();
             }, 300);
+            let slow_update_interval = setInterval(() => {
+                this.updateScoreHistory();
+                this.updateScoreHistoryChart();
+            }, 2500);
         }
     }
 
@@ -131,23 +130,23 @@ export class Scoreboard {
         });
 
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
+            var self = this;
             var $target = $(event.target);
-            var team = this.getScoreElemDetails($target)['team'];
+            var team = self.getScoreElemDetails($target)['team'];
             var newScore = Number($target.val());
-            var oldScore = Number(this.$html_frame.find('.team_score').attr(`score_${team}`));
-            console.log(oldScore, newScore);
+            var oldScore = Number(self.$html_frame.find('.team_score').attr(`score_${team}`));
 
             // if its a "-" input, remove corresponding history event
             if (newScore < oldScore) {
-                $.each(this.event_history.slice().reverse(), (index, event) => {
+                $.each(self.event_history.slice().reverse(), (index, event) => {
                     if (event.type === 'score' && event.team === team && event.score > newScore) {
-                        this.event_history.splice(this.event_history.length - 1 - index, 1);
+                        self.event_history.splice(self.event_history.length - 1 - index, 1);
                         return false; // break the loop
                     }
                 });
             // otherwise normally push the event
             } else {
-                this.event_history.push({
+                self.event_history.push({
                     type: 'score',
                     team: team,
                     score: newScore
@@ -248,6 +247,11 @@ export class Scoreboard {
 
             if (path.includes('event_history')) {
                 if (value.length > 0) {
+                    if (typeof(value) == 'string') {
+                        value = [];
+                    } else {
+                        value = value
+                    }
                     value = value
                 } else {
                     value = []
