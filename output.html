@@ -254,26 +254,32 @@
 
 
     <div class="score_history">
-        <div class="teams">
-            <div class="team">
-                <div class="color-indicator" fb-data="teams_info.team_a.color"></div>
-                <div class="name">
-                    <p class="teamname" fb-data="teams_info.team_a.name">A Teamname</p>
+        <div class="table_view">
+            <div class="teams_info">
+                <div class="team">
+                    <div class="color-indicator" fb-data="teams_info.team_a.color"></div>
+                    <div class="name">
+                        <p class="teamname" fb-data="teams_info.team_a.name">A Teamname</p>
+                    </div>
+                </div>
+                <div class="team">
+                    <div class="color-indicator" fb-data="teams_info.team_b.color"></div>
+                    <div class="name">
+                        <p class="teamname" fb-data="teams_info.team_b.name">B Teamname</p>
+                    </div>
                 </div>
             </div>
-            <div class="team">
-                <div class="color-indicator" fb-data="teams_info.team_b.color"></div>
-                <div class="name">
-                    <p class="teamname" fb-data="teams_info.team_b.name">B Teamname</p>
+            <div class="scores">
+                <div class="team_rows">
+                    <div class="team" team="a"></div>
+                    <div class="team" team="b"></div>
                 </div>
+                
             </div>
         </div>
-        <div class="scores">
-            <div class="team" team="a"></div>
-            <div class="team" team="b"></div>
-            <div class="chartContainer">
-                <canvas id="scoreChart" width="100%" height="200px"></canvas>
-            </div>
+
+        <div class="chartContainer">
+            <canvas id="scoreChart" width="100%" height="200px"></canvas>
         </div>
     </div>
 
