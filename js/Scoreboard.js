@@ -33,6 +33,7 @@ export class Scoreboard {
             "show_group_score": 0,
             "show_serve_indicator": 0,
             "show_score_history": 0,
+            "show_score_history_chart": 0,
         }
         this.active_set = 1;
         this.ScoreHistoryChart = null;
@@ -60,10 +61,10 @@ export class Scoreboard {
             this.data_interval = setInterval(() => {
                 this.insertLiveData();
             }, 300);
-            let slow_update_interval = setInterval(() => {
-                this.updateScoreHistory();
-                this.updateScoreHistoryChart();
-            }, 2500);
+            // let slow_update_interval = setInterval(() => {
+            //     this.updateScoreHistory();
+            //     this.updateScoreHistoryChart();
+            // }, 2500);
         }
     }
 
@@ -75,6 +76,10 @@ export class Scoreboard {
         this.updateSettings();
         this.handleEventHistory();
         this.updateOldScoreInputCounter();
+        if (this.type == 'output') {
+            this.updateScoreHistory();
+            this.updateScoreHistoryChart();
+        }
     }
 
     setTheme(theme) {
@@ -138,7 +143,7 @@ export class Scoreboard {
             var oldScore = Number(self.$html_frame.find('.team_score').attr(`score_${team}`));
 
             // if its a "-" input, remove corresponding history event
-            if (newScore < oldScore) {
+            if (newScore < oldScore && !$target.attr('fb-data').includes('squad_score')) {
                 $.each(self.event_history.slice().reverse(), (index, event) => {
                     if (event.type === 'score' && event.team === team && event.score > newScore) {
                         self.event_history.splice(self.event_history.length - 1 - index, 1);
@@ -147,19 +152,30 @@ export class Scoreboard {
                 });
             // otherwise normally push the event
             } else {
-                self.event_history.push({
-                    type: 'score',
-                    team: team,
-                    score: newScore
-                });
+                if ($target.attr('fb-data').includes('squad_score')) {
+                    self.event_history.push({
+                        type: 'squad_score',
+                        team: team,
+                        score: newScore,
+                    }); 
+                } else {
+                    self.event_history.push({
+                        type: 'score',
+                        team: team,
+                        score: newScore,
+                        set: self.active_set,
+                    });
+                }
+                
             }
 
             this.updateOldScoreInputCounter();
+            this.uploadData([$target]);
         });
         
 
         // upload local data as any input values changes
-        this.$scoreboardInputs.on('input', (event) => {
+        this.$scoreboardInputs.not('[fb-data*="score"]').on('input', (event) => {
             this.uploadData([$(event.target)]);
         });
 
@@ -185,7 +201,6 @@ export class Scoreboard {
                 type: 'set',
                 set: this.active_set,
             });
-            // this.event_history.push('set_'+ this.active_set);
         })
 
         // interaction for the set buttons
@@ -219,7 +234,6 @@ export class Scoreboard {
 
             this.active_set = 1;
             this.updateSets();
-            // this.event_history.push('reset');
             this.event_history.push({
                 type: 'reset',
             });
@@ -499,9 +513,10 @@ export class Scoreboard {
 
     getServingTeam() {
         if (this.event_history.length > 0) {
-            var last_action = this.event_history[this.event_history.length -1];
-            if (last_action['type'] == 'score') {
-                return last_action['team'];
+
+            const lastScoreEvent = this.event_history.slice().reverse().find(event => event.type === 'score');
+            if (lastScoreEvent) {
+                return lastScoreEvent.team;
             } else {
                 return null;
             }
@@ -532,6 +547,7 @@ export class Scoreboard {
         this.updateServeIndicatorVisibility();
         this.updateUrlOutput();
         this.updateScoreHistoryVisibility();
+        this.updateScoreHistoryChartVisibility();
     }
 
     updateGroupScoreVisibility() {
@@ -575,6 +591,19 @@ export class Scoreboard {
             $('.score_history').show();
         } else if (this.settings['show_score_history'] == 0) {
             $('.score_history').hide();
+        }
+    }
+
+    updateScoreHistoryChartVisibility() {
+        if (this.settings['show_score_history_chart'] == 1) {
+            if ($('.chartContainer').is(':hidden')) {
+                $('.chartContainer').slideDown(400, "easeOutCubic");
+                this.scoreChart.update();
+            }
+        } else if (this.settings['show_score_history_chart'] == 0) {
+            if ($('.chartContainer').not(':hidden')) {
+                $('.chartContainer').slideUp(300, "easeOutCubic");
+            }
         }
     }
 
@@ -623,30 +652,27 @@ export class Scoreboard {
     }
 
     handleEventHistory() {
-        if (this.event_history.length > 50) {
-            this.event_history = this.event_history.slice(-50);
+        if (this.event_history.length > 164) {
+            this.event_history = this.event_history.slice(-164);
         }
-        // console.log(this.event_history);
     }
 
-    getScoreHistory(set = -1) {
+    getScoreHistory(set = this.active_set) {
         let self = this;
+        
         let slicedEventHistory = [];
+        let startIndex = -1;
+        $.each(self.event_history.slice().reverse(), function (i, event) {
+            if (event['type'] == 'reset') {
+                startIndex = self.event_history.length - 1 - i;
+                return false; // break the loop
+            }
+        });
+        slicedEventHistory = self.event_history.slice(startIndex + 1);
 
-        if (set == -1) {
-            let startIndex = -1;
-            $.each(self.event_history.slice().reverse(), function (i, event) {
-                if (event['type'] == 'set' || event['type'] == 'reset') {
-                    startIndex = self.event_history.length - 1 - i;
-                    return false; // break the loop
-                }
-            });
-            slicedEventHistory = self.event_history.slice(startIndex + 1);
-        } else {
-            
-        }
+        let filteredEventHistory = slicedEventHistory.filter(event => event['type'] === 'score' && event['set'] === set);
 
-        return slicedEventHistory;
+        return filteredEventHistory;
     }
 
     scoreHistoryToTeamPoints(slicedEventHistory, team) {
@@ -676,9 +702,12 @@ export class Scoreboard {
             $container.empty();
             let team = $container.attr('team');
             let scores_list = self.scoreHistoryToTeamPoints(self.getScoreHistory(), team);
+            
+            let streak = 0;
             $.each(scores_list, function (i, score) {
                 let status = score > (i > 0 ? scores_list[i-1] : 0) ? 'active' : ''; 
-                let element = `<div class="score_item ${status}">${score}</div>`;
+                streak = score > (i > 0 ? scores_list[i-1] : 0) ? streak += 1 : 0;
+                let element = `<div class="score_item ${status}" streak="${streak}">${score}</div>`;
                 $container.append(element);
             });
         });

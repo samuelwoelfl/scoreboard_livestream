@@ -100,7 +100,7 @@ async function getUsers() {
 export async function writeData(newData) {
     update(ref(db), newData)
         .then(function () {
-            console.log("User data updated successfully.");
+            console.log("Data updated successfully.");
         })
         .catch(function (error) {
             console.error("Error updating user data:", error);
