@@ -12,6 +12,13 @@ html, body {
   text-edge: cap; */
 }
 
+.hidden {
+  opacity: 0;
+  max-height: 0px;
+  max-width: 0px;
+  overflow: hidden;
+}
+
 #auth {
   display: none;
   position: absolute;

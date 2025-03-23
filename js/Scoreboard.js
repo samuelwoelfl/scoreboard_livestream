@@ -110,7 +110,11 @@ export class Scoreboard {
             var html_structure = themes[theme]['html_structure'];
             $('.scoreboard').hide();
             $(`.scoreboard[theme="${html_structure}"]`).show();
-            $(`.scoreboard.score_history`).show();
+            if (html_structure == 'vertical_score') {
+                $('.score_history').removeClass('hidden');
+            } else {
+                $('.score_history').addClass('hidden');
+            }
         }
     }
 
