@@ -2,16 +2,18 @@ import { themes, readData, getPathsAndValues, getColorBrightness, rgb2hex, write
 
 export class Scoreboard {
     // Konstruktor
-    constructor(type = 'input', $html_frame = $('.scoreboard'), channel, theme = 'rg', user = null) {
+    constructor(type = 'input', $html_frame = $('.scoreboard'), $led_control_html_frame, channel, theme = 'rg', user = null) {
         this.type = type;
         this.user = user;
         // Frontend elements
         this.$html_frame = $html_frame;
+        this.$led_control_html_frame = $led_control_html_frame;
         this.$themeInput = $('#theme');
         this.$channelInput = $('#channel');
         this.$scoreChangeButtons = $('.button[team][change]');
         this.$setChangeButtons = $('.set_controls_container .button');
         this.$scoreboardInputs = this.$html_frame.find($('input:not([type=submit]), textarea'));
+        this.$ledControlInputs = this.$led_control_html_frame.find('input:not([type=submit])');
         this.$setCounter = $('#Set_Count');
         this.$resetScoresButton = $('#reset_scores');
         this.$sets = $('.set');
@@ -23,7 +25,19 @@ export class Scoreboard {
         this.$urlOutputContainer = $('.url_output_container');
         this.$urlOutput = $('.url_output');
         this.$logoutButton = $('#logout');
-        // Stored variables
+        this.$ledBrightness = $('#brightness_value');
+        this.$useTeamColors = $('#use_team_colors');
+        this.use_team_colors = 1;
+        this.prev_use_team_colors = 0;
+        this.$useTeamColors.prop('checked', this.use_team_colors);
+        this.teamAColor = null;
+        this.teamBColor = null;
+        this.teamAColorLED = "#0000ff";
+        this.teamBColorLED = "#ff0000";
+        this.$teamAColorLED = $('#team_a_color_led');
+        this.$teamBColorLED = $('#team_b_color_led');
+        this.$teamAColorLED.val(this.teamAColorLED);
+        this.$teamBColorLED.val(this.teamBColorLED);
         this.channel = Number(channel);
         this.theme = theme;
         this.settings = {
@@ -32,6 +46,7 @@ export class Scoreboard {
             "show_group_score": 0,
             "show_serve_indicator": 0,
         }
+        this.led_brightness = 100;
         this.active_set = 1;
         this.event_history = [];
         this.data_interval;
@@ -42,6 +57,8 @@ export class Scoreboard {
 
     init() {
         this.initEventListeners();
+        this.updateAvailableChannels();
+        this.uploadInitialData();
         this.insertLiveData();
 
         this.update_interval = setInterval(() => {
@@ -60,12 +77,18 @@ export class Scoreboard {
         }
     }
 
+    uploadInitialData(){
+        this.uploadData([this.$useTeamColors]);
+        this.uploadData([this.$teamAColorLED, this.$teamBColorLED])
+    }
+
     updateUI() {
         this.updateSets();
         this.updateSetScore();
         this.updateActiveScore();
         this.updateIndicators();
         this.updateSettings();
+        this.updateLedSettings()
         this.handleEventHistory();
     }
 
@@ -127,9 +150,56 @@ export class Scoreboard {
             // this.event_history.push($(event.target));
         });
         
-        // upload local data as any input values changes
+        // upload local data as any board input values changes
         this.$scoreboardInputs.on('input', (event) => {
+            const $target = $(event.target);
+            if (this.use_team_colors){
+                if ($target.attr("fb-data") === "teams_info.team_a.color"){
+                    this.teamAColor = $target.val()
+                    $('#digit1 .segment').css('background-color', this.teamAColor);
+                    $('#digit2 .segment').css('background-color', this.teamAColor);
+                } else if ($target.attr("fb-data") === "teams_info.team_b.color"){
+                    this.teamBColor = $target.val()
+                    $('#digit3 .segment').css('background-color', this.teamBColor);
+                    $('#digit4 .segment').css('background-color', this.teamBColor);
+                }
+            }
             this.uploadData([$(event.target)]);
+        });
+
+        // upload local data as any led control input values changes
+        this.$ledControlInputs.on('input', (event) => {
+            const $target = $(event.target);
+            if ($target.attr("fb-data") === "led_board_settings.brightness"){
+                this.led_brightness = $target.val()
+                this.$ledBrightness.text(this.led_brightness);
+                $('input[type="range"][fb-data="led_board_settings.brightness"]').val(this.led_brightness);
+            } else if ($target.attr("fb-data") === "led_board_settings.use_team_colors") {
+                this.use_team_colors = $target[0].checked;
+            }
+            this.uploadData([$target]);
+        });
+
+        // Event listener for color change
+        $('.led-color-indicator').off('input').on('input', (event) => {
+            const $target = $(event.target);
+            const selectedColor = $target.val();
+            const isTeamA = $target.attr('fb-data') === 'led_board_settings.team_a_color';
+
+            // Store and apply the selected color
+            if (isTeamA) {
+                this.teamAColorLED = selectedColor;
+                this.$teamAColorLED.val(this.teamAColorLED);
+                this.uploadData([this.$teamAColorLED]);
+                $('#digit1 .segment').css('background-color', selectedColor);
+                $('#digit2 .segment').css('background-color', selectedColor);
+            } else {
+                this.teamBColorLED = selectedColor;
+                this.$teamBColorLED.val(this.teamBColorLED);
+                this.uploadData([this.$teamBColorLED]);
+                $('#digit3 .segment').css('background-color', selectedColor);
+                $('#digit4 .segment').css('background-color', selectedColor);
+            }
         });
 
         // interaction for the score buttons
@@ -217,10 +287,18 @@ export class Scoreboard {
                 self.event_history = value;
             } else if (path.includes('admin_settings')) {
                 self.insertAdminSetting(path, value);
-            } else if (path.includes('team') && path.includes('color')) {
+            } else if (path.includes('teams_info') && path.includes('color')) {
                 self.insertColor($elem, path, value);
             } else if (path.includes('active_set')) {
                 self.active_set = value;
+            } else if (path.includes('led_board_settings.brightness')){
+                self.led_brightness = value
+            } else if (path.includes('led_board_settings.use_team_colors')){
+                self.use_team_colors = value
+            } else if (path.includes('led_board_settings.team_a_color')){
+                self.teamAColorLED = value
+            } else if (path.includes('led_board_settings.team_b_color')){
+                self.teamBColorLED = value
             } else {
                 if ($elem.is('input')) {
                     $elem.val(value);
@@ -228,7 +306,6 @@ export class Scoreboard {
                     $elem.text(value);
                 }
             }
-
         });
     }
 
@@ -247,8 +324,10 @@ export class Scoreboard {
 
         if (path.includes('team_a')) {
             var team = 'a';
+            this.teamAColor = color
         } else if (path.includes('team_b')) {
             var team = 'b';
+            this.teamBColor = color
         }
 
         if ($elem.is('input')) {
@@ -287,22 +366,22 @@ export class Scoreboard {
             $.each($(elemList), function (i, elem) {
                 let value;
 
-                // Überprüfen, ob das Element eine Checkbox ist
+                // Check if the element is a checkbox
                 if ($(elem).is(":checkbox")) {
-                    value = $(elem).is(":checked") ? 1 : 0; // Wert auf 1 oder 0 setzen
+                    value = $(elem).is(":checked") ? 1 : 0; // Set the value to 1 or 0
                 } else {
-                    value = $(elem).val(); // Wert des Elements abrufen
+                    value = $(elem).val(); // Retrieve the value of the element
                 }
 
-                // Erstelle einen Pfad basierend auf dem fb-data Attribut
+                // Create a path based on the fb-data attribute
                 let fbDataAttr = $(elem).attr("fb-data");
                 if (fbDataAttr) {
-                    // Ersetze die Punkte im fb-data Attribut mit einem Schrägstrich
+                    // Replace the dots in the fb-data attribute with a slash
                     let dbSelector = fbDataAttr.replace(/\./g, '/');
-                    // Erstelle den vollständigen Pfad für Firebase
+                    // Create the full path for Firebase
                     let path_to_variable = `/match-${self.channel}/${dbSelector}`;
 
-                    // Überprüfen, ob der Wert in einen Integer umgewandelt werden kann
+                    // Check if the value can be converted to an integer
                     if (path_to_variable.includes('score') || path_to_variable.includes('active_set')) {
                         try {
                             value = parseInt(value);
@@ -311,7 +390,7 @@ export class Scoreboard {
                         }
                     }
 
-                    // Füge den Pfad und den Wert zum newData Objekt hinzu
+                    // Add the path and the value to the newData object
                     newData[path_to_variable] = value;
                 }
             });
@@ -488,6 +567,29 @@ export class Scoreboard {
         this.updatePlayerNamesVisibility();
         this.updateServeIndicatorVisibility();
         this.updateUrlOutput();
+    }
+
+    updateLedSettings(){
+    // Check if the use_team_colors flag has changed
+        if (this.use_team_colors !== this.prev_use_team_colors) {
+            if (this.use_team_colors === 1) {
+                // Apply team colors and hide the color indicators
+                $('.led-color-indicator').hide();
+                $('#digit1 .segment').css('background-color', this.teamAColor);
+                $('#digit2 .segment').css('background-color', this.teamAColor);
+                $('#digit3 .segment').css('background-color', this.teamBColor);
+                $('#digit4 .segment').css('background-color', this.teamBColor);
+            } else {
+                // Apply the last selected colors and show the indicators
+                $('.led-color-indicator').show();
+                $('#digit1 .segment').css('background-color', this.teamAColorLED);
+                $('#digit2 .segment').css('background-color', this.teamAColorLED);
+                $('#digit3 .segment').css('background-color', this.teamBColorLED);
+                $('#digit4 .segment').css('background-color', this.teamBColorLED);
+            }
+            // Update the previous state to the current one
+            this.prev_use_team_colors = this.use_team_colors;
+        }
     }
 
     updateGroupScoreVisibility() {

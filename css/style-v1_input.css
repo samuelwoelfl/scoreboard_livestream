@@ -342,3 +342,118 @@ button:active {
   opacity: .6;
   transform: scale(.95);
 }
+
+.controls .led {
+  max-width: 400px;
+}
+
+.slider-container {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  max-width: 150px
+}
+
+input[type="range"] {
+  -webkit-appearance: none; /* Remove default styling */
+  appearance: none;
+  width: 200px;
+  height: 5px;
+  background: linear-gradient(to right, var(--text-primary), var(--primary));
+  border-radius: 4px;
+  outline: none;
+  margin-right: 10px;
+}
+
+input[type="range"]:focus {
+  outline: none;
+  box-shadow: 0 0 0px #ffc10700;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  background: #ffc107;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.segment-display {
+  display: flex;
+  align-items: flex-start;
+  gap : 20px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.digit-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.digit-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-bottom: 5px;
+  width: 100%;
+  gap: 5px
+}
+
+.digit {
+  position: relative;
+  width: 30px;
+  height: 55px;
+}
+
+#digit1 .segment, #digit2 .segment {
+  background-color: var(--led-team-a-color, #FF0000);
+}
+
+#digit3 .segment, #digit4 .segment {
+  background-color: var(--led-team-b-color, #0000FF);
+}
+
+.segment {
+  position: absolute;
+  background-color: #444;
+  opacity: 1;
+  transition: background-color 0.3s, opacity 0.3s;
+}
+
+.segment.horizontal {
+  width: 20px;
+  height: 5px;
+}
+
+.segment.vertical {
+  width: 5px;
+  height: 20px;
+}
+
+.segment.on {
+  opacity: 1;
+}
+
+.segment.a { top: 0; left: 50%; transform: translateX(-50%);}
+.segment.b { top: 5px; right: 0}
+.segment.c { bottom: 5px; right: 0}
+.segment.d { bottom: 0; left: 50%; transform: translateX(-50%);}
+.segment.e { bottom: 5px; left: 0}
+.segment.f { top: 5px; left: 0}
+.segment.g { top: 50%; left: 50%; transform: translate(-50%, -50%);}
+
+.led-color-indicator {
+  min-width: 0;
+  border: none;
+  width: 50px;
+  height: 18px;
+  background: #ffffff00;
+  border-radius: 3px;
+  cursor: pointer;
+}

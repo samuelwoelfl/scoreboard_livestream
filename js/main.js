@@ -64,13 +64,9 @@ $(document).ready(async function () {
         var type = 'input';
     }
 
-    // Scoreboard sofort erstellen
-    scoreboard = new Scoreboard(type, $('.scoreboard'), channel_selection, theme_selection);
-
     // Warten auf die Authentifizierung und den Benutzer setzen
-    if (type == 'input') {
-        await handleAuthentication(scoreboard);
-    }
+    const user = await handleAuthentication();
+    scoreboard = new Scoreboard(type, $('.scoreboard'), $('.led'), channel_selection, theme_selection, user);
 
     // Toast-Nachricht schließen
     $('.banner_close_button').click(function () {
@@ -111,7 +107,7 @@ export async function writeData(newData) {
 // ========================================= Global Functions ===================================== //
 
 
-async function handleAuthentication(scoreboard) {
+async function handleAuthentication() {
     return new Promise(async (resolve) => {
         var storedUser = localStorage.getItem('currentUser');
 
@@ -122,8 +118,6 @@ async function handleAuthentication(scoreboard) {
 
             if (loggedInUser) {
                 // Benutzer erfolgreich authentifiziert, dem Scoreboard zuweisen
-                scoreboard.user = loggedInUser;
-                scoreboard.updateAvailableChannels();
                 resolve(loggedInUser);
             }
         }
@@ -143,8 +137,6 @@ async function handleAuthentication(scoreboard) {
                 if (loggedInUser) {
                     $('#auth').hide();
                     // Benutzer setzen und Scoreboard aktualisieren
-                    scoreboard.user = loggedInUser;
-                    scoreboard.updateAvailableChannels();
                     resolve(loggedInUser);
                 }
             });
