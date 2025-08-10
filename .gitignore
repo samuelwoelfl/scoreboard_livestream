@@ -2,3 +2,4 @@
 .htaccess
 dbconnect.inc.php
 -- old --
+database_copy.json
