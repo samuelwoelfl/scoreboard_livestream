@@ -82,7 +82,7 @@ export class Scoreboard {
         // Set theme for output type
         if (this.type === 'output') {
             this.setTheme(this.theme);
-ß        }
+        }
     }
 
     /**
@@ -272,13 +272,12 @@ export class Scoreboard {
      */
     removeScoreHistoryEvents(team, newScore) {
         const reversedHistory = this.event_history.slice().reverse();
-        for (let i = 0; i < reversedHistory.length; i++) {
-            const event = reversedHistory[i];
+        $.each(reversedHistory, (index, event) => {
             if (event.type === 'score' && event.team === team && event.score > newScore) {
-                this.event_history.splice(this.event_history.length - 1 - i, 1);
-                break;
+                this.event_history.splice(this.event_history.length - 1 - index, 1);
+                return false; // break the loop
             }
-        }
+        });
     }
 
     /**
@@ -293,7 +292,7 @@ export class Scoreboard {
         const pathsAndValues = getPathsAndValues(data);
 
         // Process each path and value
-        for (const [path, value] of Object.entries(pathsAndValues)) {
+        $.each(Object.entries(pathsAndValues), (_, [path, value]) => {
             const $elem = $(`[fb-data="${path}"]`);
 
             if (path.includes('event_history')) {
@@ -308,7 +307,7 @@ export class Scoreboard {
                 // Set value based on element type
                 $elem.is('input') ? $elem.val(value) : $elem.text(value);
             }
-        }
+        });
     }
 
     /**
@@ -388,7 +387,7 @@ export class Scoreboard {
         newData[`/match-${this.channel}/event_history`] = this.event_history;
 
         // Process each element
-        $(elemList).each((i, elem) => {
+        $.each(elemList, (_, elem) => {
             const $elem = $(elem);
             const fbDataAttr = $elem.attr("fb-data");
             
@@ -424,9 +423,11 @@ export class Scoreboard {
      */
     getPlayedSets() {
         const playedSets = [];
-        for (let i = 0; i < this.active_set - 1; i++) {
-            playedSets.push(this.$sets[i]);
-        }
+        $.each(this.$sets, (i, set) => {
+            if (i + 1 < this.active_set) {
+                playedSets.push(set);
+            }
+        });
         return playedSets;
     }
 
@@ -496,11 +497,11 @@ export class Scoreboard {
         let setScore = 0;
         const playedSets = this.getPlayedSets();
         
-        for (let i = 0; i < playedSets.length; i++) {
+        $.each(playedSets, (i, set) => {
             if (this.getWinner(i + 1) === team) {
                 setScore += 1;
             }
-        }
+        });
 
         return setScore;
     }
@@ -512,7 +513,7 @@ export class Scoreboard {
     }
 
     updateSetsVisibility() {
-        this.$sets.each((i, set) => {
+        $.each(this.$sets, (i, set) => {
             const $set = $(set);
             const setNumber = i + 1;
             
@@ -530,7 +531,7 @@ export class Scoreboard {
     updateSetWinners() {
         const $scoreElems = this.$html_frame.find('[fb-data*="score"]');
 
-        $scoreElems.each((i, elem) => {
+        $.each($scoreElems, (i, elem) => {
             const $scoreElem = $(elem);
             const details = this.getScoreElemDetails($scoreElem);
             
@@ -583,7 +584,7 @@ export class Scoreboard {
 
     updateSettings() {
         // Update checkbox states
-        Object.entries(this.settings).forEach(([key, value]) => {
+        $.each(Object.entries(this.settings), (_, [key, value]) => {
             const $settingsEntry = this.$settingsEntries.filter(`[fb-data*="${key}"]`);
             $settingsEntry.prop('checked', value === 1);
         });
@@ -655,7 +656,7 @@ export class Scoreboard {
 
         let channelExists = false;
 
-        this.user.channels.forEach(channel => {
+        $.each(this.user.channels, (i, channel) => {
             this.$channelInput.append($('<option></option>').val(channel).html(channel));
             if (channel === this.channel) {
                 channelExists = true;
@@ -693,12 +694,12 @@ export class Scoreboard {
     getScoreHistory(set = this.active_set) {
         // Find the last reset event
         let startIndex = -1;
-        for (let i = this.event_history.length - 1; i >= 0; i--) {
-            if (this.event_history[i].type === 'reset') {
-                startIndex = i;
-                break;
+        $.each(this.event_history.slice().reverse(), (i, event) => {
+            if (event.type === 'reset') {
+                startIndex = this.event_history.length - 1 - i;
+                return false; // break the loop
             }
-        }
+        });
 
         const slicedEventHistory = this.event_history.slice(startIndex + 1);
         return slicedEventHistory.filter(event => event.type === 'score' && event.set === set);
@@ -715,7 +716,7 @@ export class Scoreboard {
         const teamPointsList = [];
         let lastScore = 0;
 
-        slicedEventHistory.forEach(event => {
+        $.each(slicedEventHistory, (i, event) => {
             if (event.type === 'score') {
                 if (event.team.toLowerCase() === team.toLowerCase()) {
                     lastScore = Number(event.score);
@@ -732,7 +733,7 @@ export class Scoreboard {
      * Shows score progression and active streaks for each team
      */
     updateScoreHistory() {
-        this.$scoreHistoryContainer.find('.scores .team').each((i, container) => {
+        $.each(this.$scoreHistoryContainer.find('.scores .team'), (i, container) => {
             const $container = $(container);
             const team = $container.attr('team');
             const scoresList = this.scoreHistoryToTeamPoints(this.getScoreHistory(), team);
@@ -740,8 +741,8 @@ export class Scoreboard {
             $container.empty();
             
             let streak = 0;
-            scoresList.forEach((score, index) => {
-                const isActive = score > (index > 0 ? scoresList[index - 1] : 0);
+            $.each(scoresList, (i, score) => {
+                const isActive = score > (i > 0 ? scoresList[i - 1] : 0);
                 streak = isActive ? streak + 1 : 0;
                 const status = isActive ? 'active' : '';
                 const element = `<div class="score_item ${status}" streak="${streak}">${score}</div>`;
