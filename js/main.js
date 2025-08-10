@@ -1,10 +1,9 @@
 // import firebase config
-import {get, ref, update} from "https://www.gstatic.com/firebasejs/10.5.2/firebase-database.js";
+import {get, ref, update, set} from "https://www.gstatic.com/firebasejs/10.5.2/firebase-database.js";
 import {db} from "./firebase_config.js";
 
 import { User } from "./User.js";
 import { Scoreboard } from "./Scoreboard.js";
-
 
 export const themes = {
     'full': {
@@ -33,116 +32,99 @@ export const themes = {
     },
 }
 
-// initialize variables for global usage
-var loggedInUser;
-var scoreboard;
-var $banner, $logoutButton;
-
+// Initialize variables for global usage
+let loggedInUser;
+let scoreboard;
+let $banner, $logoutButton;
 
 // =========================================== Page Load ======================================= //
-
 
 $(document).ready(async function () {
     $banner = $('.banner');
     $logoutButton = $('button#logout');
 
-    // Kanalwahl aus URL-Parameter
-    var urlParams = new URLSearchParams(window.location.search);
-    var url_channel = urlParams.get('channel');
-    var url_theme = urlParams.get('theme');
-    if (isNaN(parseInt(url_channel, 10))) {
-        var channel_selection = 1;
-    } else {
-        var channel_selection = url_channel
-    }
-    var theme_selection = url_theme;
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlChannel = urlParams.get('channel');
+    const urlTheme = urlParams.get('theme');
+    
+    // Parse channel selection with fallback
+    const channelSelection = isNaN(parseInt(urlChannel, 10)) ? 1 : urlChannel;
+    const themeSelection = urlTheme;
 
-    // Type of board
-    if ($('html').attr('type') == 'output') {
-        var type = 'output';
-    } else {
-        var type = 'input';
-    }
+    // Determine board type
+    const type = $('html').attr('type') === 'output' ? 'output' : 'input';
 
-    // Scoreboard sofort erstellen
-    scoreboard = new Scoreboard(type, $('.scoreboard'), channel_selection, theme_selection);
+    // Create scoreboard immediately
+    scoreboard = new Scoreboard(type, $('.scoreboard'), channelSelection, themeSelection);
 
-    // Warten auf die Authentifizierung und den Benutzer setzen
-    if (type == 'input') {
+    // Wait for authentication and set user for input type
+    if (type === 'input') {
         await handleAuthentication(scoreboard);
     }
 
-    // Toast-Nachricht schließen
-    $('.banner_close_button').click(function () {
+    // Close toast message
+    $('.banner_close_button').click(() => {
         $banner.fadeOut(100);
     });
 });
 
-
 // ========================================= Data Functions ===================================== //
 
-
 export async function readData(channel) {
-    var matchRef = ref(db, `match-${channel}`);
-    var matchData = await get(matchRef);
-    var matchDataObject = matchData.val(); // Assuming your data is an object
-    return matchDataObject;
+    const matchRef = ref(db, `match-${channel}`);
+    const matchData = await get(matchRef);
+    return matchData.val();
 }
-
 
 async function getUsers() {
-    var usersData = await get(ref(db, 'users'));
-    var usersDataObject = usersData.val(); // Assuming your data is an object
-    return usersDataObject;
+    const usersData = await get(ref(db, 'users'));
+    return usersData.val();
 }
-
 
 export async function writeData(newData) {
-    update(ref(db), newData)
-        .then(function () {
-            console.log("Data updated successfully.");
-        })
-        .catch(function (error) {
-            console.error("Error updating user data:", error);
-        });
+    try {
+        await update(ref(db), newData);
+        console.log("Data updated successfully.");
+    } catch (error) {
+        console.error("Error updating user data:", error);
+    }
 }
-
 
 // ========================================= Global Functions ===================================== //
 
-
 async function handleAuthentication(scoreboard) {
     return new Promise(async (resolve) => {
-        var storedUser = localStorage.getItem('currentUser');
+        const storedUser = localStorage.getItem('currentUser');
 
         if (storedUser) {
-            // Prüfen, ob ein Benutzer im LocalStorage gespeichert ist
-            var userData = JSON.parse(storedUser);
+            // Check if user is stored in localStorage
+            const userData = JSON.parse(storedUser);
             loggedInUser = await login(userData.username, userData.password || "");
 
             if (loggedInUser) {
-                // Benutzer erfolgreich authentifiziert, dem Scoreboard zuweisen
+                // User successfully authenticated, assign to scoreboard
                 scoreboard.user = loggedInUser;
                 scoreboard.updateAvailableChannels();
                 resolve(loggedInUser);
             }
         }
 
-        // Falls kein Benutzer im LocalStorage vorhanden oder Login fehlschlägt
+        // If no user in localStorage or login failed
         if (!loggedInUser) {
             $('#auth').show();
 
-            // Login-Formular für Benutzeranmeldung
+            // Login form for user authentication
             $('form#login').on('submit', async function (e) {
                 e.preventDefault();
-                var username = $('#auth #username').val();
-                var password = $('#auth #password').val();
+                const username = $('#auth #username').val();
+                const password = $('#auth #password').val();
                 
                 loggedInUser = await login(username, password);
 
                 if (loggedInUser) {
                     $('#auth').hide();
-                    // Benutzer setzen und Scoreboard aktualisieren
+                    // Set user and update scoreboard
                     scoreboard.user = loggedInUser;
                     scoreboard.updateAvailableChannels();
                     resolve(loggedInUser);
@@ -152,9 +134,8 @@ async function handleAuthentication(scoreboard) {
     });
 }
 
-
 async function signUp(email, password) {
-    var users = await getUsers();
+    const users = await getUsers();
     if (users && users[email]) {
         showToast("❌", "Username already exists");
         return null;
@@ -163,7 +144,7 @@ async function signUp(email, password) {
     try {
         await set(ref(db, `users/${email}`), {
             email: email,
-            password: password // Speichern des Passworts (nicht gehasht)
+            password: password // Store password (not hashed)
         });
         console.log(`User ${email} registered.`);
     } catch (error) {
@@ -173,7 +154,6 @@ async function signUp(email, password) {
     }
 }
 
-
 async function login(username, inputPassword) {
     const users = await getUsers();
 
@@ -181,35 +161,35 @@ async function login(username, inputPassword) {
         const user = users[username];
         if (inputPassword === user.password) {
             console.log(`${username} is now logged in.`);
-            var auth_channels = users[username]["channels"].split(',');
-            loggedInUser = new User(username, user.password, auth_channels);
+            const authChannels = users[username].channels.split(',');
+            loggedInUser = new User(username, user.password, authChannels);
             $('#auth').hide();
-            $logoutButton.html(`${users[username]["display_name"]} - Logout`);           
-            showToast("✅", `Successfully logged in as ${users[username]["display_name"]}`, 2000);
+            $logoutButton.html(`${users[username].display_name} - Logout`);           
+            showToast("✅", `Successfully logged in as ${users[username].display_name}`, 2000);
         } else {
             showToast("❌", "The entered credentials are wrong, please try it again");
             return null;
         }
     } else {
-        // Benutzer existiert nicht, Benutzer zur Registrierung auffordern
+        // User doesn't exist, prompt for registration
         showToast("🆕", `User not found. You first have to register`);
         return null;
     }
 
-    return loggedInUser || null
+    return loggedInUser || null;
 }
-
 
 export function showToast(emoji, message, duration) {
     try {
-        // set the animation-duration of the cooldown ring to the show duration so that it shows how long the banner will stay
-        var showDuration = duration || 5000;
+        // Set the animation-duration of the cooldown ring to the show duration
+        const showDuration = duration || 5000;
         $banner.find('.icon').html(emoji);
         $banner.find('.progress-ring_circle').css('animation-duration', `${showDuration / 1000}s`);
         $banner.find('p').html(message);
         $banner.fadeIn(100);
-        // fade out banner after the set show duration it not already closed manually
-        setTimeout(function () {
+        
+        // Fade out banner after the set show duration if not already closed manually
+        setTimeout(() => {
             $banner.fadeOut(100);
         }, showDuration);
     } catch (error) {
@@ -217,48 +197,44 @@ export function showToast(emoji, message, duration) {
     }
 }
 
-
 // ========================================= Helper Functions ===================================== //
 
 function isNumeric(value) {
     return /^-?\d+$/.test(value);
 }
 
-
 export function rgb2hex(rgb) {
     if (/^#[0-9A-F]{6}$/i.test(rgb)) return rgb;
-    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    
+    const rgbMatch = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if (!rgbMatch) return rgb;
 
-    function hex(x) {
-        return ("0" + parseInt(x).toString(16)).slice(-2);
-    }
-    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+    const hex = (x) => ("0" + parseInt(x).toString(16)).slice(-2);
+    return "#" + hex(rgbMatch[1]) + hex(rgbMatch[2]) + hex(rgbMatch[3]);
 }
 
-
 export function getColorBrightness(hexColor) {
-    var r = parseInt(hexColor.substr(1, 2), 16);
-    var g = parseInt(hexColor.substr(3, 2), 16);
-    var b = parseInt(hexColor.substr(5, 2), 16);
+    const r = parseInt(hexColor.substr(1, 2), 16);
+    const g = parseInt(hexColor.substr(3, 2), 16);
+    const b = parseInt(hexColor.substr(5, 2), 16);
 
     return (r * 299 + g * 587 + b * 114) / 1000;
 }
 
-
-// helper function the returns the paths and values to json objects
+// Helper function that returns the paths and values to json objects
 export function getPathsAndValues(obj, currentPath = '') {
     const result = {};
 
     for (const key in obj) {
         const value = obj[key];
-        // Erstelle den aktuellen Pfad ohne führenden Punkt
+        // Create the current path without leading dot
         const path = currentPath ? `${currentPath}.${key}` : key;
 
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-            // Rekursive Funktion aufrufen, um tiefere Objekte zu durchlaufen
+            // Call recursive function to traverse deeper objects
             Object.assign(result, getPathsAndValues(value, path));
         } else {
-            // Speichere den gesamten Pfad mit dem Wert
+            // Store the complete path with the value
             result[path] = value;
         }
     }
@@ -266,15 +242,14 @@ export function getPathsAndValues(obj, currentPath = '') {
     return result;
 }
 
-
-// Funktion zum Kopieren des Textes in die Zwischenablage
+// Function to copy text to clipboard
 export function copyToClipboard(text) {
-    // Ein temporäres Input-Feld erstellen, um den Text in die Zwischenablage zu kopieren
-    var tempInput = $('<input>');
-    $('body').append(tempInput);  // Das Input-Feld zum DOM hinzufügen
+    // Create a temporary input field to copy text to clipboard
+    const tempInput = $('<input>');
+    $('body').append(tempInput);  // Add the input field to the DOM
 
-    tempInput.val(text).select();  // Den Text in das Input-Feld setzen und es auswählen
-    document.execCommand('copy');  // Den Text in die Zwischenablage kopieren
+    tempInput.val(text).select();  // Set the text in the input field and select it
+    document.execCommand('copy');  // Copy the text to the clipboard
 
-    tempInput.remove();  // Das temporäre Input-Feld wieder entfernen
+    tempInput.remove();  // Remove the temporary input field
 }

@@ -1,11 +1,23 @@
 import { themes, readData, getPathsAndValues, getColorBrightness, rgb2hex, writeData, showToast, copyToClipboard } from "./main.js";
 
+/**
+ * Scoreboard class manages the live scoreboard functionality for both input and output modes.
+ * Handles real-time data synchronization, UI updates, event history, and theme management.
+ */
 export class Scoreboard {
-    // Konstruktor
+    /**
+     * Initialize the Scoreboard with configuration and DOM elements
+     * @param {string} type - 'input' for admin interface, 'output' for display
+     * @param {jQuery} $html_frame - Main scoreboard container
+     * @param {number} channel - Channel number for data synchronization
+     * @param {string} theme - Theme identifier for styling
+     * @param {User|null} user - Authenticated user object (required for input mode)
+     */
     constructor(type = 'input', $html_frame = $('.scoreboard'), channel, theme = 'rg', user = null) {
         this.type = type;
         this.user = user;
-        // Frontend elements
+        
+        // Frontend elements - using const for immutable references
         this.$html_frame = $html_frame;
         this.$themeInput = $('#theme');
         this.$channelInput = $('#channel');
@@ -24,6 +36,7 @@ export class Scoreboard {
         this.$urlOutput = $('.url_output');
         this.$logoutButton = $('#logout');
         this.$scoreHistoryContainer = $('.score_history');
+        
         // Stored variables
         this.channel = Number(channel);
         this.theme = theme;
@@ -34,40 +47,48 @@ export class Scoreboard {
             "show_serve_indicator": 0,
             "show_score_history": 0,
             "show_score_history_chart": 0,
-        }
+        };
         this.active_set = 1;
         this.ScoreHistoryChart = null;
         this.event_history = [];
-        this.data_interval;
-        this.update_interval;
+        this.data_interval = null;
+        this.update_interval = null;
+        
         // Init function
         this.init();
     }
 
+    /**
+     * Initialize the scoreboard with event listeners and data synchronization
+     * Sets up intervals for UI updates and data fetching based on board type
+     */
     init() {
         this.initEventListeners();
         this.insertLiveData();
         
+        // Update UI every 300ms for smooth real-time updates
         this.update_interval = setInterval(() => {
             this.updateUI();
         }, 300);
 
-        if (this.type == 'input') {
-            this.data_interval = setInterval(() => {
-                this.insertLiveData();
-            }, 1500);
-        } else {
+        // Simplified interval logic - removed redundant code
+        // Input mode: slower updates (1500ms) since admin controls the data
+        // Output mode: faster updates (300ms) for real-time display
+        const dataIntervalDelay = this.type === 'input' ? 1500 : 300;
+        this.data_interval = setInterval(() => {
+            this.insertLiveData();
+        }, dataIntervalDelay);
+
+        // Set theme for output type
+        if (this.type === 'output') {
             this.setTheme(this.theme);
-            this.data_interval = setInterval(() => {
-                this.insertLiveData();
-            }, 300);
-            // let slow_update_interval = setInterval(() => {
-            //     this.updateScoreHistory();
-            //     this.updateScoreHistoryChart();
-            // }, 2500);
-        }
+ß        }
     }
 
+    /**
+     * Update all UI components in a single pass for performance
+     * Only updates score history for output mode to avoid unnecessary processing
+     */
     updateUI() {
         this.updateSets();
         this.updateSetScore();
@@ -76,49 +97,53 @@ export class Scoreboard {
         this.updateSettings();
         this.handleEventHistory();
         this.updateOldScoreInputCounter();
-        if (this.type == 'output') {
+        
+        // Only update score history for output type
+        if (this.type === 'output') {
             this.updateScoreHistory();
             this.updateScoreHistoryChart();
         }
     }
 
+    /**
+     * Apply theme styling and HTML structure based on theme configuration
+     * @param {string} theme - Theme identifier from themes object
+     */
     setTheme(theme) {
-        // fallback theme
+        // Simplified fallback logic
         if (!(theme in themes)) {
-            if (this.type == 'output') {
-                theme = 'full';
-            } else {
-                theme = 'rg';
-            }
+            theme = this.type === 'output' ? 'full' : 'rg';
         }
 
-        // set corresponding css
-        var css_path = themes[theme]['css_path'];
-        var extensionIndex = css_path.lastIndexOf('.');
-        var css_path_input = css_path.slice(0, extensionIndex) + "_input" + css_path.slice(extensionIndex);
+        const css_path = themes[theme].css_path;
+        const extensionIndex = css_path.lastIndexOf('.');
+        const css_path_input = css_path.slice(0, extensionIndex) + "_input" + css_path.slice(extensionIndex);
 
-        // remove all stylesheets
+        // Remove all stylesheets
         $('link[rel="stylesheet"]').remove();
 
-        // add relevant stylesheets
+        // Add relevant stylesheets
         $('<link>').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', '../css/base.css').appendTo('head');
         $('<link>').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', css_path).appendTo('head');
-        if (this.type == 'input') {
+        
+        if (this.type === 'input') {
             $('<link>').attr('rel', 'stylesheet').attr('type', 'text/css').attr('href', css_path_input).appendTo('head');
-        } else if (this.type == 'output') {
-            // set corresponding html
-            var html_structure = themes[theme]['html_structure'];
+        } else if (this.type === 'output') {
+            // Set corresponding html
+            const html_structure = themes[theme].html_structure;
             $('.scoreboard').hide();
             $(`.scoreboard[theme="${html_structure}"]`).show();
-            if (html_structure == 'vertical_score') {
-                $('.score_history').removeClass('hidden');
-            } else {
-                $('.score_history').addClass('hidden');
-            }
+            
+            // Simplified conditional logic
+            $('.score_history').toggleClass('hidden', html_structure !== 'vertical_score');
         }
     }
 
 
+    /**
+     * Initialize all event listeners for user interactions
+     * Handles score changes, set navigation, settings updates, and data synchronization
+     */
     initEventListeners() {
         // Theme input dropdown listener
         this.$themeInput.change((event) => {
@@ -133,330 +158,351 @@ export class Scoreboard {
             this.updateUI();
         });
 
-        this.$urlOutputContainer.click((event) => {
-            var text = this.$urlOutput.attr('href');
+        // URL output container click handler
+        this.$urlOutputContainer.click(() => {
+            const text = this.$urlOutput.attr('href');
             copyToClipboard(text);
-            showToast('📋', 'Copied url to clipboard')
+            showToast('📋', 'Copied url to clipboard');
         });
 
+        // Score input handler with simplified logic
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
-            var self = this;
-            var $target = $(event.target);
-            var team = self.getScoreElemDetails($target)['team'];
-            var newScore = Number($target.val());
-            var oldScore = Number(self.$html_frame.find('.team_score').attr(`score_${team}`));
+            const $target = $(event.target);
+            const team = this.getScoreElemDetails($target)?.team;
+            const newScore = Number($target.val());
+            const oldScore = Number(this.$html_frame.find('.team_score').attr(`score_${team}`));
+            const isSquadScore = $target.attr('fb-data').includes('squad_score');
 
-            // if its a "-" input, remove corresponding history event
-            if (newScore < oldScore && !$target.attr('fb-data').includes('squad_score')) {
-                $.each(self.event_history.slice().reverse(), (index, event) => {
-                    if (event.type === 'score' && event.team === team && event.score > newScore) {
-                        self.event_history.splice(self.event_history.length - 1 - index, 1);
-                        return false; // break the loop
-                    }
-                });
-            // otherwise normally push the event
+            // Handle score decrease (remove history events)
+            if (newScore < oldScore && !isSquadScore) {
+                this.removeScoreHistoryEvents(team, newScore);
             } else {
-                if ($target.attr('fb-data').includes('squad_score')) {
-                    self.event_history.push({
-                        type: 'squad_score',
-                        team: team,
-                        score: newScore,
-                    }); 
-                } else {
-                    self.event_history.push({
-                        type: 'score',
-                        team: team,
-                        score: newScore,
-                        set: self.active_set,
-                    });
+                // Add new event to history
+                const eventData = {
+                    type: isSquadScore ? 'squad_score' : 'score',
+                    team: team,
+                    score: newScore,
+                };
+                
+                if (!isSquadScore) {
+                    eventData.set = this.active_set;
                 }
                 
+                this.event_history.push(eventData);
             }
 
             this.updateOldScoreInputCounter();
             this.uploadData([$target]);
         });
-        
 
-        // upload local data as any input values changes
+        // Non-score input handler
         this.$scoreboardInputs.not('[fb-data*="score"]').on('input', (event) => {
             this.uploadData([$(event.target)]);
         });
 
-        // interaction for the score buttons
+        // Score change buttons handler
         this.$scoreChangeButtons.click((event) => {
-            var $scoreButton = $(event.target);
-            var $active_set_elem = $('.set.active'); // check which set is active - which determines which score will be changed
-            var team = $scoreButton.attr('team'); // set the team based on the attribute on the button
-            var change = Number($scoreButton.attr('change')); // set the change amount based on the attribute on the button
+            const $scoreButton = $(event.target);
+            const $activeSetElem = $('.set.active');
+            const team = $scoreButton.attr('team');
+            const change = Number($scoreButton.attr('change'));
+            const $scoreElem = $activeSetElem.find(`.score[fb-data*="team_${team}"]`);
+            const currentScore = Number($scoreElem.val());
 
-            var $score_elem = $active_set_elem.find(`.score[fb-data*="team_${team}"]`);
-
-            var score_now = Number($($score_elem).val()); // check score right now
-            if (score_now + change >= 0) {
-                $score_elem.val(score_now + change); // update to new score
-                $score_elem.trigger('input');
+            if (currentScore + change >= 0) {
+                $scoreElem.val(currentScore + change).trigger('input');
             }
         });
 
-        this.$setCounter.on('input', (event) => {
+        // Set counter input handler
+        this.$setCounter.on('input', () => {
             this.updateSets();
             this.event_history.push({
                 type: 'set',
                 set: this.active_set,
             });
-        })
+        });
 
-        // interaction for the set buttons
+        // Set change buttons handler
         this.$setChangeButtons.click((event) => {
-            var $setButton = $(event.target);
-            var change = Number($setButton.attr('change'));
+            const $setButton = $(event.target);
+            const change = Number($setButton.attr('change'));
+            const currentSet = Number(this.$setCounter.val());
+            const newSet = currentSet + change;
 
-            var set_now = Number(this.$setCounter.val()); // check set right now
-            if (set_now + change > 0 && set_now + change <= 7) {
-                this.active_set = set_now + change;
+            if (newSet > 0 && newSet <= 7) {
+                this.active_set = newSet;
                 this.$setCounter.trigger('input');
                 this.updateSets();
-                this.uploadData([this.$setCounter]); // upload the new set
+                this.uploadData([this.$setCounter]);
             }
         });
 
+        // Settings entries handler
         this.$settingsEntries.click((event) => {
-            var $trigger = $(event.target);
-            var value = $trigger.prop('checked') == true ? 1 : 0;
-            var part = $trigger.attr('fb-data').split('.').pop();
+            const $trigger = $(event.target);
+            const value = $trigger.prop('checked') ? 1 : 0;
+            const part = $trigger.attr('fb-data').split('.').pop();
             this.settings[part] = value;
             this.updateSettings();
             this.uploadData([$trigger]);
         });
 
-        // function for the reset scores button
-        this.$resetScoresButton.click((event) => {
-            $.each($('[fb-data*="score"]'), function (i, elem) {
-                $(elem).val(0);
-            });
-
+        // Reset scores button handler
+        this.$resetScoresButton.click(() => {
+            $('[fb-data*="score"]').val(0);
             this.active_set = 1;
             this.updateSets();
-            this.event_history.push({
-                type: 'reset',
-            });
-
+            this.event_history.push({ type: 'reset' });
             this.uploadData();
         });
 
-        // logout button
-        this.$logoutButton.click(function () {
+        // Logout button handler
+        this.$logoutButton.click(() => {
             localStorage.clear();
             location.reload();
         });
     }
 
+    /**
+     * Remove score history events when score is decreased
+     * This maintains accurate event history for undo functionality
+     * @param {string} team - Team identifier ('a' or 'b')
+     * @param {number} newScore - The new score value
+     */
+    removeScoreHistoryEvents(team, newScore) {
+        const reversedHistory = this.event_history.slice().reverse();
+        for (let i = 0; i < reversedHistory.length; i++) {
+            const event = reversedHistory[i];
+            if (event.type === 'score' && event.team === team && event.score > newScore) {
+                this.event_history.splice(this.event_history.length - 1 - i, 1);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Fetch and process live data from Firebase
+     * Handles different data types: event history, admin settings, team colors, and general values
+     */
     async insertLiveData() {
         console.log("inserting live data for channel ", this.channel);
 
-        // receive data from firebase
-        var data = await readData(this.channel);
-        var pathsAndValues = getPathsAndValues(data);
+        // Receive data from firebase
+        const data = await readData(this.channel);
+        const pathsAndValues = getPathsAndValues(data);
 
-        let self = this;
-        // go through values and insert them
-        $.each(pathsAndValues, function (path, value) {
-            var $elem = $('[fb-data="' + path + '"]'); // Element mit passendem fb-data Attribut finden
+        // Process each path and value
+        for (const [path, value] of Object.entries(pathsAndValues)) {
+            const $elem = $(`[fb-data="${path}"]`);
 
             if (path.includes('event_history')) {
-                if (value.length > 0) {
-                    if (typeof(value) == 'string') {
-                        value = [];
-                    } else {
-                        value = value
-                    }
-                    value = value
-                } else {
-                    value = []
-                }
-                self.event_history = value;
+                this.event_history = Array.isArray(value) ? value : [];
             } else if (path.includes('admin_settings')) {
-                self.insertAdminSetting(path, value);
+                this.insertAdminSetting(path, value);
             } else if (path.includes('team') && path.includes('color')) {
-                self.insertColor($elem, path, value);
+                this.insertColor($elem, path, value);
             } else if (path.includes('active_set')) {
-                self.active_set = value;
+                this.active_set = value;
             } else {
-                if ($elem.is('input')) {
-                    $elem.val(value);
-                } else {
-                    $elem.text(value);
-                }
+                // Set value based on element type
+                $elem.is('input') ? $elem.val(value) : $elem.text(value);
             }
-
-        });
+        }
     }
 
+    /**
+     * Insert admin setting value into local settings object
+     * @param {string} path - Firebase path containing the setting
+     * @param {*} value - Setting value to store
+     */
     async insertAdminSetting(path, value) {
-        var part = path.split('.').pop();
+        const part = path.split('.').pop();
         this.settings[part] = value;
     }
 
+    /**
+     * Process team color updates with brightness calculations
+     * Applies CSS variables and light/dark class adjustments
+     * @param {jQuery} $elem - Color input element
+     * @param {string} path - Firebase path containing color data
+     * @param {string} value - Color value (hex or rgb)
+     */
     async insertColor($elem, path, value) {
-        var color = value;
-        var brightness = getColorBrightness(rgb2hex(value));
+        let color = value;
+        const brightness = getColorBrightness(rgb2hex(value));
 
-        if (brightness <= 23) { // clip at dark values to prevent complete black
+        // Clip at dark values to prevent complete black
+        if (brightness <= 23) {
             color = '#222222';
         }
 
-        if (path.includes('team_a')) {
-            var team = 'a';
-        } else if (path.includes('team_b')) {
-            var team = 'b';
-        }
+        // Determine team from path
+        const team = path.includes('team_a') ? 'a' : path.includes('team_b') ? 'b' : null;
+        if (!team) return;
 
         if ($elem.is('input')) {
             $elem.val(value);
         } else {
-            $('html').css("--" + team.toUpperCase() + "_Color", color); // Add color to css variable
+            // Add color to CSS variable
+            $('html').css(`--${team.toUpperCase()}_Color`, color);
 
-            var $team_elems = $(`.team.team_${team}`); // All elements from this team
+            const $teamElems = $(`.team.team_${team}`);
 
+            // Simplified brightness logic
             if (brightness >= 230) {
                 $elem.addClass('light');
-                $team_elems.addClass('light');
+                $teamElems.addClass('light');
             } else if (brightness >= 150) {
                 $elem.removeClass('light');
-                $team_elems.addClass('light');
+                $teamElems.addClass('light');
             } else {
                 $elem.removeClass('light');
-                $team_elems.removeClass('light');
+                $teamElems.removeClass('light');
             }
         }
     }
 
+    /**
+     * Upload data to Firebase with authentication checks
+     * Processes element values and converts them to appropriate database format
+     * @param {Array} elemList - List of jQuery elements to upload (optional, uploads all if undefined)
+     */
     async uploadData(elemList) {
-        // check if selected channel is allowed
-        if (this.user && this.channel && this.user.channels.includes(Number(this.channel))) {
-            // upload all if there are no specific elements
-            if (typeof elemList == 'undefined') {
-                elemList = $("*[fb-data]");
+        // Check if selected channel is allowed
+        if (!this.user || !this.channel || !this.user.channels.includes(Number(this.channel))) {
+            if (this.channel) {
+                showToast("❌", "You're not authenticated for this channel");
             }
-
-            // upload all data to firebase
-            self = this;
-            const newData = {};
-            this.handleEventHistory();
-            newData[`/match-${self.channel}/event_history`] = this.event_history;
-            $.each($(elemList), function (i, elem) {
-                let value;
-
-                // Überprüfen, ob das Element eine Checkbox ist
-                if ($(elem).is(":checkbox")) {
-                    value = $(elem).is(":checked") ? 1 : 0; // Wert auf 1 oder 0 setzen
-                } else {
-                    value = $(elem).val(); // Wert des Elements abrufen
-                }
-
-                // Erstelle einen Pfad basierend auf dem fb-data Attribut
-                let fbDataAttr = $(elem).attr("fb-data");
-                if (fbDataAttr) {
-                    // Ersetze die Punkte im fb-data Attribut mit einem Schrägstrich
-                    let dbSelector = fbDataAttr.replace(/\./g, '/');
-                    // Erstelle den vollständigen Pfad für Firebase
-                    let path_to_variable = `/match-${self.channel}/${dbSelector}`;
-
-                    // Überprüfen, ob der Wert in einen Integer umgewandelt werden kann
-                    if (path_to_variable.includes('score') || path_to_variable.includes('active_set')) {
-                        try {
-                            value = parseInt(value);
-                        } catch (error) {
-                            console.error(value, " can't be converted to integer");
-                        }
-                    }
-
-                    // Füge den Pfad und den Wert zum newData Objekt hinzu
-                    newData[path_to_variable] = value;
-                }
-            });
-
-            writeData(newData);
-
-        } else if (channel) {
-            showToast("❌", "You're not authenticated for this channel");
+            return;
         }
-    }
 
-    getPlayedSets() {
-        let playedSets = [];
-        let self = this;
+        // Upload all if there are no specific elements
+        if (typeof elemList === 'undefined') {
+            elemList = $("*[fb-data]");
+        }
 
-        $.each(self.$sets, function (i, set) {
-            if (i + 1 < self.active_set) {
-                playedSets.push(set);
+        // Prepare data for upload
+        const newData = {};
+        this.handleEventHistory();
+        newData[`/match-${this.channel}/event_history`] = this.event_history;
+
+        // Process each element
+        $(elemList).each((i, elem) => {
+            const $elem = $(elem);
+            const fbDataAttr = $elem.attr("fb-data");
+            
+            if (!fbDataAttr) return;
+
+            // Get value based on element type
+            const value = $elem.is(":checkbox") ? ($elem.is(":checked") ? 1 : 0) : $elem.val();
+
+            // Create database path
+            const dbSelector = fbDataAttr.replace(/\./g, '/');
+            const pathToVariable = `/match-${this.channel}/${dbSelector}`;
+
+            // Convert to integer for score and active_set paths
+            let finalValue = value;
+            if (pathToVariable.includes('score') || pathToVariable.includes('active_set')) {
+                try {
+                    finalValue = parseInt(value);
+                } catch (error) {
+                    console.error(value, " can't be converted to integer");
+                    return;
+                }
             }
+
+            newData[pathToVariable] = finalValue;
         });
 
+        writeData(newData);
+    }
+
+    /**
+     * Get all played sets (sets before the current active set)
+     * @returns {Array} Array of jQuery set elements
+     */
+    getPlayedSets() {
+        const playedSets = [];
+        for (let i = 0; i < this.active_set - 1; i++) {
+            playedSets.push(this.$sets[i]);
+        }
         return playedSets;
     }
 
+    /**
+     * Get score element for a specific set and team
+     * @param {number} set - Set number (1-7)
+     * @param {string} team - Team identifier ('a' or 'b')
+     * @returns {jQuery} Score element
+     */
     getScoreElem(set, team) {
         return $(this.$sets[set - 1]).find(`[fb-data*="score"][fb-data*="team_${team}"]`);
     }
 
+    /**
+     * Extract team and set information from score element
+     * @param {jQuery} $score_elem - Score element to analyze
+     * @returns {Object|null} Object with team and set properties, or null if invalid
+     */
     getScoreElemDetails($score_elem) {
         const fbDataAttr = $score_elem.attr('fb-data');
 
         if (!fbDataAttr) {
-            return null; // Rückgabe, falls das Attribut nicht vorhanden ist
+            return null;
         }
 
-        // Prüfe, welches Team im Attribut enthalten ist
-        const team = fbDataAttr.includes('team_a') ? 'a' : (fbDataAttr.includes('team_b') ? 'b' : null);
+        // Determine team from attribute
+        const team = fbDataAttr.includes('team_a') ? 'a' : fbDataAttr.includes('team_b') ? 'b' : null;
 
-        // Extrahiere die Set-Nummer mit einem regulären Ausdruck
+        // Extract set number with regex
         const setMatch = fbDataAttr.match(/set_(\d+)/);
         const set = setMatch ? setMatch[1] : null;
 
-        // Gebe Team und Set-Nummer als Objekt zurück
-        return {
-            team: team,
-            set: set
-        };
+        return { team, set };
     }
 
+    /**
+     * Get current score for a specific set and team
+     * @param {number} set - Set number (1-7)
+     * @param {string} team - Team identifier ('a' or 'b')
+     * @returns {number} Current score
+     */
     getScore(set, team) {
-        var $score_elem = this.getScoreElem(set, team);
-        if ($score_elem.is('input')) {
-            var score = Number($score_elem.val());
-        } else {
-            var score = Number($score_elem.text());
-        }
-        
-        return score;
+        const $scoreElem = this.getScoreElem(set, team);
+        return Number($scoreElem.is('input') ? $scoreElem.val() : $scoreElem.text());
     }
 
+    /**
+     * Determine the winner of a specific set
+     * @param {number} set - Set number (1-7)
+     * @returns {string|null} Team identifier ('a', 'b') or null if tie
+     */
     getWinner(set) {
-        var score_a = this.getScore(set, 'a');
-        var score_b = this.getScore(set, 'b');
-        if (score_a > score_b) {
-            return 'a';
-        } else if (score_b > score_a) {
-            return 'b';
-        } else {
-            return null;
-        }
+        const scoreA = this.getScore(set, 'a');
+        const scoreB = this.getScore(set, 'b');
+        
+        if (scoreA > scoreB) return 'a';
+        if (scoreB > scoreA) return 'b';
+        return null;
     }
 
+    /**
+     * Calculate total sets won by a team
+     * @param {string} team - Team identifier ('a' or 'b')
+     * @returns {number} Number of sets won
+     */
     getSetScore(team) {
-        var set_score = 0;
-        let self = this;
-
-        $.each((self.getPlayedSets()), function (i, set) {
-            if (self.getWinner(i + 1) == team) {
-                set_score += 1;
+        let setScore = 0;
+        const playedSets = this.getPlayedSets();
+        
+        for (let i = 0; i < playedSets.length; i++) {
+            if (this.getWinner(i + 1) === team) {
+                setScore += 1;
             }
+        }
 
-        });
-
-        return set_score;
+        return setScore;
     }
 
     updateSets() {
@@ -466,14 +512,15 @@ export class Scoreboard {
     }
 
     updateSetsVisibility() {
-        let self = this;
-        $.each(self.$sets, function (i, set) {
-            var $set = $(set);
-            $set.hide();
-            $set.removeClass('active');
-            if (i + 1 <= self.active_set) {
+        this.$sets.each((i, set) => {
+            const $set = $(set);
+            const setNumber = i + 1;
+            
+            $set.hide().removeClass('active');
+            
+            if (setNumber <= this.active_set) {
                 $set.show();
-                if (i + 1 == self.active_set) {
+                if (setNumber === this.active_set) {
                     $set.addClass('active');
                 }
             }
@@ -481,26 +528,24 @@ export class Scoreboard {
     }
 
     updateSetWinners() {
-        let self = this;
-        var $score_elems = $(self.$html_frame).find(`[fb-data*="score"]`);
+        const $scoreElems = this.$html_frame.find('[fb-data*="score"]');
 
-        $.each($score_elems, function (i, elem) {
-            var $score_elem = $(elem);
-            var se_details = self.getScoreElemDetails($score_elem);
-            if (se_details.set != self.active_set) {
-                if (se_details.team == self.getWinner(se_details.set)) {
-                    $score_elem.removeClass('loser');
-                    $score_elem.addClass('winner');
-                } else if (self.getWinner(se_details.set) != null) {
-                    $score_elem.removeClass('winner');
-                    $score_elem.addClass('loser');
-                } else {
-                    $score_elem.removeClass('winner');
-                    $score_elem.removeClass('loser');
-                }
+        $scoreElems.each((i, elem) => {
+            const $scoreElem = $(elem);
+            const details = this.getScoreElemDetails($scoreElem);
+            
+            if (!details || details.set === this.active_set) {
+                $scoreElem.removeClass('winner loser');
+                return;
+            }
+
+            const winner = this.getWinner(details.set);
+            if (winner === details.team) {
+                $scoreElem.removeClass('loser').addClass('winner');
+            } else if (winner !== null) {
+                $scoreElem.removeClass('winner').addClass('loser');
             } else {
-                $score_elem.removeClass('winner');
-                $score_elem.removeClass('loser');
+                $scoreElem.removeClass('winner loser');
             }
         });
     }
@@ -516,15 +561,10 @@ export class Scoreboard {
     }
 
     getServingTeam() {
-        if (this.event_history.length > 0) {
-
-            const lastScoreEvent = this.event_history.slice().reverse().find(event => event.type === 'score');
-            if (lastScoreEvent) {
-                return lastScoreEvent.team;
-            } else {
-                return null;
-            }
-        }
+        if (this.event_history.length === 0) return null;
+        
+        const lastScoreEvent = this.event_history.slice().reverse().find(event => event.type === 'score');
+        return lastScoreEvent ? lastScoreEvent.team : null;
     }
 
     updateIndicators() {
@@ -532,19 +572,23 @@ export class Scoreboard {
     }
 
     updateServeIndicator() {
-        var serving_team = this.getServingTeam();
-        var $serverIndicators = $('.serve_indicator');
+        const servingTeam = this.getServingTeam();
+        const $serverIndicators = $('.serve_indicator');
+        
         $serverIndicators.removeClass('active');
-        if (serving_team != '') {
-            $serverIndicators.filter(`.team_${serving_team}`).addClass('active');
+        if (servingTeam) {
+            $serverIndicators.filter(`.team_${servingTeam}`).addClass('active');
         }
     }
 
     updateSettings() {
-        $.each(this.settings, (key, value) => {
-            var $settingsEntry = this.$settingsEntries.filter(`[fb-data*="${key}"]`);
+        // Update checkbox states
+        Object.entries(this.settings).forEach(([key, value]) => {
+            const $settingsEntry = this.$settingsEntries.filter(`[fb-data*="${key}"]`);
             $settingsEntry.prop('checked', value === 1);
         });
+
+        // Update visibility states
         this.updateGroupScoreVisibility();
         this.updateColorIndicatorVisibility();
         this.updatePlayerNamesVisibility();
@@ -555,104 +599,84 @@ export class Scoreboard {
     }
 
     updateGroupScoreVisibility() {
-        if (this.settings['show_group_score'] == 1) {
-            $('.group_score').show();
-            $('.group-indicator').show();
-        } else if (this.settings['show_group_score'] == 0) {
-            $('.group_score').hide();
-            $('.group-indicator').hide();
-        }
+        const isVisible = this.settings.show_group_score === 1;
+        $('.group_score, .group-indicator').toggle(isVisible);
     }
 
     updateColorIndicatorVisibility() {
-        if (this.settings['show_color'] == 1) {
-            $('.color-indicator').show();
-        } else if (this.settings['show_color'] == 0) {
-            $('.color-indicator').hide();
-        }
+        const isVisible = this.settings.show_color === 1;
+        $('.color-indicator').toggle(isVisible);
     }
 
     updatePlayerNamesVisibility() {
-        if (this.settings['show_player_names'] == 1) {
-            $('body').attr('players', 'show');
-            $('.players').show();
-        } else if (this.settings['show_player_names'] == 0) {
-            $('body').attr('players', 'hidden');
-            $('.players').hide();
-        }
+        const isVisible = this.settings.show_player_names === 1;
+        $('body').attr('players', isVisible ? 'show' : 'hidden');
+        $('.players').toggle(isVisible);
     }
 
     updateServeIndicatorVisibility() {
-        if (this.settings['show_serve_indicator'] == 1) {
-            $('.serve_indicator').show();
-        } else if (this.settings['show_serve_indicator'] == 0) {
-            $('.serve_indicator').hide();
-        }
+        const isVisible = this.settings.show_serve_indicator === 1;
+        $('.serve_indicator').toggle(isVisible);
     }
 
     updateScoreHistoryVisibility() {
-        if (this.settings['show_score_history'] == 1) {
-            $('.score_history').show();
-        } else if (this.settings['show_score_history'] == 0) {
-            $('.score_history').hide();
-        }
+        const isVisible = this.settings.show_score_history === 1;
+        $('.score_history').toggle(isVisible);
     }
 
     updateScoreHistoryChartVisibility() {
-        if (this.settings['show_score_history_chart'] == 1) {
-            if ($('.chartContainer').is(':hidden')) {
-                $('.chartContainer').slideDown(400, "easeOutCubic");
-                this.scoreChart.update();
-            }
-        } else if (this.settings['show_score_history_chart'] == 0) {
-            if ($('.chartContainer').not(':hidden')) {
-                $('.chartContainer').slideUp(300, "easeOutCubic");
-            }
+        const isVisible = this.settings.show_score_history_chart === 1;
+        const $chartContainer = $('.chartContainer');
+        
+        if (isVisible && $chartContainer.is(':hidden')) {
+            $chartContainer.slideDown(400, "easeOutCubic");
+            this.scoreChart?.update();
+        } else if (!isVisible && $chartContainer.is(':visible')) {
+            $chartContainer.slideUp(300, "easeOutCubic");
         }
     }
 
     updateUrlOutput() {
-        var baseUrl = window.location.origin + window.location.pathname;
-        var newUrl = baseUrl.replace("input.html", "output.html");
-        var url_output = newUrl + '?channel=' + this.channel;
+        const baseUrl = window.location.origin + window.location.pathname;
+        const newUrl = baseUrl.replace("input.html", "output.html");
+        let urlOutput = `${newUrl}?channel=${this.channel}`;
 
         if (this.theme) {
-            url_output = url_output + '&theme=' + this.theme;
+            urlOutput += `&theme=${this.theme}`;
         }
 
-        this.$urlOutput.text(url_output);
-        this.$urlOutput.attr('href', url_output);
+        this.$urlOutput.text(urlOutput).attr('href', urlOutput);
     }
 
     updateAvailableChannels() {
-        let self = this;
-        self.$channelInput.empty();
+        this.$channelInput.empty();
 
-        if (self.user) {
-            let channelExists = false;
+        if (!this.user) return;
 
-            $.each(self.user.channels, function (i, c) {
-                self.$channelInput.append($('<option></option>').val(c).html(c));
-                if (c == self.channel) {
-                    channelExists = true;
-                }
-            });
+        let channelExists = false;
 
-            if (channelExists) {
-                self.$channelInput.val(self.channel);
-            } else {
-                self.channel = self.user.channels[0];
-                self.$channelInput.val(self.channel);
-                setTimeout(() => {
-                    showToast("ℹ️", `Due to authentification the channel got changed to "${self.user.channels[0]}".`, 2000);
-                }, 2200);
+        this.user.channels.forEach(channel => {
+            this.$channelInput.append($('<option></option>').val(channel).html(channel));
+            if (channel === this.channel) {
+                channelExists = true;
             }
+        });
+
+        if (channelExists) {
+            this.$channelInput.val(this.channel);
+        } else {
+            this.channel = this.user.channels[0];
+            this.$channelInput.val(this.channel);
+            setTimeout(() => {
+                showToast("ℹ️", `Due to authentification the channel got changed to "${this.user.channels[0]}".`, 2000);
+            }, 2200);
         }
     }
 
     updateOldScoreInputCounter() {
-        this.$html_frame.find('.team_score').attr('score_a', this.getScore(this.active_set, 'a'));
-        this.$html_frame.find('.team_score').attr('score_b', this.getScore(this.active_set, 'b'));
+        this.$html_frame.find('.team_score')
+            .attr('score_a', this.getScore(this.active_set, 'a'))
+            .attr('score_b', this.getScore(this.active_set, 'b'));
     }
 
     handleEventHistory() {
@@ -661,76 +685,89 @@ export class Scoreboard {
         }
     }
 
+    /**
+     * Get score history for a specific set, filtering from last reset event
+     * @param {number} set - Set number to get history for (defaults to active set)
+     * @returns {Array} Filtered array of score events
+     */
     getScoreHistory(set = this.active_set) {
-        let self = this;
-        
-        let slicedEventHistory = [];
+        // Find the last reset event
         let startIndex = -1;
-        $.each(self.event_history.slice().reverse(), function (i, event) {
-            if (event['type'] == 'reset') {
-                startIndex = self.event_history.length - 1 - i;
-                return false; // break the loop
+        for (let i = this.event_history.length - 1; i >= 0; i--) {
+            if (this.event_history[i].type === 'reset') {
+                startIndex = i;
+                break;
             }
-        });
-        slicedEventHistory = self.event_history.slice(startIndex + 1);
+        }
 
-        let filteredEventHistory = slicedEventHistory.filter(event => event['type'] === 'score' && event['set'] === set);
-
-        return filteredEventHistory;
+        const slicedEventHistory = this.event_history.slice(startIndex + 1);
+        return slicedEventHistory.filter(event => event.type === 'score' && event.set === set);
     }
 
+    /**
+     * Convert score history to team points list for chart visualization
+     * Maintains last known score for each team across all events
+     * @param {Array} slicedEventHistory - Filtered event history
+     * @param {string} team - Team identifier ('a' or 'b')
+     * @returns {Array} Array of score values for chart data
+     */
     scoreHistoryToTeamPoints(slicedEventHistory, team) {
-        let self = this;
-        let teamPointsList = [];
-
+        const teamPointsList = [];
         let lastScore = 0;
-        $.each(slicedEventHistory, function (i, event) {
-            if(event['type'] == 'score') {
-                if (event['team'].toLowerCase() == team.toLowerCase()) {
-                    lastScore = Number(event['score']);
-                    teamPointsList.push(lastScore);
-                } else {
-                    teamPointsList.push(lastScore);
+
+        slicedEventHistory.forEach(event => {
+            if (event.type === 'score') {
+                if (event.team.toLowerCase() === team.toLowerCase()) {
+                    lastScore = Number(event.score);
                 }
+                teamPointsList.push(lastScore);
             }
         });
 
         return teamPointsList;
     }
 
+    /**
+     * Update score history display with visual indicators
+     * Shows score progression and active streaks for each team
+     */
     updateScoreHistory() {
-        let self = this;
-
-        $.each(self.$scoreHistoryContainer.find('.scores').find('.team'), function (i, container) {
-            let $container = $(container);
+        this.$scoreHistoryContainer.find('.scores .team').each((i, container) => {
+            const $container = $(container);
+            const team = $container.attr('team');
+            const scoresList = this.scoreHistoryToTeamPoints(this.getScoreHistory(), team);
+            
             $container.empty();
-            let team = $container.attr('team');
-            let scores_list = self.scoreHistoryToTeamPoints(self.getScoreHistory(), team);
             
             let streak = 0;
-            $.each(scores_list, function (i, score) {
-                let status = score > (i > 0 ? scores_list[i-1] : 0) ? 'active' : ''; 
-                streak = score > (i > 0 ? scores_list[i-1] : 0) ? streak += 1 : 0;
-                let element = `<div class="score_item ${status}" streak="${streak}">${score}</div>`;
+            scoresList.forEach((score, index) => {
+                const isActive = score > (index > 0 ? scoresList[index - 1] : 0);
+                streak = isActive ? streak + 1 : 0;
+                const status = isActive ? 'active' : '';
+                const element = `<div class="score_item ${status}" streak="${streak}">${score}</div>`;
                 $container.append(element);
             });
         });
     }
 
+    /**
+     * Update Chart.js visualization of score progression
+     * Creates line chart showing both teams' score progression over time
+     * Uses team colors and provides visual feedback for score changes
+     */
     updateScoreHistoryChart() {
-        let self = this;
-        let scoresTeamA = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'a');
-        let scoresTeamB = self.scoreHistoryToTeamPoints(self.getScoreHistory(), 'b');
+        const scoresTeamA = this.scoreHistoryToTeamPoints(this.getScoreHistory(), 'a');
+        const scoresTeamB = this.scoreHistoryToTeamPoints(this.getScoreHistory(), 'b');
+        const labels = scoresTeamA.map((_, i) => `${i + 1}`);
 
-        let labels = scoresTeamA.map((_, i) => `${i + 1}`);
+        const ctx = document.getElementById('scoreChart').getContext('2d');
 
-        let ctx = document.getElementById('scoreChart').getContext('2d');
+        // Destroy existing chart if it exists
+        if (this.scoreChart) {
+            this.scoreChart.destroy();
+        }
 
-        try {
-            self.scoreChart.destroy();
-        } catch {}
-
-        self.scoreChart = new Chart(ctx, {
+        this.scoreChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
@@ -743,11 +780,11 @@ export class Scoreboard {
                         segment: {
                             borderColor: getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim(),
                             backgroundColor: ctx => {
-                                if (!ctx.p1 || !ctx.chart.data.datasets[1]) return '#000000'; // Fallback-Farbe
-                                const dataset2Value = ctx.chart.data.datasets[1].data[ctx.p0DataIndex]; // Wert aus Dataset 2
+                                if (!ctx.p1 || !ctx.chart.data.datasets[1]) return '#000000';
+                                const dataset2Value = ctx.chart.data.datasets[1].data[ctx.p0DataIndex];
                                 return ctx.p1.parsed.y > dataset2Value ?
-                                `${getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim()}44` :
-                                `${getComputedStyle(document.documentElement).getPropertyValue("--B_Color").trim()}44`;
+                                    `${getComputedStyle(document.documentElement).getPropertyValue("--A_Color").trim()}44` :
+                                    `${getComputedStyle(document.documentElement).getPropertyValue("--B_Color").trim()}44`;
                             },
                         },
                         fill: '+1',
@@ -767,11 +804,11 @@ export class Scoreboard {
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: {
-                    duration: 0 // Setzt die Dauer der Animation auf 0ms, wodurch die Animation deaktiviert wird
+                    duration: 0
                 },
                 plugins: {
-                    legend: { display: false }, // Versteckt die Legende
-                    tooltip: { enabled: false } // Versteckt die Tooltips
+                    legend: { display: false },
+                    tooltip: { enabled: false }
                 },
                 scales: {
                     x: {
@@ -789,6 +826,6 @@ export class Scoreboard {
             }
         });
 
-        self.scoreChart.update();
+        this.scoreChart.update();
     }
 }

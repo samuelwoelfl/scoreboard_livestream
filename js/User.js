@@ -2,13 +2,14 @@ export class User {
     constructor(username, password, channels = []) {
         this.username = username;
         this.password = password;
-        this.isAuthenticated = true; // Benutzer ist angemeldet
+        this.isAuthenticated = true; // User is logged in
         this.channels = channels.map(Number);
         this.init();
     }
 
     init() {
-        localStorage.setItem('currentUser', JSON.stringify(this)); // Speichern des Benutzers in localStorage
+        // Store user in localStorage
+        localStorage.setItem('currentUser', JSON.stringify(this));
     }
 
     logout() {
