@@ -54,6 +54,12 @@ export class Scoreboard {
         this.data_interval = null;
         this.update_interval = null;
         
+        // Game settings
+        this.gameSettings = {
+            "winning_score": 15, // Standard winning score
+            "min_win_margin": 2 // Minimum points difference to win
+        };
+        
         // Init function
         this.init();
     }
@@ -86,6 +92,30 @@ export class Scoreboard {
     }
 
     /**
+     * Update the starting team selector to show the current set's starting team
+     */
+    updateStartingTeamSelector() {
+        // Update all starting team selectors for all sets
+        for (let setNumber = 1; setNumber <= 7; setNumber++) {
+            const $selector = this.$html_frame.find(`#starting_team_${setNumber}`);
+            if ($selector.length > 0) {
+                const currentStartingTeam = this.getStartingTeam(setNumber);
+                if (currentStartingTeam) {
+                    $selector.val(currentStartingTeam);
+                }
+            }
+        }
+        
+        // Update hidden starting_team fields in output.html to reflect current set
+        if (this.type === 'output') {
+            this.$html_frame.find(`[fb-data*="score.set_"][fb-data*=".starting_team"]`).each((index, element) => {
+                const $element = $(element);
+                $element.attr('fb-data', `score.set_${this.active_set}.starting_team`);
+            });
+        }
+    }
+
+    /**
      * Update all UI components in a single pass for performance
      * Only updates score history for output mode to avoid unnecessary processing
      */
@@ -95,6 +125,7 @@ export class Scoreboard {
         this.updateActiveScore();
         this.updateIndicators();
         this.updateSettings();
+        this.updateStartingTeamSelector();
         this.handleEventHistory();
         this.updateOldScoreInputCounter();
         
@@ -156,6 +187,17 @@ export class Scoreboard {
             this.channel = $(event.target).val();
             this.insertLiveData();
             this.updateUI();
+        });
+
+        // Starting team dropdown listener
+        this.$html_frame.find('.starting_team_selector select').change((event) => {
+            this.updateIndicators();
+            this.uploadData([$(event.target)]);
+        });
+
+        // Update starting team selector when set changes
+        this.$setCounter.on('input', () => {
+            this.updateStartingTeamSelector();
         });
 
         // URL output container click handler
@@ -248,6 +290,13 @@ export class Scoreboard {
             this.uploadData([$trigger]);
         });
 
+        // Winning score handler
+        $('#winning_score').on('input', (event) => {
+            const value = Number($(event.target).val());
+            this.gameSettings.winning_score = value;
+            this.uploadData([$(event.target)]);
+        });
+
         // Reset scores button handler
         this.$resetScoresButton.click(() => {
             $('[fb-data*="score"]').val(0);
@@ -299,10 +348,36 @@ export class Scoreboard {
                 this.event_history = Array.isArray(value) ? value : [];
             } else if (path.includes('admin_settings')) {
                 this.insertAdminSetting(path, value);
-            } else if (path.includes('team') && path.includes('color')) {
+            } else if (path.includes('teams_info') && path.includes('color')) {
                 this.insertColor($elem, path, value);
             } else if (path.includes('active_set')) {
                 this.active_set = value;
+            } else if (path.includes('first_serve_team')) {
+                // Handle first serve team setting
+                if ($elem.is('input') || $elem.is('select')) {
+                    $elem.val(value);
+                } else {
+                    $elem.text(value);
+                }
+            } else if (path.includes('starting_team')) {
+                // Handle starting team setting
+                if ($elem.is('input') || $elem.is('select')) {
+                    $elem.val(value);
+                } else {
+                    $elem.text(value);
+                }
+                
+                // Update the selector if this is for the current set
+                if (path.includes(`set_${this.active_set}`)) {
+                    this.updateStartingTeamSelector();
+                }
+            } else if (path.includes('game_settings')) {
+                // Handle game settings (winning score, etc.)
+                const settingKey = path.split('.').pop();
+                if (settingKey === 'winning_score') {
+                    this.gameSettings.winning_score = Number(value);
+                    $('#winning_score').val(value);
+                }
             } else {
                 // Set value based on element type
                 $elem.is('input') ? $elem.val(value) : $elem.text(value);
@@ -328,8 +403,8 @@ export class Scoreboard {
      * @param {string} value - Color value (hex or rgb)
      */
     async insertColor($elem, path, value) {
-        let color = value;
-        const brightness = getColorBrightness(rgb2hex(value));
+        var color = value;
+        var brightness = getColorBrightness(rgb2hex(value));
 
         // Clip at dark values to prevent complete black
         if (brightness <= 23) {
@@ -400,9 +475,9 @@ export class Scoreboard {
             const dbSelector = fbDataAttr.replace(/\./g, '/');
             const pathToVariable = `/match-${this.channel}/${dbSelector}`;
 
-            // Convert to integer for score and active_set paths
+            // Convert to integer for score and active_set paths, but not for starting_team
             let finalValue = value;
-            if (pathToVariable.includes('score') || pathToVariable.includes('active_set')) {
+            if ((pathToVariable.includes('score') || pathToVariable.includes('active_set')) && !pathToVariable.includes('starting_team')) {
                 try {
                     finalValue = parseInt(value);
                 } catch (error) {
@@ -474,19 +549,7 @@ export class Scoreboard {
         return Number($scoreElem.is('input') ? $scoreElem.val() : $scoreElem.text());
     }
 
-    /**
-     * Determine the winner of a specific set
-     * @param {number} set - Set number (1-7)
-     * @returns {string|null} Team identifier ('a', 'b') or null if tie
-     */
-    getWinner(set) {
-        const scoreA = this.getScore(set, 'a');
-        const scoreB = this.getScore(set, 'b');
-        
-        if (scoreA > scoreB) return 'a';
-        if (scoreB > scoreA) return 'b';
-        return null;
-    }
+
 
     /**
      * Calculate total sets won by a team
@@ -498,7 +561,7 @@ export class Scoreboard {
         const playedSets = this.getPlayedSets();
         
         $.each(playedSets, (i, set) => {
-            if (this.getWinner(i + 1) === team) {
+            if (this.setWinner(i + 1) === team) {
                 setScore += 1;
             }
         });
@@ -516,14 +579,19 @@ export class Scoreboard {
         $.each(this.$sets, (i, set) => {
             const $set = $(set);
             const setNumber = i + 1;
-            
-            $set.hide().removeClass('active');
-            
+
+            $set.hide().removeClass('active completed');
+
             if (setNumber <= this.active_set) {
                 $set.show();
                 if (setNumber === this.active_set) {
                     $set.addClass('active');
                 }
+            }
+
+            // Add 'completed' class if the set is already decided
+            if (this.setWinner && this.setWinner(setNumber) != null) {
+                $set.addClass('completed');
             }
         });
     }
@@ -534,14 +602,15 @@ export class Scoreboard {
         $.each($scoreElems, (i, elem) => {
             const $scoreElem = $(elem);
             const details = this.getScoreElemDetails($scoreElem);
-            
-            if (!details || details.set === this.active_set) {
+            let { team, set } = details
+
+            if (!details || (details.set == this.active_set && this.setWinner(details.set) == null)) {
                 $scoreElem.removeClass('winner loser');
                 return;
             }
 
-            const winner = this.getWinner(details.set);
-            if (winner === details.team) {
+            const winner = this.setWinner(details.set);
+            if (winner == details.team) {
                 $scoreElem.removeClass('loser').addClass('winner');
             } else if (winner !== null) {
                 $scoreElem.removeClass('winner').addClass('loser');
@@ -561,11 +630,120 @@ export class Scoreboard {
         this.$activeScoreCounterB.text(this.getScore(this.active_set, 'b'));
     }
 
+    /**
+     * Get the team that should be serving based on new rules
+     * Serve alternates every 2 serves regardless of point outcome
+     * In overtime mode (when winning score is reached but 2-point margin not met), serve changes after every point
+     * @returns {Object|null} Object with team and serve number, or null if no serve data
+     */
     getServingTeam() {
-        if (this.event_history.length === 0) return null;
+        // Get the starting team for this set from database
+        const startingTeam = this.getStartingTeam(this.active_set);
+        if (!startingTeam) return null;
         
-        const lastScoreEvent = this.event_history.slice().reverse().find(event => event.type === 'score');
-        return lastScoreEvent ? lastScoreEvent.team : null;
+        // Count total points in this set
+        const totalPoints = this.getTotalPointsInSet(this.active_set);
+        
+        // Check if we're in overtime mode
+        const isOvertime = this.isInOvertime(this.active_set);
+        
+        if (isOvertime) {
+            // Overtime rules: serve changes after every point
+            const servingTeam = totalPoints % 2 === 0 ? startingTeam : (startingTeam === 'a' ? 'b' : 'a');
+            return {
+                team: servingTeam,
+                serveNumber: 1, // Always single serve in overtime
+                isOvertime: true
+            };
+        }
+        
+        // Normal rules: first serve is single, then alternates every 2 points
+        let servingTeam, serveNumber;
+        if (totalPoints === 0) {
+            servingTeam = startingTeam;
+            serveNumber = 1;
+        } else {
+            const servesAfterFirst = totalPoints - 1;
+            const serveGroup = Math.floor(servesAfterFirst / 2);
+            const isStartingTeamServe = serveGroup % 2 === 0;
+            servingTeam = isStartingTeamServe ? (startingTeam === 'a' ? 'b' : 'a') : startingTeam;
+            serveNumber = (servesAfterFirst % 2) + 1;
+        }
+        
+        return {
+            team: servingTeam,
+            serveNumber: serveNumber,
+            isOvertime: false
+        };
+    }
+
+    /**
+     * Check if a set is in overtime mode
+     * Overtime occurs when winning score is reached but 2-point margin is not met
+     * @param {number} set - Set number to check (defaults to active set)
+     * @returns {boolean} True if set is in overtime
+     */
+    isInOvertime(set = this.active_set) {
+        const scoreA = this.getScore(set, 'a');
+        const scoreB = this.getScore(set, 'b');
+        
+        // Check if winning score is reached
+        if (scoreA >= this.gameSettings.winning_score || scoreB >= this.gameSettings.winning_score) {
+            // Check if 2-point margin is met
+            const scoreDifference = Math.abs(scoreA - scoreB);
+            return scoreDifference < this.gameSettings.min_win_margin;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Check if a set is won by a team
+     * Takes into account overtime rules (2-point margin required)
+     * @param {number} set - Set number to check (defaults to active set)
+     * @returns {string|null} Team identifier ('a', 'b') or null if set not won
+     */
+    setWinner(set = this.active_set) {
+        const scoreA = this.getScore(set, 'a');
+        const scoreB = this.getScore(set, 'b');
+        
+        // Check if winning score is reached
+        if (scoreA >= this.gameSettings.winning_score || scoreB >= this.gameSettings.winning_score) {
+            const scoreDifference = Math.abs(scoreA - scoreB);
+            
+            // Check if 2-point margin is met
+            if (scoreDifference >= this.gameSettings.min_win_margin) {
+                return scoreA > scoreB ? 'a' : 'b';
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Get the team that has the starting serve for a specific set
+     * @param {number} set - Set number (1-7), defaults to active set
+     * @returns {string|null} Team identifier ('a' or 'b') or null if not set
+     */
+    getStartingTeam(set = this.active_set) {
+        const startingTeamData = this.$html_frame.find(`[fb-data="score.set_${set}.starting_team"]`).first();
+        if (startingTeamData.length > 0) {
+            const value = startingTeamData.is('input') ? startingTeamData.val() : startingTeamData.text();
+            if (value && (value == 'a' || value == 'b')) {
+                return value;
+            }
+        }
+    }
+
+    /**
+     * Count total points in a specific set
+     * @param {number} set - Set number (1-7), defaults to active set
+     * @returns {number} Total number of points
+     */
+    getTotalPointsInSet(set = this.active_set) {
+        const scoreA = this.getScore(set, 'a');
+        const scoreB = this.getScore(set, 'b');
+        return scoreA + scoreB;
     }
 
     updateIndicators() {
@@ -573,12 +751,40 @@ export class Scoreboard {
     }
 
     updateServeIndicator() {
-        const servingTeam = this.getServingTeam();
+        const serveInfo = this.getServingTeam();
         const $serverIndicators = $('.serve_indicator');
         
-        $serverIndicators.removeClass('active');
-        if (servingTeam) {
-            $serverIndicators.filter(`.team_${servingTeam}`).addClass('active');
+        // Check if set is already won - if so, hide all serve indicators
+        const setWinner = this.setWinner();
+        if (setWinner) {
+            $serverIndicators.removeClass('active serve_1 serve_2 single_serve overtime');
+            $serverIndicators.hide();
+            return;
+        }
+        
+        // Show serve indicators if set is not won
+        $serverIndicators.show();
+        
+        // Remove all active classes first
+        $serverIndicators.removeClass('active serve_1 serve_2 single_serve overtime');
+        
+        if (serveInfo) {
+            const { team, serveNumber, isOvertime } = serveInfo;
+            const $teamIndicators = $serverIndicators.filter(`.team_${team}`);
+            
+            // Add active class and serve number class
+            $teamIndicators.addClass('active');
+
+            const totalPoints = this.getTotalPointsInSet();
+            if (totalPoints === 0 || isOvertime) {
+                $teamIndicators.addClass('single_serve');
+            }
+            
+            if (serveNumber === 1) {
+                $teamIndicators.addClass('serve_1');
+            } else if (serveNumber === 2) {
+                $teamIndicators.addClass('serve_2');
+            }
         }
     }
 
@@ -702,7 +908,13 @@ export class Scoreboard {
         });
 
         const slicedEventHistory = this.event_history.slice(startIndex + 1);
-        return slicedEventHistory.filter(event => event.type === 'score' && event.set === set);
+        return slicedEventHistory.filter(event => 
+            event.type === 'score' && 
+            event.set === set && 
+            event.team && 
+            typeof event.team === 'string' &&
+            event.score !== undefined
+        );
     }
 
     /**
@@ -717,7 +929,7 @@ export class Scoreboard {
         let lastScore = 0;
 
         $.each(slicedEventHistory, (i, event) => {
-            if (event.type === 'score') {
+            if (event.type === 'score' && event.team && typeof event.team === 'string') {
                 if (event.team.toLowerCase() === team.toLowerCase()) {
                     lastScore = Number(event.score);
                 }

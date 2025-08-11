@@ -171,10 +171,10 @@ html, body {
 }
 
 .color-indicator.light {
-  border: 1px solid #bbbbbb;
-  box-sizing: content-box;
-  margin-left: -1px;
-  width: 5px;
+  border: 1px solid #bbbbbb !important;
+  /* box-sizing: content-box !important;
+  margin-left: -1px !important;
+  width: 5px !important; */
 }
 
 .indicators {
@@ -192,15 +192,43 @@ html, body {
 }
 
 .serve_indicator {
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid transparent; /* Farbe des Dreiecks */
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background-color: transparent;
+  /* transition: 0.2s ease; */
+  position: relative;
+  display: inline-block;
+  margin-bottom: 18px;
 }
 
 .serve_indicator.active {
-  border-right: 10px solid var(--primary) !important;
+  background-color: var(--primary);
+}
+
+/* Show both serves for first serve */
+.serve_indicator.serve_1::before,
+.serve_indicator.serve_2::before {
+  content: '';
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  top: 16px;
+  left: 0px;
+}
+
+.serve_indicator.active.serve_2 {
+  background-color: #e3e3e3;
+}
+
+.serve_indicator.active.single_serve {
+  margin: 8px 0;
+}
+
+.serve_indicator.active.single_serve::before {
+  display: none;
 }
 
 .score_history {
@@ -413,4 +441,73 @@ html, body {
 #scoreChart {
   max-width: 100% !important;
   max-height: 100% !important;
+}
+
+/* Starting Team Selector Styling */
+.starting_team_selector {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+    padding: 2px;
+}
+
+.starting_team_selector label {
+    color: var(--text);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.starting_team_selector select {
+    background-color: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: 10px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.starting_team_selector select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Winning Score Control Styling */
+.winning_score_control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 20px;
+    padding: 4px 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.winning_score_control label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.winning_score_control input {
+    background-color: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    width: 50px;
+    text-align: center;
+}
+
+.winning_score_control input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Show starting team selector for all visible sets */
+.set:not(:hidden) .starting_team_selector {
+    display: flex;
 }

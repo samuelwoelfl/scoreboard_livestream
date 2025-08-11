@@ -203,7 +203,7 @@ body[players='show'] .counter {
   background-color: var(--secondary-1);
 }
 
-.active .counter {
+.active:not(.completed) .counter {
   border: 2px solid var(--primary);
 }
 

@@ -102,6 +102,12 @@
                             <div class="counter b_team">
                                 <input type="number" class="score" id="B_Score_1" value="0" fb-data="score.set_1.team_b_score">
                             </div>
+                            <div class="starting_team_selector">
+                                <select id="starting_team_1" fb-data="score.set_1.starting_team">
+                                    <option value="a">Team A</option>
+                                    <option value="b">Team B</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="set">
                             <div class="counter a_team">
@@ -109,6 +115,12 @@
                             </div>
                             <div class="counter b_team">
                                 <input type="number" class="score" id="B_Score_2" value="0" fb-data="score.set_2.team_b_score">
+                            </div>
+                            <div class="starting_team_selector">
+                                <select id="starting_team_2" fb-data="score.set_2.starting_team">
+                                    <option value="a">Team A</option>
+                                    <option value="b">Team B</option>
+                                </select>
                             </div>
                         </div>
                         <div class="set">
@@ -118,6 +130,12 @@
                             <div class="counter b_team">
                                 <input type="number" class="score" id="B_Score_3" value="0" fb-data="score.set_3.team_b_score">
                             </div>
+                            <div class="starting_team_selector">
+                                <select id="starting_team_3" fb-data="score.set_3.starting_team">
+                                    <option value="a">Team A</option>
+                                    <option value="b">Team B</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="set">
                             <div class="counter a_team">
@@ -125,6 +143,12 @@
                             </div>
                             <div class="counter b_team">
                                 <input type="number" class="score" id="B_Score_4" value="0" fb-data="score.set_4.team_b_score">
+                            </div>
+                            <div class="starting_team_selector">
+                                <select id="starting_team_4" fb-data="score.set_4.starting_team">
+                                    <option value="a">Team A</option>
+                                    <option value="b">Team B</option>
+                                </select>
                             </div>
                         </div>
                         <div class="set">
@@ -134,6 +158,12 @@
                             <div class="counter b_team">
                                 <input type="number" class="score" id="B_Score_5" value="0" fb-data="score.set_5.team_b_score">
                             </div>
+                            <div class="starting_team_selector">
+                                <select id="starting_team_5" fb-data="score.set_5.starting_team">
+                                    <option value="a">Team A</option>
+                                    <option value="b">Team B</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="set">
                             <div class="counter a_team">
@@ -142,6 +172,12 @@
                             <div class="counter b_team">
                                 <input type="number" class="score" id="B_Score_6" value="0" fb-data="score.set_6.team_b_score">
                             </div>
+                            <div class="starting_team_selector">
+                                <select id="starting_team_6" fb-data="score.set_6.starting_team">
+                                    <option value="a">Team A</option>
+                                    <option value="b">Team B</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="set">
                             <div class="counter a_team">
@@ -149,6 +185,12 @@
                             </div>
                             <div class="counter b_team">
                                 <input type="number" class="score" id="B_Score_7" value="0" fb-data="score.set_7.team_b_score">
+                            </div>
+                            <div class="starting_team_selector">
+                                <select id="starting_team_7" fb-data="score.set_7.starting_team">
+                                    <option value="a">Team A</option>
+                                    <option value="b">Team B</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -169,6 +211,10 @@
                     <input type="text" class="text" id="Game" value="" fb-data="phase"></input>
                     <span class="divider"></span>
                     <input type="text" class="text" id="Mode" value="" fb-data="format"></input>
+                </div>
+                <div class="winning_score_control">
+                    <label for="winning_score">Gewinnpunktstand:</label>
+                    <input type="number" id="winning_score" value="15" min="1" max="50" fb-data="game_settings.winning_score">
                 </div>
                 <button id="reset_scores" class="destructive">Reset Scores</button>
             </div>
@@ -198,8 +244,10 @@
     
                 <div class="setting_entry boolean">
                     <span>Serve Indicator:</span>
-                    <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_serve_indicator">
+                    <input type="checkbox" id="Show_Serve_Indicator" fb-data="admin_settings.show_serve_indicator">
                 </div>
+
+
 
                 <div class="setting_entry boolean">
                     <span>Score History:</span>
