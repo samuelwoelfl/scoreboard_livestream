@@ -8,7 +8,7 @@
 }
 
 :root {
-  --primary: #F2C650;
+  --primary: #fcc155;
   --secondary: #C55151;
   --special: #3C5B96;
   --white: #ffffff;
@@ -256,7 +256,7 @@ body[players='show'] .counter {
 }
 
 .button {
-  font-size: 30px;
+  /* font-size: 30px;
   font-weight: 600;
   height: 47px;
   width: 48px;
@@ -267,7 +267,7 @@ body[players='show'] .counter {
   border: none;
   border-radius: 4px;
   padding-bottom: 4px;
-  color: var(--white);
+  color: var(--white); */
 }
 
 .controls {
