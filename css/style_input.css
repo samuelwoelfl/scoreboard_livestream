@@ -146,28 +146,9 @@ html, body {
   margin-bottom: 10px;
 }
 
-.controls .inner > *:not(:last-child) {
-  margin-bottom: 8px;
-}
 
-.controls .inner > *:last-child {
-  margin-top: 1rem;
-}
 
-.controls .settings .inner > * {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 5px;
-  width: 100%;
-}
-
-.controls .settings .inner > * span {
-  margin-bottom: 1px;
-}
-
-.controls .settings .inner #reset_scores {
+.controls .display_options .inner #reset_scores {
   margin-top: 5px;
 }
 
@@ -721,3 +702,61 @@ select.small {
 .starting_team_container .starting_team_sets .starting_team_selector.active select {
   box-shadow: inset 0px 0px 0px 2px var(--primary);
 }
+
+.setting_entry {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.setting_entry span {
+  margin-bottom: 2px;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.toggle-switch.active {
+  background-color: var(--primary);
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.active::after {
+  transform: translateX(14px);
+}
+
+.toggle-switch:hover::after {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+

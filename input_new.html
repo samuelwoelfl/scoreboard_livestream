@@ -279,6 +279,100 @@
             </div>
         </div>
 
+        <div class="row_section controls">
+            <div class="container display_options">
+                <h3>Display Options</h3>
+                <div class="inner">
+                    
+                                         <div class="setting_entry">
+                         <span>Colors:</span>
+                         <label class="toggle-switch" for="Show_Color">
+                             <input type="checkbox" id="Show_Color" fb-data="admin_settings.show_color">
+                         </label>
+                     </div>
+         
+                     <div class="setting_entry">
+                         <span>Player Names:</span>
+                         <label class="toggle-switch" for="Show_Players">
+                             <input type="checkbox" id="Show_Players" fb-data="admin_settings.show_player_names">
+                         </label>
+                     </div>
+         
+                     <div class="setting_entry">
+                         <span>Squad Score:</span>
+                         <label class="toggle-switch" for="Show_Team_Score">
+                             <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_group_score">
+                         </label>
+                     </div>
+         
+                     <div class="setting_entry">
+                         <span>Serve Indicator:</span>
+                         <label class="toggle-switch" for="Show_Serve_Indicator">
+                             <input type="checkbox" id="Show_Serve_Indicator" fb-data="admin_settings.show_serve_indicator">
+                         </label>
+                     </div>
+                </div>
+            </div>
+
+            <div class="container extras">
+                <h3>Extras</h3>
+                <div class="inner">    
+                                         <div class="setting_entry">
+                         <span>Score History:</span>
+                         <label class="toggle-switch" for="Show_Score_History">
+                             <input type="checkbox" id="Show_Score_History" fb-data="admin_settings.show_score_history">
+                         </label>
+                     </div>
+     
+                     <div class="setting_entry">
+                         <span>Score History Chart:</span>
+                         <label class="toggle-switch" for="Show_Score_History_Chart">
+                             <input type="checkbox" id="Show_Score_History_Chart" fb-data="admin_settings.show_score_history_chart">
+                         </label>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row_section output">
+            <div class="container output">
+                <h3>Output</h3>
+                <div class="inner">
+                    <div class="setting_entry">
+                        <span>Channel:</span>
+                        <select id="channel">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                    </div>
+        
+                    <div class="setting_entry">
+                        <span>Theme:</span>
+                        <select id="theme">
+                            <option value="full">Fullscreen</option>
+                            <option value="rg">RoundnetGermany</option>
+                            <option value="france">Roundnet France</option>
+                            <option value="tops">TopsRoundnet</option>
+                            <option value="eura">EURA</option>
+                            <option value="small">Secondary Board</option>
+                        </select>
+                    </div>
+    
+                    <div class="output_entry url">
+                        <span>Output-URL:</span>
+                        <div class="url_output_container">
+                            <a class="url_output" href="" target="_blank"></a>
+                            <i class="material-symbols-rounded">content_copy</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     
@@ -469,83 +563,7 @@
 
     </div> -->
 
-    <div class="controls">
-        <div class="container settings">
-            <h3>Settings</h3>
-            <div class="inner">
-                
-                <div class="setting_entry boolean">
-                    <span>Colors:</span>
-                    <input type="checkbox" id="Show_Color" fb-data="admin_settings.show_color">
-                </div>
     
-                <div class="setting_entry boolean">
-                    <span>Player Names:</span>
-                    <input type="checkbox" id="Show_Players" fb-data="admin_settings.show_player_names">
-                </div>
-    
-                <div class="setting_entry boolean">
-                    <span>Squad Score:</span>
-                    <input type="checkbox" id="Show_Team_Score" fb-data="admin_settings.show_group_score">
-                </div>
-    
-                <div class="setting_entry boolean">
-                    <span>Serve Indicator:</span>
-                    <input type="checkbox" id="Show_Serve_Indicator" fb-data="admin_settings.show_serve_indicator">
-                </div>
-
-
-
-                <div class="setting_entry boolean">
-                    <span>Score History:</span>
-                    <input type="checkbox" id="Show_Score_History" fb-data="admin_settings.show_score_history">
-                </div>
-
-                <div class="setting_entry boolean">
-                    <span>Score History Chart:</span>
-                    <input type="checkbox" id="Show_Score_History_Chart" fb-data="admin_settings.show_score_history_chart">
-                </div>
-    
-                <button id="logout">Logout</button>
-            </div>
-        </div>
-        <div class="container output">
-            <h3>Output</h3>
-            <div class="inner">
-                <div class="setting_entry">
-                    <span>Channel:</span>
-                    <select id="channel">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                </div>
-    
-                <div class="setting_entry">
-                    <span>Theme:</span>
-                    <select id="theme">
-                        <option value="full">Fullscreen</option>
-                        <option value="rg">RoundnetGermany</option>
-                        <option value="france">Roundnet France</option>
-                        <option value="tops">TopsRoundnet</option>
-                        <option value="eura">EURA</option>
-                        <option value="small">Secondary Board</option>
-                    </select>
-                </div>
-
-                <div class="output_entry url">
-                    <span>Output-URL:</span>
-                    <div class="url_output_container">
-                        <a class="url_output" href="" target="_blank"></a>
-                        <i class="material-symbols-rounded">content_copy</i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>

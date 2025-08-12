@@ -212,26 +212,29 @@ export class Scoreboard {
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
             const $target = $(event.target);
             const team = this.getScoreElemDetails($target)?.team;
-            const newScore = Number($target.val());
-            const oldScore = Number(this.$html_frame.find('.team_score').attr(`score_${team}`));
+            const newScore = Number($target.val()) || 0; // Default to 0 if NaN
+            const oldScore = Number(this.$html_frame.find('.team_score').attr(`score_${team}`)) || 0;
             const isSquadScore = $target.attr('fb-data').includes('squad_score');
 
-            // Handle score decrease (remove history events)
-            if (newScore < oldScore && !isSquadScore) {
-                this.removeScoreHistoryEvents(team, newScore);
-            } else {
-                // Add new event to history
-                const eventData = {
-                    type: isSquadScore ? 'squad_score' : 'score',
-                    team: team,
-                    score: newScore,
-                };
-                
-                if (!isSquadScore) {
-                    eventData.set = this.active_set;
+            // Only add to event history if we have valid scores
+            if (!isNaN(newScore) && !isNaN(oldScore)) {
+                // Handle score decrease (remove history events)
+                if (newScore < oldScore && !isSquadScore) {
+                    this.removeScoreHistoryEvents(team, newScore);
+                } else {
+                    // Add new event to history
+                    const eventData = {
+                        type: isSquadScore ? 'squad_score' : 'score',
+                        team: team,
+                        score: newScore,
+                    };
+                    
+                    if (!isSquadScore) {
+                        eventData.set = this.active_set;
+                    }
+                    
+                    this.event_history.push(eventData);
                 }
-                
-                this.event_history.push(eventData);
             }
 
             this.updateOldScoreInputCounter();
@@ -289,6 +292,22 @@ export class Scoreboard {
             this.settings[part] = value;
             this.updateSettings();
             this.uploadData([$trigger]);
+        });
+
+        // Toggle switch handler
+        $('.toggle-switch input[type="checkbox"]').change((event) => {
+            const $checkbox = $(event.target);
+            const $toggleSwitch = $checkbox.closest('.toggle-switch');
+            const value = $checkbox.prop('checked') ? 1 : 0;
+            const part = $checkbox.attr('fb-data').split('.').pop();
+            
+            // Update toggle switch appearance
+            $toggleSwitch.toggleClass('active', $checkbox.prop('checked'));
+            
+            // Update settings
+            this.settings[part] = value;
+            this.updateSettings();
+            this.uploadData([$checkbox]);
         });
 
         // Winning score handler
@@ -476,9 +495,11 @@ export class Scoreboard {
             const dbSelector = fbDataAttr.replace(/\./g, '/');
             const pathToVariable = `/match-${this.channel}/${dbSelector}`;
 
-            // Convert to integer for score and active_set paths, but not for starting_team
+            // Convert to integer for score and active_set paths, but not for starting_team or admin_settings
             let finalValue = value;
-            if ((pathToVariable.includes('score') || pathToVariable.includes('active_set')) && !pathToVariable.includes('starting_team')) {
+            if ((pathToVariable.includes('score') || pathToVariable.includes('active_set')) && 
+                !pathToVariable.includes('starting_team') && 
+                !pathToVariable.includes('admin_settings')) {
                 try {
                     finalValue = parseInt(value);
                 } catch (error) {
@@ -825,6 +846,12 @@ export class Scoreboard {
         $.each(Object.entries(this.settings), (_, [key, value]) => {
             const $settingsEntry = this.$settingsEntries.filter(`[fb-data*="${key}"]`);
             $settingsEntry.prop('checked', value === 1);
+        });
+
+        // Update toggle switch states
+        $.each(Object.entries(this.settings), (_, [key, value]) => {
+            const $toggleSwitch = $(`.toggle-switch input[fb-data*="${key}"]`).closest('.toggle-switch');
+            $toggleSwitch.toggleClass('active', value === 1);
         });
 
         // Update visibility states
