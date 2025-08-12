@@ -170,6 +170,21 @@ html, body {
   background-color: var(--B_Color) !important;
 }
 
+.player_names {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+}
+
+.player_names > * {
+  font-size: 18px;
+  font-weight: 300;
+  max-width: 100%;
+}
+
 .color-indicator.light {
   border: 1px solid #bbbbbb !important;
   /* box-sizing: content-box !important;
@@ -441,36 +456,6 @@ html, body {
 #scoreChart {
   max-width: 100% !important;
   max-height: 100% !important;
-}
-
-/* Starting Team Selector Styling */
-.starting_team_selector {
-    display: flex;
-    justify-content: center;
-    margin-top: 4px;
-    padding: 2px;
-}
-
-.starting_team_selector label {
-    color: var(--text);
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.starting_team_selector select {
-    background-color: var(--background);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 1px 4px;
-    font-size: 10px;
-    min-width: 60px;
-    text-align: center;
-}
-
-.starting_team_selector select:focus {
-    outline: none;
-    border-color: var(--primary);
 }
 
 /* Winning Score Control Styling */

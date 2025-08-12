@@ -169,11 +169,19 @@
   padding: 3px 0;
 }
 
-.teams .team .name .players {
+.teams .team .name .player_names {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+}
+
+.teams .team .name .player_names > * {
   font-size: 18px;
   font-weight: 300;
   max-width: 100%;
-  /* font-family: 'Barlow', sans-serif; */
 }
 
 .counter {

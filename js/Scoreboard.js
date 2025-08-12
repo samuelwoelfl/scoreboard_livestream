@@ -25,6 +25,7 @@ export class Scoreboard {
         this.$setChangeButtons = $('.set_controls_container .button');
         this.$scoreboardInputs = this.$html_frame.find($('input:not([type=submit]), textarea'));
         this.$setCounter = $('#Set_Count');
+        this.$winPoints = $('#win_points');
         this.$resetScoresButton = $('#reset_scores');
         this.$sets = $('.set');
         this.$setScoreCounterA = $('.a_sets_won');
@@ -56,7 +57,7 @@ export class Scoreboard {
         
         // Game settings
         this.gameSettings = {
-            "winning_score": 15, // Standard winning score
+            "win_points": 15, // Standard winning score
             "min_win_margin": 2 // Minimum points difference to win
         };
         
@@ -291,7 +292,7 @@ export class Scoreboard {
         });
 
         // Winning score handler
-        $('#winning_score').on('input', (event) => {
+        this.$winPoints.on('input', (event) => {
             const value = Number($(event.target).val());
             this.gameSettings.winning_score = value;
             this.uploadData([$(event.target)]);
@@ -374,9 +375,9 @@ export class Scoreboard {
             } else if (path.includes('game_settings')) {
                 // Handle game settings (winning score, etc.)
                 const settingKey = path.split('.').pop();
-                if (settingKey === 'winning_score') {
+                if (settingKey === 'win_points') {
                     this.gameSettings.winning_score = Number(value);
-                    $('#winning_score').val(value);
+                    this.$winPoints.val(value);
                 }
             } else {
                 // Set value based on element type
@@ -576,23 +577,39 @@ export class Scoreboard {
     }
 
     updateSetsVisibility() {
-        $.each(this.$sets, (i, set) => {
-            const $set = $(set);
-            const setNumber = i + 1;
+        // The counter (setNumber) should be local to each group of set elements,
+        // i.e., for each parent element containing a group of .set elements, the counter restarts.
+        // We'll iterate over each parent group, then over its .set children.
 
-            $set.hide().removeClass('active completed');
+        // Find all unique parent elements that contain .set elements
+        const setGroups = [];
+        this.$sets.each(function () {
+            const parent = $(this).parent()[0];
+            if (parent && !setGroups.includes(parent)) {
+                setGroups.push(parent);
+            }
+        });
 
-            if (setNumber <= this.active_set) {
-                $set.show();
-                if (setNumber === this.active_set) {
-                    $set.addClass('active');
+        setGroups.forEach((groupElem) => {
+            const $groupSets = $(groupElem).children('.set');
+            $groupSets.each((i, set) => {
+                const $set = $(set);
+                const setNumber = i + 1; // Counter is local to this group
+
+                $set.hide().removeClass('active completed');
+
+                if (setNumber <= this.active_set) {
+                    $set.show();
+                    if (setNumber === this.active_set) {
+                        $set.addClass('active');
+                    }
                 }
-            }
 
-            // Add 'completed' class if the set is already decided
-            if (this.setWinner && this.setWinner(setNumber) != null) {
-                $set.addClass('completed');
-            }
+                // Add 'completed' class if the set is already decided
+                if (this.setWinner && this.setWinner(setNumber) != null) {
+                    $set.addClass('completed');
+                }
+            });
         });
     }
 
@@ -721,18 +738,33 @@ export class Scoreboard {
     }
 
     /**
+     * Get the starting player for a specific set
+     * @param {number} set - Set number (1-7), defaults to active set
+     * @returns {string|null} Player identifier ('a', 'b', 'c', 'd') or null if not set
+     */
+    getStartingPlayer(set = this.active_set) {
+        const startingTeamData = this.$html_frame.find(`[fb-data="score.set_${set}.starting_team"]`).first();
+        if (startingTeamData.length > 0) {
+            const value = startingTeamData.is('input') ? startingTeamData.val() : startingTeamData.text();
+            if (value && (value === 'a' || value === 'b' || value === 'c' || value === 'd')) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get the team that has the starting serve for a specific set
      * @param {number} set - Set number (1-7), defaults to active set
      * @returns {string|null} Team identifier ('a' or 'b') or null if not set
      */
     getStartingTeam(set = this.active_set) {
-        const startingTeamData = this.$html_frame.find(`[fb-data="score.set_${set}.starting_team"]`).first();
-        if (startingTeamData.length > 0) {
-            const value = startingTeamData.is('input') ? startingTeamData.val() : startingTeamData.text();
-            if (value && (value == 'a' || value == 'b')) {
-                return value;
-            }
+        const startingPlayer = this.getStartingPlayer(set);
+        if (startingPlayer) {
+            // Map player values to team values
+            return (startingPlayer === 'a' || startingPlayer === 'b') ? 'a' : 'b';
         }
+        return null;
     }
 
     /**
@@ -1042,3 +1074,4 @@ export class Scoreboard {
         this.scoreChart.update();
     }
 }
+
