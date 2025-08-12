@@ -35,13 +35,14 @@ export const themes = {
 // Initialize variables for global usage
 let loggedInUser;
 let scoreboard;
-let $banner, $logoutButton;
+let $banner, $logoutButton, $userString;
 
 // =========================================== Page Load ======================================= //
 
 $(document).ready(async function () {
     $banner = $('.banner');
     $logoutButton = $('button#logout');
+    $userString = $('header #username');
 
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -164,7 +165,8 @@ async function login(username, inputPassword) {
             const authChannels = users[username].channels.split(',');
             loggedInUser = new User(username, user.password, authChannels);
             $('#auth').hide();
-            $logoutButton.html(`${users[username].display_name} - Logout`);           
+            $userString.html(`${users[username].display_name}`);
+            $logoutButton.html(`Logout`);           
             showToast("✅", `Successfully logged in as ${users[username].display_name}`, 2000);
         } else {
             showToast("❌", "The entered credentials are wrong, please try it again");
