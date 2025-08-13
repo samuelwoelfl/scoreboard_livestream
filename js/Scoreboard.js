@@ -208,6 +208,11 @@ export class Scoreboard {
             showToast('📋', 'Copied url to clipboard');
         });
 
+        // Data import button handler
+        $('#import_data').click(() => {
+            this.importDataFromJson();
+        });
+
         // Score input handler with simplified logic
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
             const $target = $(event.target);
@@ -334,6 +339,58 @@ export class Scoreboard {
     }
 
     /**
+     * Import data from JSON format in the textarea
+     * Parses JSON data and applies it to the form fields
+     */
+    importDataFromJson() {
+        const jsonText = $('#Data_Import').val().trim();
+        
+        if (!jsonText) {
+            showToast("❌", "Please enter JSON data in the textarea");
+            return;
+        }
+
+        try {
+            const data = JSON.parse(jsonText);
+            
+            // Check if data has the expected structure
+            if (!data || typeof data !== 'object') {
+                showToast("❌", "Invalid JSON format");
+                return;
+            }
+
+            // Process the data and update form fields using the common function
+            this.processDataAndUpdateFields(data, true);
+
+            // Find all updated elements for database upload
+            const updatedElements = [];
+            const pathsAndValues = getPathsAndValues(data);
+
+            $.each(Object.entries(pathsAndValues), (_, [path, value]) => {
+                const $elem = $(`[fb-data="${path}"]`);
+                if ($elem.length > 0) {
+                    updatedElements.push($elem);
+                }
+            });
+
+            // Upload the imported data to database
+            if (updatedElements.length > 0) {
+                this.uploadData(updatedElements);
+                showToast("✅", `Successfully imported ${updatedElements.length} fields`);
+                
+                // Clear the textarea after successful import
+                $('#Data_Import').val('');
+            } else {
+                showToast("⚠️", "No matching fields found for the imported data");
+            }
+
+        } catch (error) {
+            console.error("JSON parsing error:", error);
+            showToast("❌", "Invalid JSON format: " + error.message);
+        }
+    }
+
+    /**
      * Remove score history events when score is decreased
      * This maintains accurate event history for undo functionality
      * @param {string} team - Team identifier ('a' or 'b')
@@ -358,6 +415,16 @@ export class Scoreboard {
 
         // Receive data from firebase
         const data = await readData(this.channel);
+        this.processDataAndUpdateFields(data);
+    }
+
+    /**
+     * Process data object and update form fields
+     * Common function used by both live data insertion and JSON import
+     * @param {Object} data - Data object to process
+     * @param {boolean} isImport - Whether this is an import operation (affects special handling)
+     */
+    processDataAndUpdateFields(data, isImport = false) {
         const pathsAndValues = getPathsAndValues(data);
 
         // Process each path and value
@@ -400,9 +467,26 @@ export class Scoreboard {
                 }
             } else {
                 // Set value based on element type
-                $elem.is('input') ? $elem.val(value) : $elem.text(value);
+                this.setElementValue($elem, value);
             }
         });
+    }
+
+    /**
+     * Set value on an element based on its type
+     * @param {jQuery} $elem - Element to update
+     * @param {*} value - Value to set
+     */
+    setElementValue($elem, value) {
+        if ($elem.is('input[type="checkbox"]')) {
+            $elem.prop('checked', value === 1 || value === true);
+        } else if ($elem.is('input[type="color"]')) {
+            $elem.val(value);
+        } else if ($elem.is('input') || $elem.is('select')) {
+            $elem.val(value);
+        } else {
+            $elem.text(value);
+        }
     }
 
     /**
