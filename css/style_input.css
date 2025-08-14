@@ -246,6 +246,17 @@ h3 {
   text-transform: uppercase;
 }
 
+.heading_w_icon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.heading_w_icon i {
+  font-size: 1.25rem;
+}
+
 button,
 .button {
   font-weight: 500;
