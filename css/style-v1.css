@@ -14,11 +14,11 @@
   --white: #ffffff;
   --text-primary: #000000;
   --text-secondary: #00000044;
-  --light-2: #FDF8E9;
-  --light-3: #FBF0D1;
-  --light-4: #F9E8B9;
-  --light-5: #F7E0A1;
-  --light-6: #F5D889;
+  --light-2: #FDF6E9;
+  --light-3: #fdedce;
+  --light-4: #F9E3B9;
+  --light-5: #F7D9A1;
+  --light-6: #F5CF89;
   --light-7: #F3D071;
   --light-8: #F2C650;
   --secondary-1: rgba(197, 81, 81, 0.2);
@@ -166,15 +166,6 @@
   align-items: flex-start;
   justify-content: center;
   gap: 0px;
-  padding: 3px 0;
-}
-
-.teams .team .name .player_names {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 4px;
   padding: 3px 0;
 }
 

@@ -176,7 +176,6 @@ html, body {
   justify-content: flex-start;
   align-items: center;
   gap: 4px;
-  padding: 3px 0;
 }
 
 .player_names > * {
@@ -324,27 +323,31 @@ html, body {
   font-weight: 400;
 }
 
-.score_history .scores .team_rows .score_item[streak="2"] {
+.score_history .scores .team_rows .score_item[break] {
   background-color: var(--light-3);
 }
 
-.score_history .scores .team_rows .score_item[streak="3"] {
+/* .score_history .scores .team_rows .score_item[streak="2"] {
+  background-color: var(--light-3);
+} */
+
+/* .score_history .scores .team_rows .score_item[streak="3"] {
   background-color: var(--light-4);
-}
+} */
 
-.score_history .scores .team_rows .score_item[streak="4"] {
+/* .score_history .scores .team_rows .score_item[streak="4"] {
   background-color: var(--light-5);
-}
+} */
 
-.score_history .scores .team_rows .score_item[streak="5"] {
+/* .score_history .scores .team_rows .score_item[streak="5"] {
   background-color: var(--light-6);
-}
+} */
 
-.score_history .scores .team_rows .score_item[streak="6"] {
+/* .score_history .scores .team_rows .score_item[streak="6"] {
   background-color: var(--light-7);
-}
+} */
 
-.score_history .scores .team_rows .score_item[streak="7"],
+/* .score_history .scores .team_rows .score_item[streak="7"],
 .score_history .scores .team_rows .score_item[streak="8"],
 .score_history .scores .team_rows .score_item[streak="9"],
 .score_history .scores .team_rows .score_item[streak="10"],
@@ -364,7 +367,7 @@ html, body {
 .score_history .scores .team_rows .score_item[streak="24"],
 .score_history .scores .team_rows .score_item[streak="25"] {
   background-color: var(--primary);
-}
+} */
 
 /* .score_history .scores .team_rows .team:last-child .score_item.active {
   border: 2px solid var(--B_Color);
