@@ -214,7 +214,7 @@ html, body {
   /* transition: 0.2s ease; */
   position: relative;
   display: inline-block;
-  margin-bottom: 18px;
+  margin-top: 16px;
 }
 
 .serve_indicator.active {
@@ -230,11 +230,11 @@ html, body {
   height: 11px;
   border-radius: 50%;
   background-color: var(--primary);
-  top: 16px;
+  bottom: 16px;
   left: 0px;
 }
 
-.serve_indicator.active.serve_2 {
+.serve_indicator.active.serve_2::before {
   background-color: #e3e3e3;
 }
 
