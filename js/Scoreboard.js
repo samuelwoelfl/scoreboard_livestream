@@ -987,7 +987,7 @@ export class Scoreboard {
     updatePlayerNamesVisibility() {
         const isVisible = this.settings.show_player_names === 1;
         $('body').attr('players', isVisible ? 'show' : 'hidden');
-        $('.players').toggle(isVisible);
+        $('.player_names').toggle(isVisible);
     }
 
     updateServeIndicatorVisibility() {
