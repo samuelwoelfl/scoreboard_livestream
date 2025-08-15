@@ -107,30 +107,6 @@ html, body {
   width: 100%;
 }
 
-.teams .team input.color-indicator {
-  
-}
-
-.controls {
-  /* margin-left: 16px; */
-  display: flex;
-  flex-direction: row;
-}
-
-.controls .container {
-  /* width: max-content; */
-  /* margin-top: 15px; */
-  /* border-radius: 8px; */
-  /* padding: 14px 16px 16px 16px; */
-  /* background-color: var(--white); */
-  /* filter: drop-shadow(1px 3px 20px rgba(0, 0, 0, 0.08)); */
-}
-
-.controls h3 {
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
 
 
 .controls .display_options .inner #reset_scores {
