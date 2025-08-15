@@ -568,8 +568,14 @@ select.small {
   width: 80px; 
 }
 
+.game_details {
+  flex-basis: 340px;
+}
+
 .data_import {
   background-color: var(--light-2);
+  flex-basis: 196px;
+  /* max-width: 230px; */
 }
 
 .data_import .input_container {
@@ -814,7 +820,7 @@ select.small {
   color: #000000aa;
 }
 
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 900px) and (pointer: coarse) {
   .scores .set_counter_container input {
     padding: 1px 2px 3px 2px;
   }
@@ -825,25 +831,8 @@ select.small {
 }
 
 @media only screen and (max-width: 600px) {
-  button.small,
-  .button.small {
-    font-size: 0.8rem;
-    padding: 3px 5px 5px 6px;
-  }
-
   .input_group {
     gap: 16px;
-  }
-
-  .counter,
-  .scores .set_counter_container input,
-  .starting_team_container .starting_team_sets .starting_team_selector {
-    width: 30px;
-  }
-
-  .scores .set_controls_container,
-  .points .controls .team_container {
-    width: 76px;
   }
 
   .scores .scores_container,
@@ -857,5 +846,25 @@ select.small {
 
   .starting_team_container .starting_team_sets .starting_team_selector select {
     padding: 1px 0px 3px 0px;
+  }
+}
+
+
+@media only screen and (max-width: 600px) and (pointer: coarse) {
+  button.small,
+  .button.small {
+    font-size: 0.8rem;
+    padding: 3px 5px 5px 6px;
+  }
+  
+  .counter,
+  .scores .set_counter_container input,
+  .starting_team_container .starting_team_sets .starting_team_selector {
+    width: 30px;
+  }
+
+  .scores .set_controls_container,
+  .points .controls .team_container {
+    width: 76px;
   }
 }
