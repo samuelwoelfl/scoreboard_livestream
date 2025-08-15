@@ -59,7 +59,7 @@ export class Scoreboard {
         this.gameSettings = {
             "win_points": 15, // Standard winning score
             "min_win_margin": 2, // Minimum points difference to win
-            "max_sets": 3, // Maximum number of sets
+            "set_mode": "3", // Set mode (e.g., "3", "5", "Best of 3")
             "hardcap": 21
         };
         
@@ -461,9 +461,17 @@ export class Scoreboard {
                     this.updateStartingTeamSelector();
                 }
             } else if (path.includes('game_settings')) {
-                // Handle game settings (winning score, max sets, hardcap, etc.)
+                // Handle game settings (winning score, set mode, hardcap, etc.)
                 const settingKey = path.split('.').pop();
-                this.gameSettings[settingKey] = Number(value);
+                
+                // Handle different data types for different settings
+                if (settingKey === 'set_mode') {
+                    // set_mode is a string, don't convert to number
+                    this.gameSettings[settingKey] = value;
+                } else {
+                    // Other settings are numbers
+                    this.gameSettings[settingKey] = Number(value);
+                }
 
                 // Update the UI
                 if ($elem.is('input') || $elem.is('select')) {

@@ -562,7 +562,10 @@ select.small {
 
 .row_section.top {
   flex-wrap: wrap-reverse;
-  
+}
+
+#Max_Sets {
+  width: 80px; 
 }
 
 .data_import {
