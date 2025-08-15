@@ -24,23 +24,13 @@ html, body {
   background-color: #13141A;
 }
 
-
-
-
-
 .top {
   gap: 4px;
 }
 
-
-
-
-
 .top input {
   width: 100%;
 }
-
-
 
 .top .content {
   background-color: var(--text-primary);
@@ -54,11 +44,6 @@ html, body {
 .bottom input {
   background-color: #ffffffaa;
 }
-
-/* .bottom button {
-  margin-top: 6px;
-  height: 28px;
-} */
 
 .top input, .bottom input {
   font-size: 17px;
@@ -831,6 +816,10 @@ select.small {
 }
 
 @media only screen and (max-width: 600px) {
+  .wrapper {
+    margin: 8px;
+  }
+
   .input_group {
     gap: 16px;
   }

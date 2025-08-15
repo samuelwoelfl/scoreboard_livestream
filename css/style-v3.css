@@ -133,7 +133,7 @@ html, body {
 .serve_indicator {
   width: 16px;
   height: 16px;
-  margin-right: 16px;
+  margin-right: 16px !important;
   margin-top: 24px;
 }
 
@@ -223,7 +223,7 @@ html, body {
     width: 9px;
     height: 9px;
     min-width: 9px;
-    margin-right: 10px;
+    margin-right: 10px !important;
     margin-top: 10px;
   }
   
@@ -240,7 +240,7 @@ html, body {
     width: 8px;
     height: 8px;
     min-width: 8px;
-    margin-right: 8px;
+    margin-right: 8px !important;
     margin-top: 10px;
   }
   
