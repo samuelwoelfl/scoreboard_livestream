@@ -1084,6 +1084,37 @@ export class Scoreboard {
     }
 
     /**
+     * Get the team that was serving at a specific point in the score history
+     * @param {number} pointIndex - Index of the point (0-based)
+     * @param {number} set - Set number (defaults to active set)
+     * @returns {string|null} Team identifier ('a' or 'b') or null if not available
+     */
+    getServingTeamAtPoint(pointIndex, set = this.active_set) {
+        const startingTeam = this.getStartingTeam(set);
+        if (!startingTeam) return null;
+        
+        // Check if we're in overtime mode at this point
+        const scoreA = this.getScore(set, 'a');
+        const scoreB = this.getScore(set, 'b');
+        const isOvertime = this.isInOvertime(set);
+        
+        if (isOvertime) {
+            // Overtime rules: serve changes after every point
+            return pointIndex % 2 === 0 ? startingTeam : (startingTeam === 'a' ? 'b' : 'a');
+        }
+        
+        // Normal rules: first serve is single, then alternates every 2 points
+        if (pointIndex === 0) {
+            return startingTeam;
+        } else {
+            const servesAfterFirst = pointIndex - 1;
+            const serveGroup = Math.floor(servesAfterFirst / 2);
+            const isStartingTeamServe = serveGroup % 2 === 0;
+            return isStartingTeamServe ? (startingTeam === 'a' ? 'b' : 'a') : startingTeam;
+        }
+    }
+
+    /**
      * Update score history display with visual indicators
      * Shows score progression and active streaks for each team
      */
@@ -1100,7 +1131,16 @@ export class Scoreboard {
                 const isActive = score > (i > 0 ? scoresList[i - 1] : 0);
                 streak = isActive ? streak + 1 : 0;
                 const status = isActive ? 'active' : '';
-                const element = `<div class="score_item ${status}" streak="${streak}">${score}</div>`;
+                
+                // Calculate if this was a break point
+                let breakAttribute = '';
+                if (isActive) {
+                    const servingTeam = this.getServingTeamAtPoint(i);
+                    const isBreak = servingTeam && servingTeam !== team;
+                    breakAttribute = isBreak ? ' break' : '';
+                }
+                
+                const element = `<div class="score_item ${status}" streak="${streak}"${breakAttribute}>${score}</div>`;
                 $container.append(element);
             });
         });
