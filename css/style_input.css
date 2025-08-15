@@ -565,7 +565,7 @@ select.small {
 }
 
 #Max_Sets {
-  width: 80px; 
+  max-width: 82px; 
 }
 
 .game_details {
@@ -856,7 +856,7 @@ select.small {
     font-size: 0.8rem;
     padding: 3px 5px 5px 6px;
   }
-  
+
   .counter,
   .scores .set_counter_container input,
   .starting_team_container .starting_team_sets .starting_team_selector {
