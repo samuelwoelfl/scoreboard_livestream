@@ -316,7 +316,7 @@ html, body {
 }
 
 .score_history .scores .team_rows .team .score_item.active {
-  border: 2px solid var(--A_Color);
+  /* border: 2px solid var(--A_Color); */
   border: 2px solid var(--primary);
   color: var(--text-primary);
   z-index: 10;
@@ -324,30 +324,30 @@ html, body {
 }
 
 .score_history .scores .team_rows .score_item[break] {
-  background-color: var(--light-3);
+  background-color: var(--light-4);
 }
 
 /* .score_history .scores .team_rows .score_item[streak="2"] {
   background-color: var(--light-3);
-} */
+}
 
-/* .score_history .scores .team_rows .score_item[streak="3"] {
+.score_history .scores .team_rows .score_item[streak="3"] {
   background-color: var(--light-4);
-} */
+}
 
-/* .score_history .scores .team_rows .score_item[streak="4"] {
+.score_history .scores .team_rows .score_item[streak="4"] {
   background-color: var(--light-5);
-} */
+}
 
-/* .score_history .scores .team_rows .score_item[streak="5"] {
+.score_history .scores .team_rows .score_item[streak="5"] {
   background-color: var(--light-6);
-} */
+}
 
-/* .score_history .scores .team_rows .score_item[streak="6"] {
+.score_history .scores .team_rows .score_item[streak="6"] {
   background-color: var(--light-7);
-} */
+}
 
-/* .score_history .scores .team_rows .score_item[streak="7"],
+.score_history .scores .team_rows .score_item[streak="7"],
 .score_history .scores .team_rows .score_item[streak="8"],
 .score_history .scores .team_rows .score_item[streak="9"],
 .score_history .scores .team_rows .score_item[streak="10"],

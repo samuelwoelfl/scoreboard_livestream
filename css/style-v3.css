@@ -131,16 +131,16 @@ html, body {
 } */
 
 .serve_indicator {
-  width: 8px;
-  height: 8px;
-  margin-right: 8px;
-  margin-top: 10px;
+  width: 16px;
+  height: 16px;
+  margin-right: 16px;
+  margin-top: 24px;
 }
 
 .serve_indicator::before {
-  width: 8px !important;
-  height: 8px !important;
-  bottom: 12px !important;
+  width: 16px !important;
+  height: 16px !important;
+  bottom: 24px !important;
 }
 
 .serve_indicator.active {
@@ -218,9 +218,39 @@ html, body {
     margin: 2px 15px 0px 15px;
     height: 75%;
   }
+
+  .serve_indicator {
+    width: 9px;
+    height: 9px;
+    min-width: 9px;
+    margin-right: 10px;
+    margin-top: 10px;
+  }
+  
+  .serve_indicator::before {
+    width: 9px !important;
+    height: 9px !important;
+    min-width: 9px !important;
+    bottom: 12px !important;
+  }
 }
 
 @media only screen and (max-width: 450px) {
+  .serve_indicator {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    margin-right: 8px;
+    margin-top: 10px;
+  }
+  
+  .serve_indicator::before {
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    bottom: 11px !important;
+  }
+
   .board {
     justify-content: flex-start;
     gap: 12px;
