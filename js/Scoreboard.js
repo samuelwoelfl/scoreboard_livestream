@@ -58,7 +58,9 @@ export class Scoreboard {
         // Game settings
         this.gameSettings = {
             "win_points": 15, // Standard winning score
-            "min_win_margin": 2 // Minimum points difference to win
+            "min_win_margin": 2, // Minimum points difference to win
+            "max_sets": 3, // Maximum number of sets
+            "hardcap": 21
         };
         
         // Init function
@@ -318,7 +320,7 @@ export class Scoreboard {
         // Winning score handler
         this.$winPoints.on('input', (event) => {
             const value = Number($(event.target).val());
-            this.gameSettings.winning_score = value;
+            this.gameSettings.win_points = value;
             this.uploadData([$(event.target)]);
         });
 
@@ -459,11 +461,15 @@ export class Scoreboard {
                     this.updateStartingTeamSelector();
                 }
             } else if (path.includes('game_settings')) {
-                // Handle game settings (winning score, etc.)
+                // Handle game settings (winning score, max sets, hardcap, etc.)
                 const settingKey = path.split('.').pop();
-                if (settingKey === 'win_points') {
-                    this.gameSettings.winning_score = Number(value);
-                    this.$winPoints.val(value);
+                this.gameSettings[settingKey] = Number(value);
+
+                // Update the UI
+                if ($elem.is('input') || $elem.is('select')) {
+                    $elem.val(value);
+                } else {
+                    $elem.text(value);
                 }
             } else {
                 // Set value based on element type
@@ -596,6 +602,7 @@ export class Scoreboard {
         });
 
         writeData(newData);
+        console.log("uploaded data to firebase", newData);
     }
 
     /**
@@ -802,6 +809,7 @@ export class Scoreboard {
     /**
      * Check if a set is in overtime mode
      * Overtime occurs when winning score is reached but 2-point margin is not met
+     * OR when hardcap is reached by either team
      * @param {number} set - Set number to check (defaults to active set)
      * @returns {boolean} True if set is in overtime
      */
@@ -809,8 +817,13 @@ export class Scoreboard {
         const scoreA = this.getScore(set, 'a');
         const scoreB = this.getScore(set, 'b');
         
+        // Check if hardcap is reached by either team
+        if (scoreA >= this.gameSettings.hardcap || scoreB >= this.gameSettings.hardcap) {
+            return true;
+        }
+        
         // Check if winning score is reached
-        if (scoreA >= this.gameSettings.winning_score || scoreB >= this.gameSettings.winning_score) {
+        if (scoreA >= this.gameSettings.win_points || scoreB >= this.gameSettings.win_points) {
             // Check if 2-point margin is met
             const scoreDifference = Math.abs(scoreA - scoreB);
             return scoreDifference < this.gameSettings.min_win_margin;
@@ -821,7 +834,7 @@ export class Scoreboard {
 
     /**
      * Check if a set is won by a team
-     * Takes into account overtime rules (2-point margin required)
+     * Takes into account overtime rules (2-point margin required or hardcap reached)
      * @param {number} set - Set number to check (defaults to active set)
      * @returns {string|null} Team identifier ('a', 'b') or null if set not won
      */
@@ -829,8 +842,13 @@ export class Scoreboard {
         const scoreA = this.getScore(set, 'a');
         const scoreB = this.getScore(set, 'b');
         
+        // Check if hardcap is reached by either team
+        if (scoreA >= this.gameSettings.hardcap || scoreB >= this.gameSettings.hardcap) {
+            return scoreA > scoreB ? 'a' : 'b';
+        }
+        
         // Check if winning score is reached
-        if (scoreA >= this.gameSettings.winning_score || scoreB >= this.gameSettings.winning_score) {
+        if (scoreA >= this.gameSettings.win_points || scoreB >= this.gameSettings.win_points) {
             const scoreDifference = Math.abs(scoreA - scoreB);
             
             // Check if 2-point margin is met
