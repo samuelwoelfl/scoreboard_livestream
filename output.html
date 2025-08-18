@@ -83,7 +83,8 @@
 
                     <div class="team_score">
                         <div class="set active">
-                            <div style="display: none;" fb-data="score.set_1.starting_team">a</div>
+                            <div style="display: none;" fb-data="score.set_1.starting_server">a</div>
+                            <div style="display: none;" fb-data="score.set_1.starting_receiver">a</div>
                             <div class="counter a_team">
                                 <p class="score" fb-data="score.set_1.team_a_score"></p>
                             </div>
@@ -92,7 +93,8 @@
                             </div>
                         </div>
                         <div class="set">
-                            <div style="display: none;" fb-data="score.set_2.starting_team">a</div>
+                            <div style="display: none;" fb-data="score.set_2.starting_server">a</div>
+                            <div style="display: none;" fb-data="score.set_2.starting_receiver">a</div>
                             <div class="counter a_team">
                                 <p class="score" fb-data="score.set_2.team_a_score"></p>
                             </div>
@@ -101,7 +103,8 @@
                             </div>
                         </div>
                         <div class="set">
-                            <div style="display: none;" fb-data="score.set_3.starting_team">a</div>
+                            <div style="display: none;" fb-data="score.set_3.starting_server">a</div>
+                            <div style="display: none;" fb-data="score.set_3.starting_receiver">a</div>
                             <div class="counter a_team">
                                 <p class="score" fb-data="score.set_3.team_a_score"></p>
                             </div>
@@ -110,7 +113,8 @@
                             </div>
                         </div>
                         <div class="set">
-                            <div style="display: none;" fb-data="score.set_4.starting_team">a</div>
+                            <div style="display: none;" fb-data="score.set_4.starting_server">a</div>
+                            <div style="display: none;" fb-data="score.set_4.starting_receiver">a</div>
                             <div class="counter a_team">
                                 <p class="score" fb-data="score.set_4.team_a_score"></p>
                             </div>
@@ -119,7 +123,8 @@
                             </div>
                         </div>
                         <div class="set">
-                            <div style="display: none;" fb-data="score.set_5.starting_team">a</div>
+                            <div style="display: none;" fb-data="score.set_5.starting_server">a</div>
+                            <div style="display: none;" fb-data="score.set_5.starting_receiver">a</div>
                             <div class="counter a_team">
                                 <p class="score" fb-data="score.set_5.team_a_score"></p>
                             </div>
@@ -128,7 +133,8 @@
                             </div>
                         </div>
                         <div class="set">
-                            <div style="display: none;" fb-data="score.set_6.starting_team">a</div>
+                            <div style="display: none;" fb-data="score.set_6.starting_server">a</div>
+                            <div style="display: none;" fb-data="score.set_6.starting_receiver">a</div>
                             <div class="counter a_team">
                                 <p class="score" fb-data="score.set_6.team_a_score"></p>
                             </div>
@@ -137,7 +143,8 @@
                             </div>
                         </div>
                         <div class="set">
-                            <div style="display: none;" fb-data="score.set_7.starting_team">a</div>
+                            <div style="display: none;" fb-data="score.set_7.starting_server">a</div>
+                            <div style="display: none;" fb-data="score.set_7.starting_receiver">a</div>
                             <div class="counter a_team">
                                 <p class="score" fb-data="score.set_7.team_a_score"></p>
                             </div>
@@ -164,9 +171,6 @@
 
     <div class="wrapper scoreboard" theme="horizontal_score">
         <div class="board">
-
-            <!-- Hidden field for starting team -->
-            <div style="display: none;" fb-data="score.set_1.starting_team">a</div>
 
             <div class="top">
 
@@ -230,9 +234,6 @@
 
     <div class="wrapper scoreboard" theme="full">
         <div class="board">
-            
-            <!-- Hidden field for starting team -->
-            <div style="display: none;" fb-data="score.set_1.starting_team">a</div>
             
             <div class="top">
                 <div class="content">
@@ -309,6 +310,121 @@
 
         <div class="chartContainer">
             <canvas id="scoreChart" width="100%" height="200px"></canvas>
+        </div>
+    </div>
+
+    <div class="match_statistics">
+        <div class="statistics_header">
+            <h3>Match Statistics</h3>
+        </div>
+        
+        <div class="team_statistics">
+            <div class="team_stats team_a">
+                <div class="team_header">
+                    <div class="color-indicator" fb-data="teams_info.team_a.color"></div>
+                    <h4 fb-data="teams_info.team_a.name">Team A</h4>
+                </div>
+                <div class="team_overall_stats">
+                    <div class="stat_item">
+                        <span class="stat_label">Break %</span>
+                        <span class="stat_value" id="team_a_break_percentage">0%</span>
+                    </div>
+                </div>
+                <div class="player_stats">
+                    <div class="player player_a">
+                        <h5 fb-data="teams_info.team_a.player_1">Player A</h5>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Sideout %</span>
+                            <span class="stat_value" id="player_a_sideout_percentage">0%</span>
+                        </div>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Break %</span>
+                            <span class="stat_value" id="player_a_break_percentage">0%</span>
+                        </div>
+                    </div>
+                    <div class="player player_b">
+                        <h5 fb-data="teams_info.team_a.player_2">Player B</h5>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Sideout %</span>
+                            <span class="stat_value" id="player_b_sideout_percentage">0%</span>
+                        </div>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Break %</span>
+                            <span class="stat_value" id="player_b_break_percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="team_stats team_b">
+                <div class="team_header">
+                    <div class="color-indicator" fb-data="teams_info.team_b.color"></div>
+                    <h4 fb-data="teams_info.team_b.name">Team B</h4>
+                </div>
+                <div class="team_overall_stats">
+                    <div class="stat_item">
+                        <span class="stat_label">Break %</span>
+                        <span class="stat_value" id="team_b_break_percentage">0%</span>
+                    </div>
+                </div>
+                <div class="player_stats">
+                    <div class="player player_c">
+                        <h5 fb-data="teams_info.team_b.player_1">Player C</h5>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Sideout %</span>
+                            <span class="stat_value" id="player_c_sideout_percentage">0%</span>
+                        </div>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Break %</span>
+                            <span class="stat_value" id="player_c_break_percentage">0%</span>
+                        </div>
+                    </div>
+                    <div class="player player_d">
+                        <h5 fb-data="teams_info.team_b.player_2">Player D</h5>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Sideout %</span>
+                            <span class="stat_value" id="player_d_sideout_percentage">0%</span>
+                        </div>
+                        <div class="player_stat_item">
+                            <span class="stat_label">Break %</span>
+                            <span class="stat_value" id="player_d_break_percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="set_statistics">
+            <h4>Set Statistics</h4>
+            <div class="sets_container" id="set_statistics_container">
+                <!-- Set statistics will be dynamically generated here -->
+            </div>
+        </div>
+
+        <div class="score_history_in_stats">
+            <h4>Score History</h4>
+            <div class="table_view">
+                <div class="teams_info">
+                    <div class="team">
+                        <div class="color-indicator" fb-data="teams_info.team_a.color"></div>
+                        <div class="name">
+                            <p class="teamname" fb-data="teams_info.team_a.name">A Teamname</p>
+                        </div>
+                    </div>
+                    <div class="team">
+                        <div class="color-indicator" fb-data="teams_info.team_b.color"></div>
+                        <div class="name">
+                            <p class="teamname" fb-data="teams_info.team_b.name">B Teamname</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="scores">
+                    <div class="team_rows">
+                        <div class="team" team="a"></div>
+                        <div class="team" team="b"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

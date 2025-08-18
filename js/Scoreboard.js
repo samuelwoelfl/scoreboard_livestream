@@ -37,6 +37,7 @@ export class Scoreboard {
         this.$urlOutput = $('.url_output');
         this.$logoutButton = $('#logout');
         this.$scoreHistoryContainer = $('.score_history');
+        this.$matchStatisticsContainer = $('.match_statistics');
         
         // Stored variables
         this.channel = Number(channel);
@@ -48,6 +49,7 @@ export class Scoreboard {
             "show_serve_indicator": 0,
             "show_score_history": 0,
             "show_score_history_chart": 0,
+            "show_match_statistics": 0,
         };
         this.active_set = 1;
         this.ScoreHistoryChart = null;
@@ -98,24 +100,37 @@ export class Scoreboard {
      * Update the starting team selector to show the current set's starting team
      */
     updateStartingTeamSelector() {
-        // Update all starting team selectors for all sets
-        for (let setNumber = 1; setNumber <= 7; setNumber++) {
-            const $selector = this.$html_frame.find(`#starting_team_${setNumber}`);
-            if ($selector.length > 0) {
-                const currentStartingTeam = this.getStartingTeam(setNumber);
-                if (currentStartingTeam) {
-                    $selector.val(currentStartingTeam);
-                }
-            }
-        }
+        // Update all starting server selectors for all sets
+        // for (let setNumber = 1; setNumber <= 7; setNumber++) {
+        //     const $serverSelector = this.$html_frame.find(`#starting_server_${setNumber}`);
+        //     if ($serverSelector.length > 0) {
+        //         const currentStartingServer = this.getStartingServer(setNumber);
+        //         if (currentStartingServer) {
+        //             $serverSelector.val(currentStartingServer);
+        //         }
+        //     }
+            
+        //     const $receiverSelector = this.$html_frame.find(`#starting_receiver_${setNumber}`);
+        //     if ($receiverSelector.length > 0) {
+        //         const currentStartingReceiver = this.getStartingReceiver(setNumber);
+        //         if (currentStartingReceiver) {
+        //             $receiverSelector.val(currentStartingReceiver);
+        //         }
+        //     }
+        // }
         
-        // Update hidden starting_team fields in output.html to reflect current set
-        if (this.type === 'output') {
-            this.$html_frame.find(`[fb-data*="score.set_"][fb-data*=".starting_team"]`).each((index, element) => {
-                const $element = $(element);
-                $element.attr('fb-data', `score.set_${this.active_set}.starting_team`);
-            });
-        }
+        // Update hidden starting_server and starting_receiver fields in output.html to reflect current set
+        // if (this.type === 'output') {
+        //     this.$html_frame.find(`[fb-data*="score.set_"][fb-data*=".starting_server"]`).each((index, element) => {
+        //         const $element = $(element);
+        //         $element.attr('fb-data', `score.set_${this.active_set}.starting_server`);
+        //     });
+            
+        //     this.$html_frame.find(`[fb-data*="score.set_"][fb-data*=".starting_receiver"]`).each((index, element) => {
+        //         const $element = $(element);
+        //         $element.attr('fb-data', `score.set_${this.active_set}.starting_receiver`);
+        //     });
+        // }
     }
 
     /**
@@ -136,6 +151,7 @@ export class Scoreboard {
         if (this.type === 'output') {
             this.updateScoreHistory();
             this.updateScoreHistoryChart();
+            this.updateMatchStatistics();
         }
     }
 
@@ -170,6 +186,7 @@ export class Scoreboard {
             
             // Simplified conditional logic
             $('.score_history').toggleClass('hidden', html_structure !== 'vertical_score');
+            $('.match_statistics').toggleClass('hidden', html_structure !== 'vertical_score');
         }
     }
 
@@ -441,25 +458,17 @@ export class Scoreboard {
                 this.insertColor($elem, path, value);
             } else if (path.includes('active_set')) {
                 this.active_set = value;
-            } else if (path.includes('first_serve_team')) {
-                // Handle first serve team setting
-                if ($elem.is('input') || $elem.is('select')) {
-                    $elem.val(value);
-                } else {
-                    $elem.text(value);
-                }
-            } else if (path.includes('starting_team')) {
+            } else if (path.includes('starting_server') || path.includes('starting_receiver')) {
                 // Handle starting team setting
                 if ($elem.is('input') || $elem.is('select')) {
                     $elem.val(value);
                 } else {
                     $elem.text(value);
                 }
-                
                 // Update the selector if this is for the current set
-                if (path.includes(`set_${this.active_set}`)) {
-                    this.updateStartingTeamSelector();
-                }
+                // if (path.includes(`set_${this.active_set}`)) {
+                //     this.updateStartingTeamSelector();
+                // }
             } else if (path.includes('game_settings')) {
                 // Handle game settings (winning score, set mode, hardcap, etc.)
                 const settingKey = path.split('.').pop();
@@ -596,7 +605,8 @@ export class Scoreboard {
             // Convert to integer for score and active_set paths, but not for starting_team or admin_settings
             let finalValue = value;
             if ((pathToVariable.includes('score') || pathToVariable.includes('active_set')) && 
-                !pathToVariable.includes('starting_team') && 
+                !pathToVariable.includes('starting_server') && 
+                !pathToVariable.includes('starting_receiver') && 
                 !pathToVariable.includes('admin_settings')) {
                 try {
                     finalValue = parseInt(value);
@@ -869,19 +879,23 @@ export class Scoreboard {
     }
 
     /**
-     * Get the starting player for a specific set
+     * Get the starting server for a specific set
      * @param {number} set - Set number (1-7), defaults to active set
      * @returns {string|null} Player identifier ('a', 'b', 'c', 'd') or null if not set
      */
-    getStartingPlayer(set = this.active_set) {
-        const startingTeamData = this.$html_frame.find(`[fb-data="score.set_${set}.starting_team"]`).first();
-        if (startingTeamData.length > 0) {
-            const value = startingTeamData.is('input') ? startingTeamData.val() : startingTeamData.text();
-            if (value && (value === 'a' || value === 'b' || value === 'c' || value === 'd')) {
-                return value;
-            }
-        }
-        return null;
+    getStartingServer(set = this.active_set) {
+        const startingServerData = this.$html_frame.find(`[fb-data="score.set_${set}.starting_server"]`).first();
+        return startingServerData.is('input') ? startingServerData.val() : startingServerData.text();
+    }
+
+    /**
+     * Get the starting receiver for a specific set
+     * @param {number} set - Set number (1-7), defaults to active set
+     * @returns {string|null} Player identifier ('a', 'b', 'c', 'd') or null if not set
+     */
+    getStartingReceiver(set = this.active_set) {
+        const startingReceiverData = this.$html_frame.find(`[fb-data="score.set_${set}.starting_receiver"]`).first();
+        return startingReceiverData.is('input') ? startingReceiverData.val() : startingReceiverData.text();
     }
 
     /**
@@ -890,10 +904,10 @@ export class Scoreboard {
      * @returns {string|null} Team identifier ('a' or 'b') or null if not set
      */
     getStartingTeam(set = this.active_set) {
-        const startingPlayer = this.getStartingPlayer(set);
-        if (startingPlayer) {
+        const startingServer = this.getStartingServer(set);
+        if (startingServer) {
             // Map player values to team values
-            return (startingPlayer === 'a' || startingPlayer === 'b') ? 'a' : 'b';
+            return (startingServer === 'a' || startingServer === 'b') ? 'a' : 'b';
         }
         return null;
     }
@@ -972,6 +986,7 @@ export class Scoreboard {
         this.updateUrlOutput();
         this.updateScoreHistoryVisibility();
         this.updateScoreHistoryChartVisibility();
+        this.updateMatchStatisticsVisibility();
     }
 
     updateGroupScoreVisibility() {
@@ -1009,6 +1024,16 @@ export class Scoreboard {
             this.scoreChart?.update();
         } else if (!isVisible && $chartContainer.is(':visible')) {
             $chartContainer.slideUp(300, "easeOutCubic");
+        }
+    }
+
+    updateMatchStatisticsVisibility() {
+        const isVisible = this.settings.show_match_statistics === 1;
+        
+        if (isVisible) {
+            this.$matchStatisticsContainer.addClass('show').removeClass('hidden');
+        } else {
+            this.$matchStatisticsContainer.removeClass('show').addClass('hidden');
         }
     }
 
@@ -1110,33 +1135,186 @@ export class Scoreboard {
     }
 
     /**
-     * Get the team that was serving at a specific point in the score history
+     * Get the player that was serving at a specific point in the score history
      * @param {number} pointIndex - Index of the point (0-based)
      * @param {number} set - Set number (defaults to active set)
-     * @returns {string|null} Team identifier ('a' or 'b') or null if not available
+     * @returns {string|null} Player identifier ('a', 'b', 'c', 'd') or null if not available
      */
-    getServingTeamAtPoint(pointIndex, set = this.active_set) {
-        const startingTeam = this.getStartingTeam(set);
-        if (!startingTeam) return null;
-        
-        // Check if we're in overtime mode at this point
-        const scoreA = this.getScore(set, 'a');
-        const scoreB = this.getScore(set, 'b');
+    getServingPlayerAtPoint(pointIndex, set = this.active_set) {
+        const startingServer = this.getStartingServer(set);
+        const startingReceiver = this.getStartingReceiver(set);
         const isOvertime = this.isInOvertime(set);
+
+        let serveOrder;
+        if (startingServer == 'a' && startingReceiver == 'c') {
+            serveOrder = ['a', 'd', 'b', 'c'];
+        } else if (startingServer == 'a' && startingReceiver == 'd') {
+            serveOrder = ['a', 'c', 'b', 'd'];
+        } else if (startingServer == 'b' && startingReceiver == 'c') {
+            serveOrder = ['b', 'd', 'a', 'c'];
+        } else if (startingServer == 'b' && startingReceiver == 'd') {
+            serveOrder = ['b', 'c', 'a', 'd'];
+        } else if (startingServer == 'c' && startingReceiver == 'a') {
+            serveOrder = ['c', 'b', 'd', 'a'];
+        } else if (startingServer == 'c' && startingReceiver == 'b') {
+            serveOrder = ['c', 'a', 'd', 'b'];
+        } else if (startingServer == 'd' && startingReceiver == 'a') {
+            serveOrder = ['d', 'b', 'c', 'a'];
+        } else if (startingServer == 'd' && startingReceiver == 'b') {
+            serveOrder = ['d', 'a', 'c', 'b'];
+        }
+        // let serveOrder = ['b', 'c', 'a', 'd'];
+        // let serveOrderOvertime = ['d', 'a', 'c', 'b'];
         
-        if (isOvertime) {
-            // Overtime rules: serve changes after every point
-            return pointIndex % 2 === 0 ? startingTeam : (startingTeam === 'a' ? 'b' : 'a');
+        
+        const startIndex = serveOrder.indexOf(startingServer);
+        // const startIndex = serveOrder.indexOf(this.playerLocationTransformation(startingServer, 'player', set));
+        if (pointIndex === 0) {
+            return startingServer;
+        } else {
+            let player, steps, pointsTillOvertime;
+            if (!isOvertime) {
+                steps = Math.floor(((pointIndex + 1) / 2) % 4);
+                player = serveOrder[(startIndex + steps) % 4];
+            } else {
+                pointsTillOvertime = this.gameSettings.win_points * 2 - 2;
+                steps = Math.floor(((((pointsTillOvertime + 1) / 2) % 4) + (pointIndex - pointsTillOvertime) % 4) % 4);
+                player = serveOrder[(startIndex + steps) % 4];
+                if (startingServer == 'a' || startingServer == 'b') {
+                    player = player == 'a' ? 'b' : player == 'b' ? 'a' : player;
+                }
+            }
+            
+            return player;
+            // return this.playerLocationTransformation(serveOrder[(startIndex + steps) % 4], 'location', set);
+        }
+    }
+
+    playerLocationTransformation(input, inputType, set) {
+        const startingServer = this.getStartingServer(set);
+        const startingReceiver = this.getStartingReceiver(set);
+        
+        let list;
+        if (startingServer == 'a' && startingReceiver == 'c') {
+            list = {
+                a: 'b',
+                b: 'a',
+                c: 'd',
+                d: 'c'
+            }
+        } else if (startingServer == 'a' && startingReceiver == 'd') {
+            list = {
+                a: 'b',
+                b: 'a',
+                c: 'c',
+                d: 'd'
+            }
+        } else if (startingServer == 'b' && startingReceiver == 'c') {
+            list = {
+                a: 'a',
+                b: 'b',
+                c: 'd',
+                d: 'c'
+            }
+        } else if (startingServer == 'b' && startingReceiver == 'd') {
+            list = {
+                a: 'a',
+                b: 'b',
+                c: 'c',
+                d: 'd'
+            }
+        } else if (startingServer == 'c' && startingReceiver == 'a') {
+            list = {
+                a: 'd',
+                b: 'c',
+                c: 'b',
+                d: 'a'
+            }
+        } else if (startingServer == 'c' && startingReceiver == 'b') {
+            list = {
+                a: 'c',
+                b: 'd',
+                c: 'b',
+                d: 'a'
+            }
+        } else if (startingServer == 'd' && startingReceiver == 'a') {
+            list = {
+                a: 'd',
+                b: 'c',
+                c: 'a',
+                d: 'b'
+            }
+        } else if (startingServer == 'd' && startingReceiver == 'b') {
+            list = {
+                a: 'c',
+                b: 'd',
+                c: 'a',
+                d: 'b'
+            }
         }
         
-        // Normal rules: first serve is single, then alternates every 2 points
+        if (inputType == 'player') {
+            for (const [key, value] of Object.entries(list)) {
+                if (value === input) {
+                    return String(key);
+                }
+            }
+        } else if (inputType == 'location') {
+            return list[input];
+        }
+    }
+
+    /**
+     * Get the receiving player at a specific point in a set
+     * @param {number} pointIndex - Point index (0-based)
+     * @param {number} set - Set number
+     * @returns {string|null} Player identifier ('a', 'b', 'c', 'd') or null
+     */
+    getReceivingPlayerAtPoint(pointIndex, set) {
+        const startingServer = this.getStartingServer(set);
+        const startingReceiver = this.getStartingReceiver(set);
+        const isOvertime = this.isInOvertime(set);
+
+        let receivingOrder, overtimeOrder;
+        if (startingServer == 'a' && startingReceiver == 'c') {
+            receivingOrder = ['c', 'b', 'a', 'c', 'd', 'a', 'b', 'd'];
+        } else if (startingServer == 'a' && startingReceiver == 'd') {
+            receivingOrder = ['d', 'b', 'a', 'd', 'c', 'a', 'b', 'c'];
+        } else if (startingServer == 'b' && startingReceiver == 'c') {
+            receivingOrder = ['c', 'a', 'b', 'c', 'd', 'b', 'a', 'd'];
+        } else if (startingServer == 'b' && startingReceiver == 'd') {
+            receivingOrder = ['d', 'a', 'b', 'd', 'c', 'b', 'a', 'c'];
+            overtimeOrder = ['b', 'c', 'a', 'd'];
+        } else if (startingServer == 'c' && startingReceiver == 'a') {
+            receivingOrder = ['a', 'd', 'c', 'a', 'b', 'c', 'd', 'b'];
+        } else if (startingServer == 'c' && startingReceiver == 'b') {
+            receivingOrder = ['b', 'd', 'c', 'b', 'a', 'c', 'd', 'a'];
+        } else if (startingServer == 'd' && startingReceiver == 'a') {
+            receivingOrder = ['a', 'c', 'd', 'a', 'b', 'd', 'c', 'b'];
+        } else if (startingServer == 'd' && startingReceiver == 'b') {
+            receivingOrder = ['b', 'c', 'd', 'b', 'a', 'd', 'c', 'a'];
+        }
+
+        // receivingOrder = []
+        // receivingOrder.push(startingReceiver);
+        // receivingOrder.push(this.getPlayerTeam(startingReceiver) == 'a' ? '' : 'd');
+
+        // TODO: fix overtime
+        const startIndex = receivingOrder.indexOf(startingReceiver);
         if (pointIndex === 0) {
-            return startingTeam;
+            return startingReceiver;
         } else {
-            const servesAfterFirst = pointIndex - 1;
-            const serveGroup = Math.floor(servesAfterFirst / 2);
-            const isStartingTeamServe = serveGroup % 2 === 0;
-            return isStartingTeamServe ? (startingTeam === 'a' ? 'b' : 'a') : startingTeam;
+            let steps, pointsTillOvertime;
+            if (!isOvertime) {
+                steps = Math.floor((pointIndex) % 8);
+                return receivingOrder[(startIndex + steps) % 8];
+            } else {
+                steps = Math.floor((pointIndex - 1) % 4);
+                return overtimeOrder[(startIndex + steps) % 4];
+                // pointsTillOvertime = this.gameSettings.win_points * 2 - 2;
+                // steps = Math.floor(((pointsTillOvertime) % 8) + (pointIndex - pointsTillOvertime));
+            }
+            
         }
     }
 
@@ -1145,30 +1323,47 @@ export class Scoreboard {
      * Shows score progression and active streaks for each team
      */
     updateScoreHistory() {
+        // Update main score history
         $.each(this.$scoreHistoryContainer.find('.scores .team'), (i, container) => {
-            const $container = $(container);
-            const team = $container.attr('team');
-            const scoresList = this.scoreHistoryToTeamPoints(this.getScoreHistory(), team);
+            this.updateScoreHistoryForContainer($(container));
+        });
+        
+        // Update score history in match statistics
+        $.each(this.$matchStatisticsContainer.find('.score_history_in_stats .scores .team'), (i, container) => {
+            this.updateScoreHistoryForContainer($(container));
+        });
+
+        let score_sum = this.getScore(this.active_set, 'a') + this.getScore(this.active_set, 'b');
+        // console.log(this.getServingPlayerAtPoint(score_sum), this.getReceivingPlayerAtPoint(score_sum));
+    }
+
+    /**
+     * Update score history for a specific container
+     * @param {jQuery} $container - Container element to update
+     */
+    updateScoreHistoryForContainer($container) {
+        const team = $container.attr('team');
+        const scoresList = this.scoreHistoryToTeamPoints(this.getScoreHistory(), team);
+        
+        $container.empty();
+        
+        let streak = 0;
+        $.each(scoresList, (i, score) => {
+            const isActive = score > (i > 0 ? scoresList[i - 1] : 0);
+            streak = isActive ? streak + 1 : 0;
+            const status = isActive ? 'active' : '';
             
-            $container.empty();
+            // Calculate if this was a break point
+            let breakAttribute = '';
+            if (isActive) {
+                const servingPlayer = this.getServingPlayerAtPoint(i);
+                const servingTeam = this.getPlayerTeam(servingPlayer);
+                const isBreak = servingTeam == team;
+                breakAttribute = isBreak ? ' break' : '';
+            }
             
-            let streak = 0;
-            $.each(scoresList, (i, score) => {
-                const isActive = score > (i > 0 ? scoresList[i - 1] : 0);
-                streak = isActive ? streak + 1 : 0;
-                const status = isActive ? 'active' : '';
-                
-                // Calculate if this was a break point
-                let breakAttribute = '';
-                if (isActive) {
-                    const servingTeam = this.getServingTeamAtPoint(i);
-                    const isBreak = servingTeam && servingTeam !== team;
-                    breakAttribute = isBreak ? ' break' : '';
-                }
-                
-                const element = `<div class="score_item ${status}" streak="${streak}"${breakAttribute}>${score}</div>`;
-                $container.append(element);
-            });
+            const element = `<div class="score_item ${status}" streak="${streak}"${breakAttribute}>${score}</div>`;
+            $container.append(element);
         });
     }
 
@@ -1249,6 +1444,310 @@ export class Scoreboard {
         });
 
         this.scoreChart.update();
+    }
+
+    /**
+     * Update match statistics overlay with calculated statistics
+     * Shows break percentages, sideout percentages, and player-specific stats
+     */
+    updateMatchStatistics() {
+        if (this.settings.show_match_statistics !== 1) return;
+
+        // Calculate overall statistics
+        const overallStats = this.calculateOverallStatistics();
+        
+        // Update team break percentages
+        $('#team_a_break_percentage').text(`${overallStats.teamA.breakPercentage}%`);
+        $('#team_b_break_percentage').text(`${overallStats.teamB.breakPercentage}%`);
+        
+        // Update player statistics
+        this.updatePlayerStatistics(overallStats);
+        
+        // Update set statistics
+        this.updateSetStatistics();
+        
+        // Update score history within match statistics
+    }
+
+    /**
+     * Calculate overall match statistics from event history
+     * @returns {Object} Object containing team and player statistics
+     */
+    calculateOverallStatistics() {
+        const stats = {
+            teamA: { breaks: 0, breakOpportunities: 0, breakPercentage: 0 },
+            teamB: { breaks: 0, breakOpportunities: 0, breakPercentage: 0 },
+            players: {
+                a: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
+                b: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
+                c: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
+                d: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 }
+            }
+        };
+
+        // Find the last reset event
+        let startIndex = -1;
+        $.each(this.event_history.slice().reverse(), (i, event) => {
+            if (event.type === 'reset') {
+                startIndex = this.event_history.length - 1 - i;
+                return false; // break the loop
+            }
+        });
+
+        // Get score events since last reset (all sets)
+        const scoreEvents = this.event_history.slice(startIndex + 1).filter(event => event.type === 'score');
+        
+        // Process each score event
+        scoreEvents.forEach((event, index) => {
+            if (!event.team || !event.set) return;
+            
+            const team = event.team.toLowerCase();
+            const set = event.set;
+            
+            // Determine who was serving at this point and if it was a break
+            const servingPlayer = this.getServingPlayerAtPoint(index, set);
+            const receivingPlayer = this.getReceivingPlayerAtPoint(index, set);
+            const servingTeam = this.getPlayerTeam(servingPlayer);
+            const isBreak = (team == servingTeam);
+
+            // set break opportunities and sideout opportunities for team and player
+            stats[`team${servingTeam.toUpperCase()}`].breakOpportunities++;
+            stats.players[servingPlayer].breakOpportunities++;
+            stats.players[receivingPlayer].sideoutOpportunities++;
+
+            // set breaks and sideouts for team and player
+            if (isBreak) {
+                stats[`team${team.toUpperCase()}`].breaks++;
+                stats.players[servingPlayer].breaks++;   
+            } else {
+                stats.players[receivingPlayer].sideouts++;
+            }
+            
+
+            // console.log(stats);
+        });
+        
+        // Calculate percentages
+        stats.teamA.breakPercentage = stats.teamA.breakOpportunities > 0 ? 
+            Math.round((stats.teamA.breaks / stats.teamA.breakOpportunities) * 100) : 0;
+        stats.teamB.breakPercentage = stats.teamB.breakOpportunities > 0 ? 
+            Math.round((stats.teamB.breaks / stats.teamB.breakOpportunities) * 100) : 0;
+        
+        return stats;
+    }
+
+    /**
+     * Update player statistics in the UI
+     * @param {Object} stats - Overall statistics object
+     */
+    updatePlayerStatistics(stats) {
+        const players = ['a', 'b', 'c', 'd'];
+        
+        players.forEach(player => {
+            const playerStats = stats.players[player];
+            
+            // Calculate sideout percentage
+            const sideoutPercentage = playerStats.sideoutOpportunities > 0 ? 
+                Math.round((playerStats.sideouts / playerStats.sideoutOpportunities) * 100) : 0;
+            
+            // Calculate break percentage
+            const breakPercentage = playerStats.breakOpportunities > 0 ? 
+                Math.round((playerStats.breaks / playerStats.breakOpportunities) * 100) : 0;
+            
+            // Update UI
+            $(`#player_${player}_sideout_percentage`).text(`${sideoutPercentage}%`);
+            $(`#player_${player}_break_percentage`).text(`${breakPercentage}%`);
+        });
+    }
+
+    /**
+     * Update set-specific statistics
+     */
+    updateSetStatistics() {
+        const $container = $('#set_statistics_container');
+        $container.empty();
+        
+        // Get all played sets
+        const playedSets = [];
+        for (let set = 1; set <= 7; set++) {
+            if (this.getScore(set, 'a') > 0 || this.getScore(set, 'b') > 0) {
+                playedSets.push(set);
+            }
+        }
+        
+        // Generate statistics for each set
+        playedSets.forEach(set => {
+            const setStats = this.calculateSetStatistics(set);
+            const setHtml = this.generateSetStatisticsHTML(set, setStats);
+            $container.append(setHtml);
+        });
+    }
+
+    /**
+     * Calculate statistics for a specific set
+     * @param {number} set - Set number
+     * @returns {Object} Set statistics
+     */
+    calculateSetStatistics(set) {
+        const stats = {
+            teamA: { breaks: 0, totalPoints: 0, breakPercentage: 0 },
+            teamB: { breaks: 0, totalPoints: 0, breakPercentage: 0 },
+            players: {
+                a: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
+                b: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
+                c: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
+                d: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 }
+            }
+        };
+
+        // Get score events for this specific set
+        const setScoreEvents = this.event_history.filter(event => 
+            event.type === 'score' && event.set === set
+        );
+        
+        // Process each score event for this set
+        setScoreEvents.forEach((event, index) => {
+            if (!event.team) return;
+            
+            const team = event.team.toLowerCase();
+            
+            // Count total points for each team
+            if (team === 'a') {
+                stats.teamA.totalPoints++;
+            } else if (team === 'b') {
+                stats.teamB.totalPoints++;
+            }
+            
+            // Determine who was serving at this point
+            const servingPlayer = this.getServingPlayerAtPoint(index, set);
+            if (!servingPlayer) return;
+            
+            // Determine if this was a break
+            const isBreak = (team === 'a' && (servingPlayer === 'c' || servingPlayer === 'd')) || 
+                           (team === 'b' && (servingPlayer === 'a' || servingPlayer === 'b'));
+            
+            if (isBreak) {
+                if (team === 'a') {
+                    stats.teamA.breaks++;
+                } else if (team === 'b') {
+                    stats.teamB.breaks++;
+                }
+            }
+            
+            // Determine which player was receiving
+            const receivingPlayer = this.getReceivingPlayerAtPoint(index, set);
+            
+            if (receivingPlayer && servingPlayer) {
+                // Count sideout opportunities and successes
+                if (team === this.getPlayerTeam(receivingPlayer)) {
+                    stats.players[receivingPlayer].sideoutOpportunities++;
+                    if (isBreak) {
+                        stats.players[receivingPlayer].sideouts++;
+                    }
+                }
+                
+                // Count break opportunities and successes
+                if (team === this.getPlayerTeam(servingPlayer)) {
+                    stats.players[servingPlayer].breakOpportunities++;
+                    if (!isBreak) {
+                        stats.players[servingPlayer].breaks++;
+                    }
+                }
+            }
+        });
+        
+        // Calculate percentages
+        stats.teamA.breakPercentage = stats.teamA.totalPoints > 0 ? 
+            Math.round((stats.teamA.breaks / stats.teamA.totalPoints) * 100) : 0;
+        stats.teamB.breakPercentage = stats.teamB.totalPoints > 0 ? 
+            Math.round((stats.teamB.breaks / stats.teamB.totalPoints) * 100) : 0;
+        
+        return stats;
+    }
+
+    /**
+     * Generate HTML for set statistics
+     * @param {number} set - Set number
+     * @param {Object} stats - Set statistics
+     * @returns {string} HTML string
+     */
+    generateSetStatisticsHTML(set, stats) {
+        const teamAName = this.$html_frame.find('[fb-data="teams_info.team_a.name"]').first().text() || 'Team A';
+        const teamBName = this.$html_frame.find('[fb-data="teams_info.team_b.name"]').first().text() || 'Team B';
+        
+        return `
+            <div class="set_stats">
+                <h5>Set ${set}</h5>
+                <div class="set_team_stats">
+                    <div class="set_team">
+                        <h6>${teamAName}</h6>
+                        <div class="set_player_stats">
+                            <div class="set_player">
+                                <span class="stat_label">Break %</span>
+                                <span class="stat_value">${stats.teamA.breakPercentage}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">A Sideout %</span>
+                                <span class="stat_value">${stats.players.a.sideoutOpportunities > 0 ? Math.round((stats.players.a.sideouts / stats.players.a.sideoutOpportunities) * 100) : 0}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">A Break %</span>
+                                <span class="stat_value">${stats.players.a.breakOpportunities > 0 ? Math.round((stats.players.a.breaks / stats.players.a.breakOpportunities) * 100) : 0}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">B Sideout %</span>
+                                <span class="stat_value">${stats.players.b.sideoutOpportunities > 0 ? Math.round((stats.players.b.sideouts / stats.players.b.sideoutOpportunities) * 100) : 0}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">B Break %</span>
+                                <span class="stat_value">${stats.players.b.breakOpportunities > 0 ? Math.round((stats.players.b.breaks / stats.players.b.breakOpportunities) * 100) : 0}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="set_team">
+                        <h6>${teamBName}</h6>
+                        <div class="set_player_stats">
+                            <div class="set_player">
+                                <span class="stat_label">Break %</span>
+                                <span class="stat_value">${stats.teamB.breakPercentage}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">C Sideout %</span>
+                                <span class="stat_value">${stats.players.c.sideoutOpportunities > 0 ? Math.round((stats.players.c.sideouts / stats.players.c.sideoutOpportunities) * 100) : 0}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">C Break %</span>
+                                <span class="stat_value">${stats.players.c.breakOpportunities > 0 ? Math.round((stats.players.c.breaks / stats.players.c.breakOpportunities) * 100) : 0}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">D Sideout %</span>
+                                <span class="stat_value">${stats.players.d.sideoutOpportunities > 0 ? Math.round((stats.players.d.sideouts / stats.players.d.sideoutOpportunities) * 100) : 0}%</span>
+                            </div>
+                            <div class="set_player">
+                                <span class="stat_label">D Break %</span>
+                                <span class="stat_value">${stats.players.d.breakOpportunities > 0 ? Math.round((stats.players.d.breaks / stats.players.d.breakOpportunities) * 100) : 0}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    
+
+    /**
+     * Get the team that a player belongs to
+     * @param {string} player - Player identifier ('a', 'b', 'c', 'd')
+     * @returns {string|null} Team identifier ('a' or 'b') or null
+     */
+    getPlayerTeam(player) {
+        if (player === 'a' || player === 'b') {
+            return 'a';
+        } else if (player === 'c' || player === 'd') {
+            return 'b';
+        }
+        return null;
     }
 }
 
