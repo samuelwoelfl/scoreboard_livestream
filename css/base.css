@@ -801,7 +801,7 @@ html, body {
   gap: 14px;
 }
 
-.match_statistics .players_container .player img {
+.match_statistics .players_container .player > img {
   height: 90px;
   object-fit: contain;
   border-radius: 4px;
@@ -840,9 +840,23 @@ html, body {
   text-transform: uppercase;
 }
 
+.match_statistics .players_container .player .details .club {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 6px;
+}
+
 .match_statistics .players_container .player .details .club p {
   font-size: .9rem;
   font-weight: 300;
+}
+
+.match_statistics .players_container .player .details .club img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .match_statistics .player_stats {
