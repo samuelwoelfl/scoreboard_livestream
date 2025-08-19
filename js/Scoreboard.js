@@ -448,27 +448,26 @@ export class Scoreboard {
 
         // Process each path and value
         $.each(Object.entries(pathsAndValues), (_, [path, value]) => {
-            const $elem = $(`[fb-data="${path}"]`);
+            const $allElements = $(`[fb-data="${path}"]`);
 
             if (path.includes('event_history')) {
                 this.event_history = Array.isArray(value) ? value : [];
             } else if (path.includes('admin_settings')) {
                 this.insertAdminSetting(path, value);
             } else if (path.includes('teams_info') && path.includes('color')) {
-                this.insertColor($elem, path, value);
+                this.insertColor($allElements.first(), path, value);
             } else if (path.includes('active_set')) {
                 this.active_set = value;
             } else if (path.includes('starting_server') || path.includes('starting_receiver')) {
                 // Handle starting team setting
-                if ($elem.is('input') || $elem.is('select')) {
-                    $elem.val(value);
-                } else {
-                    $elem.text(value);
-                }
-                // Update the selector if this is for the current set
-                // if (path.includes(`set_${this.active_set}`)) {
-                //     this.updateStartingTeamSelector();
-                // }
+                $allElements.each((_, elem) => {
+                    const $elem = $(elem);
+                    if ($elem.is('input') || $elem.is('select')) {
+                        $elem.val(value);
+                    } else {
+                        $elem.text(value);
+                    }
+                });
             } else if (path.includes('game_settings')) {
                 // Handle game settings (winning score, set mode, hardcap, etc.)
                 const settingKey = path.split('.').pop();
@@ -483,14 +482,20 @@ export class Scoreboard {
                 }
 
                 // Update the UI
-                if ($elem.is('input') || $elem.is('select')) {
-                    $elem.val(value);
-                } else {
-                    $elem.text(value);
-                }
+                $allElements.each((_, elem) => {
+                    const $elem = $(elem);
+                    if ($elem.is('input') || $elem.is('select')) {
+                        $elem.val(value);
+                    } else {
+                        $elem.text(value);
+                    }
+                });
             } else {
-                // Set value based on element type
-                this.setElementValue($elem, value);
+                // Handle elements with and without part attributes
+                $allElements.each((_, elem) => {
+                    const $elem = $(elem);
+                    this.setElementValue($elem, value);
+                });
             }
         });
     }
@@ -501,7 +506,26 @@ export class Scoreboard {
      * @param {*} value - Value to set
      */
     setElementValue($elem, value) {
-        if ($elem.is('input[type="checkbox"]')) {
+        // Check if element has a part attribute for name splitting
+        const part = $elem.attr('part');
+        if (part && (part === 'prename' || part === 'surname')) {
+            // Split the full name at the first space
+            const nameParts = String(value).split(' ');
+            if (part === 'prename') {
+                // Set the first part (everything before the first space)
+                $elem.text(nameParts[0] || '');
+            } else if (part === 'surname') {
+                // Set everything after the first space (join remaining parts)
+                $elem.text(nameParts.slice(1).join(' ') || '');
+            }
+            return;
+        }
+
+        // Handle image elements - set src attribute
+        if ($elem.is('img')) {
+            $elem.attr('src', value || '');
+            return;
+        } else if ($elem.is('input[type="checkbox"]')) {
             $elem.prop('checked', value === 1 || value === true);
         } else if ($elem.is('input[type="color"]')) {
             $elem.val(value);
@@ -1032,8 +1056,14 @@ export class Scoreboard {
         
         if (isVisible) {
             this.$matchStatisticsContainer.addClass('show').removeClass('hidden');
+            if (this.type == 'output') {
+                this.$html_frame.addClass('hidden');
+            }
         } else {
             this.$matchStatisticsContainer.removeClass('show').addClass('hidden');
+            if (this.type == 'output') {
+                this.$html_frame.removeClass('hidden');
+            }
         }
     }
 
@@ -1457,8 +1487,8 @@ export class Scoreboard {
         const overallStats = this.calculateOverallStatistics();
         
         // Update team break percentages
-        $('#team_a_break_percentage').text(`${overallStats.teamA.breakPercentage}%`);
-        $('#team_b_break_percentage').text(`${overallStats.teamB.breakPercentage}%`);
+        $('#team_a_break_percentage').text(`${overallStats.teamA.breakPercentage}`);
+        $('#team_b_break_percentage').text(`${overallStats.teamB.breakPercentage}`);
         
         // Update player statistics
         this.updatePlayerStatistics(overallStats);
@@ -1555,8 +1585,8 @@ export class Scoreboard {
                 Math.round((playerStats.breaks / playerStats.breakOpportunities) * 100) : 0;
             
             // Update UI
-            $(`#player_${player}_sideout_percentage`).text(`${sideoutPercentage}%`);
-            $(`#player_${player}_break_percentage`).text(`${breakPercentage}%`);
+            $(`#player_${player}_sideout_percentage`).text(`${sideoutPercentage}`);
+            $(`#player_${player}_break_percentage`).text(`${breakPercentage}`);
         });
     }
 
