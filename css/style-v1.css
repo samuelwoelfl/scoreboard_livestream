@@ -220,7 +220,7 @@ body[players='show'] .counter {
   font-weight: 300;
 }
 
-.score.winner {
+.counter.winner .score {
   font-weight: 600;
 }
 

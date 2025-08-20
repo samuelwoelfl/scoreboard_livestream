@@ -343,7 +343,7 @@ export class Scoreboard {
 
         // Reset scores button handler
         this.$resetScoresButton.click(() => {
-            $('[fb-data*="score"]').val(0);
+            $('[fb-data*="score"]:not(select)').val(0);
             this.active_set = 1;
             this.updateSets();
             this.event_history.push({ type: 'reset' });
@@ -768,7 +768,7 @@ export class Scoreboard {
     }
 
     updateSetWinners() {
-        const $scoreElems = this.$html_frame.find('[fb-data*="score"]');
+        const $scoreElems = $('[fb-data*="score"]');
 
         $.each($scoreElems, (i, elem) => {
             const $scoreElem = $(elem);
@@ -777,16 +777,20 @@ export class Scoreboard {
 
             if (!details || (details.set == this.active_set && this.setWinner(details.set) == null)) {
                 $scoreElem.removeClass('winner loser');
+                $scoreElem.parent().removeClass('winner loser');
                 return;
             }
 
             const winner = this.setWinner(details.set);
             if (winner == details.team) {
                 $scoreElem.removeClass('loser').addClass('winner');
+                $scoreElem.parent().removeClass('loser').addClass('winner');
             } else if (winner !== null) {
                 $scoreElem.removeClass('winner').addClass('loser');
+                $scoreElem.parent().removeClass('winner').addClass('loser');
             } else {
                 $scoreElem.removeClass('winner loser');
+                $scoreElem.parent().removeClass('winner loser');
             }
         });
     }
@@ -1123,13 +1127,7 @@ export class Scoreboard {
      */
     getScoreHistory(set = this.active_set) {
         // Find the last reset event
-        let startIndex = -1;
-        $.each(this.event_history.slice().reverse(), (i, event) => {
-            if (event.type === 'reset') {
-                startIndex = this.event_history.length - 1 - i;
-                return false; // break the loop
-            }
-        });
+        let startIndex = this.getLastResetIndex();
 
         const slicedEventHistory = this.event_history.slice(startIndex + 1);
         return slicedEventHistory.filter(event => 
@@ -1363,7 +1361,7 @@ export class Scoreboard {
             this.updateScoreHistoryForContainer($(container));
         });
 
-        let score_sum = this.getScore(this.active_set, 'a') + this.getScore(this.active_set, 'b');
+        // let score_sum = this.getScore(this.active_set, 'a') + this.getScore(this.active_set, 'b');
         // console.log(this.getServingPlayerAtPoint(score_sum), this.getReceivingPlayerAtPoint(score_sum));
     }
 
@@ -1476,6 +1474,18 @@ export class Scoreboard {
         this.scoreChart.update();
     }
 
+    getCompletedSetsCount() {
+        const setGroups = [];
+        this.$sets.each(function () {
+            const parent = $(this).parent()[0];
+            if (parent && !setGroups.includes(parent)) {
+                setGroups.push(parent);
+            }
+        });
+        const completedCount = $(setGroups[0]).find('.set.completed').length;
+        return completedCount;
+    }
+
     /**
      * Update match statistics overlay with calculated statistics
      * Shows break percentages, sideout percentages, and player-specific stats
@@ -1484,48 +1494,70 @@ export class Scoreboard {
         if (this.settings.show_match_statistics !== 1) return;
 
         // Calculate overall statistics
-        const overallStats = this.calculateOverallStatistics();
+        const overallStats = this.calculateStatistics('game');
         
         // Update team break percentages
-        $('#team_a_break_percentage').text(`${overallStats.teamA.breakPercentage}`);
-        $('#team_b_break_percentage').text(`${overallStats.teamB.breakPercentage}`);
+        const breakPercentageA = overallStats.teamA.breakPercentage;
+        const breakPercentageB = overallStats.teamB.breakPercentage;
+        $('#team_a_break_percentage').text(`${breakPercentageA}`);
+        $('#team_b_break_percentage').text(`${breakPercentageB}`);
+        // Remove 'best' class from both first
+        $('#team_a_break_percentage').closest('.stat_item').removeClass('best');
+        $('#team_b_break_percentage').closest('.stat_item').removeClass('best');
+        // Add 'best' class to the element with the higher break percentage (if not equal)
+        if (breakPercentageA > breakPercentageB) {
+            $('#team_a_break_percentage').closest('.stat_item').addClass('best');
+        } else if (breakPercentageB > breakPercentageA) {
+            $('#team_b_break_percentage').closest('.stat_item').addClass('best');
+        }
         
         // Update player statistics
         this.updatePlayerStatistics(overallStats);
-        
-        // Update set statistics
-        this.updateSetStatistics();
+
+        this.updatePlayerSetStatistics();
         
         // Update score history within match statistics
+    }
+
+    getLastResetIndex(event_history = this.event_history) {
+        let startIndex = -1;
+        $.each(event_history.slice().reverse(), (i, event) => {
+            if (event.type === 'reset') {
+                startIndex = event_history.length - 1 - i;
+                return false; // break the loop
+            }
+        });
+        return startIndex;
     }
 
     /**
      * Calculate overall match statistics from event history
      * @returns {Object} Object containing team and player statistics
      */
-    calculateOverallStatistics() {
+    calculateStatistics(type = 'game', set = this.active_set) {
         const stats = {
             teamA: { breaks: 0, breakOpportunities: 0, breakPercentage: 0 },
             teamB: { breaks: 0, breakOpportunities: 0, breakPercentage: 0 },
             players: {
-                a: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
-                b: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
-                c: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
-                d: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 }
+                a: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0, sideoutPercentage: 0, breakPercentage: 0 },
+                b: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0, sideoutPercentage: 0, breakPercentage: 0 },
+                c: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0, sideoutPercentage: 0, breakPercentage: 0 },
+                d: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0, sideoutPercentage: 0, breakPercentage: 0 }
             }
         };
 
         // Find the last reset event
-        let startIndex = -1;
-        $.each(this.event_history.slice().reverse(), (i, event) => {
-            if (event.type === 'reset') {
-                startIndex = this.event_history.length - 1 - i;
-                return false; // break the loop
-            }
-        });
-
-        // Get score events since last reset (all sets)
-        const scoreEvents = this.event_history.slice(startIndex + 1).filter(event => event.type === 'score');
+        let lastResetIndex = this.getLastResetIndex();
+        let scoreEvents;
+        // Get score events since last reset (all sets) of specific set
+        if (type === 'game') {
+            scoreEvents = this.event_history.slice(lastResetIndex + 1).filter(event => event.type === 'score');
+        } else if (set !== null) {
+            scoreEvents = this.getScoreHistory(set);
+        } else {
+            console.error('No set or game type specified');
+            return;
+        }
         
         // Process each score event
         scoreEvents.forEach((event, index) => {
@@ -1552,9 +1584,6 @@ export class Scoreboard {
             } else {
                 stats.players[receivingPlayer].sideouts++;
             }
-            
-
-            // console.log(stats);
         });
         
         // Calculate percentages
@@ -1562,6 +1591,15 @@ export class Scoreboard {
             Math.round((stats.teamA.breaks / stats.teamA.breakOpportunities) * 100) : 0;
         stats.teamB.breakPercentage = stats.teamB.breakOpportunities > 0 ? 
             Math.round((stats.teamB.breaks / stats.teamB.breakOpportunities) * 100) : 0;
+
+        // Calculate sideout and break percentages for each player
+        Object.keys(stats.players).forEach(player => {
+            const playerStats = stats.players[player];
+            playerStats.sideoutPercentage = playerStats.sideoutOpportunities > 0 ?
+                Math.round((playerStats.sideouts / playerStats.sideoutOpportunities) * 100) : 0;
+            playerStats.breakPercentage = playerStats.breakOpportunities > 0 ?
+                Math.round((playerStats.breaks / playerStats.breakOpportunities) * 100) : 0;
+        });
         
         return stats;
     }
@@ -1575,196 +1613,96 @@ export class Scoreboard {
         
         players.forEach(player => {
             const playerStats = stats.players[player];
-            
-            // Calculate sideout percentage
-            const sideoutPercentage = playerStats.sideoutOpportunities > 0 ? 
-                Math.round((playerStats.sideouts / playerStats.sideoutOpportunities) * 100) : 0;
-            
-            // Calculate break percentage
-            const breakPercentage = playerStats.breakOpportunities > 0 ? 
-                Math.round((playerStats.breaks / playerStats.breakOpportunities) * 100) : 0;
-            
-            // Update UI
-            $(`#player_${player}_sideout_percentage`).text(`${sideoutPercentage}`);
-            $(`#player_${player}_break_percentage`).text(`${breakPercentage}`);
+            const sideoutPercentage = playerStats.sideoutPercentage;
+            const breakPercentage = playerStats.breakPercentage;
+
+            const allSideoutPercentages = players.map(p => stats.players[p].sideoutPercentage);
+            const allBreakPercentages = players.map(p => stats.players[p].breakPercentage);
+            const maxSideout = Math.max(...allSideoutPercentages);
+            const maxBreak = Math.max(...allBreakPercentages);
+
+            // Update UI and add/remove "best" class accordingly
+            const $sideoutElem = $(`#player_${player}_sideout_percentage`);
+            const $breakElem = $(`#player_${player}_break_percentage`);
+
+            $sideoutElem.text(`${sideoutPercentage}`);
+            $breakElem.text(`${breakPercentage}`);
+
+            if (sideoutPercentage === maxSideout && maxSideout > 0) {
+                $sideoutElem.closest('.stat_item').addClass('best');
+            } else {
+                $sideoutElem.closest('.stat_item').removeClass('best');
+            }
+
+            if (breakPercentage === maxBreak && maxBreak > 0) {
+                $breakElem.closest('.stat_item').addClass('best');
+            } else {
+                $breakElem.closest('.stat_item').removeClass('best');
+            }
         });
     }
 
     /**
-     * Update set-specific statistics
+     * Update set-specific player statistics in the UI
      */
-    updateSetStatistics() {
-        const $container = $('#set_statistics_container');
-        $container.empty();
-        
-        // Get all played sets
-        const playedSets = [];
-        for (let set = 1; set <= 7; set++) {
-            if (this.getScore(set, 'a') > 0 || this.getScore(set, 'b') > 0) {
-                playedSets.push(set);
-            }
+    updatePlayerSetStatistics() {
+        let completedSetsCount = this.getCompletedSetsCount();
+        // const completedSetsCount = this.active_set;
+        if (this.active_set != completedSetsCount && this.getScore(this.active_set, 'a') + this.getScore(this.active_set, 'b') > 0) {
+            completedSetsCount++;
         }
-        
-        // Generate statistics for each set
-        playedSets.forEach(set => {
-            const setStats = this.calculateSetStatistics(set);
-            const setHtml = this.generateSetStatisticsHTML(set, setStats);
-            $container.append(setHtml);
+        const setsStats = [];
+        $.each(Array(completedSetsCount), (i) => {
+            const setStats = this.calculateStatistics('set', i + 1);
+            setsStats.push(setStats);
         });
-    }
 
-    /**
-     * Calculate statistics for a specific set
-     * @param {number} set - Set number
-     * @returns {Object} Set statistics
-     */
-    calculateSetStatistics(set) {
-        const stats = {
-            teamA: { breaks: 0, totalPoints: 0, breakPercentage: 0 },
-            teamB: { breaks: 0, totalPoints: 0, breakPercentage: 0 },
-            players: {
-                a: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
-                b: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
-                c: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 },
-                d: { sideouts: 0, sideoutOpportunities: 0, breaks: 0, breakOpportunities: 0 }
-            }
-        };
-
-        // Get score events for this specific set
-        const setScoreEvents = this.event_history.filter(event => 
-            event.type === 'score' && event.set === set
-        );
-        
-        // Process each score event for this set
-        setScoreEvents.forEach((event, index) => {
-            if (!event.team) return;
-            
-            const team = event.team.toLowerCase();
-            
-            // Count total points for each team
-            if (team === 'a') {
-                stats.teamA.totalPoints++;
-            } else if (team === 'b') {
-                stats.teamB.totalPoints++;
-            }
-            
-            // Determine who was serving at this point
-            const servingPlayer = this.getServingPlayerAtPoint(index, set);
-            if (!servingPlayer) return;
-            
-            // Determine if this was a break
-            const isBreak = (team === 'a' && (servingPlayer === 'c' || servingPlayer === 'd')) || 
-                           (team === 'b' && (servingPlayer === 'a' || servingPlayer === 'b'));
-            
-            if (isBreak) {
-                if (team === 'a') {
-                    stats.teamA.breaks++;
-                } else if (team === 'b') {
-                    stats.teamB.breaks++;
+        const players = ['a', 'b', 'c', 'd'];
+        players.forEach(player => {
+            const playerStats = setsStats.map(setStats => setStats.players[player]);
+            // console.log(playerStats);
+            // Find the max sideout percentage for this player across their sets
+            const maxSideout = Math.max(...playerStats.map(s => s.sideoutPercentage));
+            const maxBreak = Math.max(...playerStats.map(s => s.breakPercentage));
+            $.each(playerStats, function(setIndex, setPlayerStats) {
+                const sideoutPercentage = setPlayerStats.sideoutPercentage;
+                const breakPercentage = setPlayerStats.breakPercentage;
+                const $sideoutElem = $(`#player_${player}_sideout_percentage_set_${setIndex + 1}`);
+                const $breakElem = $(`#player_${player}_break_percentage_set_${setIndex + 1}`);
+                $sideoutElem.text(`${sideoutPercentage}`);
+                $breakElem.text(`${breakPercentage}`);
+                // Set the width of the .fill inside the sibling .bar_stat according to the percentage
+                $sideoutElem.closest('.line_stat').find('.bar_stat .fill').css('width', `${sideoutPercentage}%`);
+                $breakElem.closest('.line_stat').find('.bar_stat .fill').css('width', `${breakPercentage}%`);
+                // Add or remove "best" class for the highest sideout % in this player's sets
+                if (sideoutPercentage === maxSideout && maxSideout > 0) {
+                    $sideoutElem.closest('.line_stat').addClass('best');
+                } else {
+                    $sideoutElem.closest('.line_stat').removeClass('best');
                 }
-            }
-            
-            // Determine which player was receiving
-            const receivingPlayer = this.getReceivingPlayerAtPoint(index, set);
-            
-            if (receivingPlayer && servingPlayer) {
-                // Count sideout opportunities and successes
-                if (team === this.getPlayerTeam(receivingPlayer)) {
-                    stats.players[receivingPlayer].sideoutOpportunities++;
-                    if (isBreak) {
-                        stats.players[receivingPlayer].sideouts++;
-                    }
+                if (breakPercentage === maxBreak && maxBreak > 0) {
+                    $breakElem.closest('.line_stat').addClass('best');
+                } else {
+                    $breakElem.closest('.line_stat').removeClass('best');
                 }
                 
-                // Count break opportunities and successes
-                if (team === this.getPlayerTeam(servingPlayer)) {
-                    stats.players[servingPlayer].breakOpportunities++;
-                    if (!isBreak) {
-                        stats.players[servingPlayer].breaks++;
+
+            });
+
+            $(`[id^="player_${player}_sideout_percentage_set_"], [id^="player_${player}_break_percentage_set_"]`).each(function() {
+                const id = $(this).attr('id');
+                const match = id.match(/set_(\d+)$/);
+                if (match) {
+                    const setNum = parseInt(match[1], 10);
+                    if (setNum > completedSetsCount) {
+                        $(this).closest('.line_stat').hide();
+                    } else {
+                        $(this).closest('.line_stat').show();
                     }
                 }
-            }
+            });
         });
-        
-        // Calculate percentages
-        stats.teamA.breakPercentage = stats.teamA.totalPoints > 0 ? 
-            Math.round((stats.teamA.breaks / stats.teamA.totalPoints) * 100) : 0;
-        stats.teamB.breakPercentage = stats.teamB.totalPoints > 0 ? 
-            Math.round((stats.teamB.breaks / stats.teamB.totalPoints) * 100) : 0;
-        
-        return stats;
     }
-
-    /**
-     * Generate HTML for set statistics
-     * @param {number} set - Set number
-     * @param {Object} stats - Set statistics
-     * @returns {string} HTML string
-     */
-    generateSetStatisticsHTML(set, stats) {
-        const teamAName = this.$html_frame.find('[fb-data="teams_info.team_a.name"]').first().text() || 'Team A';
-        const teamBName = this.$html_frame.find('[fb-data="teams_info.team_b.name"]').first().text() || 'Team B';
-        
-        return `
-            <div class="set_stats">
-                <h5>Set ${set}</h5>
-                <div class="set_team_stats">
-                    <div class="set_team">
-                        <h6>${teamAName}</h6>
-                        <div class="set_player_stats">
-                            <div class="set_player">
-                                <span class="stat_label">Break %</span>
-                                <span class="stat_value">${stats.teamA.breakPercentage}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">A Sideout %</span>
-                                <span class="stat_value">${stats.players.a.sideoutOpportunities > 0 ? Math.round((stats.players.a.sideouts / stats.players.a.sideoutOpportunities) * 100) : 0}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">A Break %</span>
-                                <span class="stat_value">${stats.players.a.breakOpportunities > 0 ? Math.round((stats.players.a.breaks / stats.players.a.breakOpportunities) * 100) : 0}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">B Sideout %</span>
-                                <span class="stat_value">${stats.players.b.sideoutOpportunities > 0 ? Math.round((stats.players.b.sideouts / stats.players.b.sideoutOpportunities) * 100) : 0}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">B Break %</span>
-                                <span class="stat_value">${stats.players.b.breakOpportunities > 0 ? Math.round((stats.players.b.breaks / stats.players.b.breakOpportunities) * 100) : 0}%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="set_team">
-                        <h6>${teamBName}</h6>
-                        <div class="set_player_stats">
-                            <div class="set_player">
-                                <span class="stat_label">Break %</span>
-                                <span class="stat_value">${stats.teamB.breakPercentage}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">C Sideout %</span>
-                                <span class="stat_value">${stats.players.c.sideoutOpportunities > 0 ? Math.round((stats.players.c.sideouts / stats.players.c.sideoutOpportunities) * 100) : 0}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">C Break %</span>
-                                <span class="stat_value">${stats.players.c.breakOpportunities > 0 ? Math.round((stats.players.c.breaks / stats.players.c.breakOpportunities) * 100) : 0}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">D Sideout %</span>
-                                <span class="stat_value">${stats.players.d.sideoutOpportunities > 0 ? Math.round((stats.players.d.sideouts / stats.players.d.sideoutOpportunities) * 100) : 0}%</span>
-                            </div>
-                            <div class="set_player">
-                                <span class="stat_label">D Break %</span>
-                                <span class="stat_value">${stats.players.d.breakOpportunities > 0 ? Math.round((stats.players.d.breaks / stats.players.d.breakOpportunities) * 100) : 0}%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    
 
     /**
      * Get the team that a player belongs to

@@ -55,16 +55,16 @@ html, body {
   font-weight: 700;
 }
 
-.center input.score {
-  font-weight: 300;
+input.score {
+  font-weight: 300 !important;
 }
 
-.center input.score.winner {
-  font-weight: 600;
+input.score.winner {
+  font-weight: 600 !important;
 }
 
-.center input.score.loser {
-  font-weight: 300;
+input.score.loser {
+  font-weight: 300 !important;
 }
 
 .top, .bottom {
@@ -616,7 +616,7 @@ select.small {
   font-family: 'Antonio', sans-serif;
   font-size: 1.4rem;
   font-weight: 600;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   padding: 2px 8px 5px 8px;
 }
 
