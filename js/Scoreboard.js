@@ -81,6 +81,7 @@ export class Scoreboard {
         this.update_interval = setInterval(() => {
             this.updateUI();
         }, 300);
+        // TODO: reset this interval to 300
 
         // Simplified interval logic - removed redundant code
         // Input mode: slower updates (1500ms) since admin controls the data
@@ -704,7 +705,25 @@ export class Scoreboard {
         return Number($scoreElem.is('input') ? $scoreElem.val() : $scoreElem.text());
     }
 
-
+    /**
+     * Get the score for a specific team at a given point index in a set
+     * @param {number} set - Set number (1-7)
+     * @param {string} team - Team identifier ('a' or 'b')
+     * @param {number} pointIndex - Point index (0-based)
+     * @returns {number} Score at the specified point index
+     */
+    getScoreAtPointIndex(set, team, pointIndex) {
+        const scoreHistory = this.getScoreHistory(set);
+        const teamPointsList = this.scoreHistoryToTeamPoints(scoreHistory, team);
+        
+        // If pointIndex is beyond the available history, return the current score
+        if (pointIndex >= teamPointsList.length) {
+            return this.getScore(set, team);
+        }
+        
+        // Return the score at the specified point index
+        return teamPointsList[pointIndex] || 0;
+    }
 
     /**
      * Calculate total sets won by a team
@@ -859,9 +878,16 @@ export class Scoreboard {
      * @param {number} set - Set number to check (defaults to active set)
      * @returns {boolean} True if set is in overtime
      */
-    isInOvertime(set = this.active_set) {
-        const scoreA = this.getScore(set, 'a');
-        const scoreB = this.getScore(set, 'b');
+    isInOvertime(set = this.active_set, pointIndex = null) {
+        let scoreA, scoreB;
+        if (pointIndex == null) {
+            scoreA = this.getScore(set, 'a');
+            scoreB = this.getScore(set, 'b');
+        } else {
+            scoreA = this.getScoreAtPointIndex(set, 'a', pointIndex);
+            scoreB = this.getScoreAtPointIndex(set, 'b', pointIndex);
+        }
+        // console.log(pointIndex, scoreA, scoreB);
         
         // Check if hardcap is reached by either team
         if (scoreA >= this.gameSettings.hardcap || scoreB >= this.gameSettings.hardcap) {
@@ -1171,7 +1197,7 @@ export class Scoreboard {
     getServingPlayerAtPoint(pointIndex, set = this.active_set) {
         const startingServer = this.getStartingServer(set);
         const startingReceiver = this.getStartingReceiver(set);
-        const isOvertime = this.isInOvertime(set);
+        const isOvertime = this.isInOvertime(set, pointIndex);
 
         let serveOrder;
         if (startingServer == 'a' && startingReceiver == 'c') {
@@ -1210,7 +1236,10 @@ export class Scoreboard {
                 player = serveOrder[(startIndex + steps) % 4];
                 if (startingServer == 'a' || startingServer == 'b') {
                     player = player == 'a' ? 'b' : player == 'b' ? 'a' : player;
+                } else if (startingServer == 'c' || startingServer == 'd') {
+                    player = player == 'c' ? 'd' : player == 'd' ? 'c' : player;
                 }
+                // console.log(isOvertime, player, steps, pointsTillOvertime, pointIndex);
             }
             
             return player;
@@ -1306,21 +1335,28 @@ export class Scoreboard {
         let receivingOrder, overtimeOrder;
         if (startingServer == 'a' && startingReceiver == 'c') {
             receivingOrder = ['c', 'b', 'a', 'c', 'd', 'a', 'b', 'd'];
+            overtimeOrder = ['a', 'd', 'b', 'c'];
         } else if (startingServer == 'a' && startingReceiver == 'd') {
             receivingOrder = ['d', 'b', 'a', 'd', 'c', 'a', 'b', 'c'];
+            overtimeOrder = ['a', 'c', 'b', 'd'];
         } else if (startingServer == 'b' && startingReceiver == 'c') {
             receivingOrder = ['c', 'a', 'b', 'c', 'd', 'b', 'a', 'd'];
+            overtimeOrder = ['b', 'd', 'a', 'c'];
         } else if (startingServer == 'b' && startingReceiver == 'd') {
             receivingOrder = ['d', 'a', 'b', 'd', 'c', 'b', 'a', 'c'];
             overtimeOrder = ['b', 'c', 'a', 'd'];
         } else if (startingServer == 'c' && startingReceiver == 'a') {
             receivingOrder = ['a', 'd', 'c', 'a', 'b', 'c', 'd', 'b'];
+            overtimeOrder = ['c', 'b', 'd', 'a'];
         } else if (startingServer == 'c' && startingReceiver == 'b') {
             receivingOrder = ['b', 'd', 'c', 'b', 'a', 'c', 'd', 'a'];
+            overtimeOrder = ['c', 'a', 'd', 'b'];
         } else if (startingServer == 'd' && startingReceiver == 'a') {
             receivingOrder = ['a', 'c', 'd', 'a', 'b', 'd', 'c', 'b'];
+            overtimeOrder = ['d', 'b', 'c', 'a'];
         } else if (startingServer == 'd' && startingReceiver == 'b') {
             receivingOrder = ['b', 'c', 'd', 'b', 'a', 'd', 'c', 'a'];
+            overtimeOrder = ['d', 'a', 'c', 'b'];
         }
 
         // receivingOrder = []
@@ -1339,6 +1375,7 @@ export class Scoreboard {
             } else {
                 steps = Math.floor((pointIndex - 1) % 4);
                 return overtimeOrder[(startIndex + steps) % 4];
+                
                 // pointsTillOvertime = this.gameSettings.win_points * 2 - 2;
                 // steps = Math.floor(((pointsTillOvertime) % 8) + (pointIndex - pointsTillOvertime));
             }
@@ -1353,13 +1390,24 @@ export class Scoreboard {
     updateScoreHistory() {
         // Update main score history
         $.each(this.$scoreHistoryContainer.find('.scores .team'), (i, container) => {
-            this.updateScoreHistoryForContainer($(container));
+            this.updateScoreHistoryForContainer($(container)), this.active_set;
         });
         
         // Update score history in match statistics
-        $.each(this.$matchStatisticsContainer.find('.score_history_in_stats .scores .team'), (i, container) => {
-            this.updateScoreHistoryForContainer($(container));
+        $.each(this.$matchStatisticsContainer.find('.score_history_in_stats .scores .set'), (i, set_container) => {
+            $.each($(set_container).find('.team'), (j, container) => {
+                this.updateScoreHistoryForContainer($(container), i + 1);
+            });
         });
+
+        // count score items in score_history_in_stats and set it as attribute to .scores
+        const score_items_count = this.$matchStatisticsContainer.find('.score_history_in_stats .scores .set .team_rows .score_item').length / 2;
+        this.$matchStatisticsContainer.find('.score_history_in_stats .scores').attr('score_items_count', score_items_count);
+        if (score_items_count >= 70) {
+            this.$matchStatisticsContainer.find('.score_history_in_stats .scores').addClass('full');
+        } else {
+            this.$matchStatisticsContainer.find('.score_history_in_stats .scores').removeClass('full');
+        }
 
         // let score_sum = this.getScore(this.active_set, 'a') + this.getScore(this.active_set, 'b');
         // console.log(this.getServingPlayerAtPoint(score_sum), this.getReceivingPlayerAtPoint(score_sum));
@@ -1369,9 +1417,10 @@ export class Scoreboard {
      * Update score history for a specific container
      * @param {jQuery} $container - Container element to update
      */
-    updateScoreHistoryForContainer($container) {
+    updateScoreHistoryForContainer($container, set = this.active_set) {
         const team = $container.attr('team');
-        const scoresList = this.scoreHistoryToTeamPoints(this.getScoreHistory(), team);
+        let scoresList;
+        scoresList = this.scoreHistoryToTeamPoints(this.getScoreHistory(set), team);
         
         $container.empty();
         
@@ -1390,7 +1439,7 @@ export class Scoreboard {
                 breakAttribute = isBreak ? ' break' : '';
             }
             
-            const element = `<div class="score_item ${status}" streak="${streak}"${breakAttribute}>${score}</div>`;
+            const element = `<div class="score_item ${status}" streak="${streak}"${breakAttribute}><p class="score_number">${score}</p></div>`;
             $container.append(element);
         });
     }
@@ -1571,6 +1620,8 @@ export class Scoreboard {
             const receivingPlayer = this.getReceivingPlayerAtPoint(index, set);
             const servingTeam = this.getPlayerTeam(servingPlayer);
             const isBreak = (team == servingTeam);
+
+            // console.log(servingPlayer, receivingPlayer, isBreak);
 
             // set break opportunities and sideout opportunities for team and player
             stats[`team${servingTeam.toUpperCase()}`].breakOpportunities++;
