@@ -236,7 +236,7 @@ export class Scoreboard {
         // Score input handler with simplified logic
         this.$scoreboardInputs.filter('[fb-data*="score"]').on('input', (event) => {
             const $target = $(event.target);
-            const team = this.getScoreElemDetails($target)?.team;
+            const { team, set } = this.getScoreElemDetails($target);
             const newScore = Number($target.val()) || 0; // Default to 0 if NaN
             const oldScore = Number(this.$html_frame.find('.team_score').attr(`score_${team}`)) || 0;
             const isSquadScore = $target.attr('fb-data').includes('squad_score');
@@ -245,7 +245,7 @@ export class Scoreboard {
             if (!isNaN(newScore) && !isNaN(oldScore)) {
                 // Handle score decrease (remove history events)
                 if (newScore < oldScore && !isSquadScore) {
-                    this.removeScoreHistoryEvents(team, newScore);
+                    this.removeScoreHistoryEvents(team, newScore, set);
                 } else {
                     // Add new event to history
                     const eventData = {
@@ -255,10 +255,11 @@ export class Scoreboard {
                     };
                     
                     if (!isSquadScore) {
-                        eventData.set = this.active_set;
+                        eventData.set = Number(set);
                     }
                     
                     this.event_history.push(eventData);
+                    console.log(this.event_history);
                 }
             }
 
@@ -416,10 +417,10 @@ export class Scoreboard {
      * @param {string} team - Team identifier ('a' or 'b')
      * @param {number} newScore - The new score value
      */
-    removeScoreHistoryEvents(team, newScore) {
+    removeScoreHistoryEvents(team, newScore, set = this.active_set) {
         const reversedHistory = this.event_history.slice().reverse();
         $.each(reversedHistory, (index, event) => {
-            if (event.type === 'score' && event.team === team && event.score > newScore) {
+            if (event.type === 'score' && event.team === team && event.score > newScore && event.set == set) {
                 this.event_history.splice(this.event_history.length - 1 - index, 1);
                 return false; // break the loop
             }
@@ -1082,19 +1083,21 @@ export class Scoreboard {
     }
 
     updateMatchStatisticsVisibility() {
-        const isVisible = this.settings.show_match_statistics === 1;
+        if (this.theme != 'full') {
+            const isVisible = this.settings.show_match_statistics === 1;
         
-        if (isVisible) {
-            this.$matchStatisticsContainer.addClass('show').removeClass('hidden');
-            if (this.type == 'output') {
-                this.$html_frame.addClass('hidden');
-                $('#score_history_individual').addClass('hidden');
-            }
-        } else {
-            this.$matchStatisticsContainer.removeClass('show').addClass('hidden');
-            if (this.type == 'output') {
-                this.$html_frame.removeClass('hidden');
-                $('#score_history_individual').removeClass('hidden');
+            if (isVisible) {
+                this.$matchStatisticsContainer.addClass('show').removeClass('hidden');
+                if (this.type == 'output') {
+                    this.$html_frame.addClass('hidden');
+                    $('#score_history_individual').addClass('hidden');
+                }
+            } else {
+                this.$matchStatisticsContainer.removeClass('show').addClass('hidden');
+                if (this.type == 'output') {
+                    this.$html_frame.removeClass('hidden');
+                    $('#score_history_individual').removeClass('hidden');
+                }
             }
         }
     }
@@ -1143,8 +1146,8 @@ export class Scoreboard {
     }
 
     handleEventHistory() {
-        if (this.event_history.length > 164) {
-            this.event_history = this.event_history.slice(-164);
+        if (this.event_history.length > 200) {
+            this.event_history = this.event_history.slice(-200);
         }
     }
 
@@ -1160,7 +1163,7 @@ export class Scoreboard {
         const slicedEventHistory = this.event_history.slice(startIndex + 1);
         return slicedEventHistory.filter(event => 
             event.type === 'score' && 
-            event.set === set && 
+            event.set == set && 
             event.team && 
             typeof event.team === 'string' &&
             event.score !== undefined
