@@ -161,10 +161,14 @@ export class Scoreboard {
      * @param {string} theme - Theme identifier from themes object
      */
     setTheme(theme) {
+        console.log("setting theme to ", theme);
         // Simplified fallback logic
         if (!(theme in themes)) {
             theme = this.type === 'output' ? 'full' : 'rg';
+            this.theme = theme;
         }
+
+        console.log("theme is ", theme);
 
         const css_path = themes[theme].css_path;
         const extensionIndex = css_path.lastIndexOf('.');
@@ -1089,14 +1093,14 @@ export class Scoreboard {
             if (isVisible) {
                 this.$matchStatisticsContainer.addClass('show').removeClass('hidden');
                 if (this.type == 'output') {
-                    this.$html_frame.addClass('hidden');
-                    $('#score_history_individual').addClass('hidden');
+                    // this.$html_frame.addClass('hidden');
+                    // $('#score_history_individual').addClass('hidden');
                 }
             } else {
                 this.$matchStatisticsContainer.removeClass('show').addClass('hidden');
                 if (this.type == 'output') {
-                    this.$html_frame.removeClass('hidden');
-                    $('#score_history_individual').removeClass('hidden');
+                    // this.$html_frame.removeClass('hidden');
+                    // $('#score_history_individual').removeClass('hidden');
                 }
             }
         }
