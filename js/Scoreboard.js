@@ -1088,11 +1088,13 @@ export class Scoreboard {
             this.$matchStatisticsContainer.addClass('show').removeClass('hidden');
             if (this.type == 'output') {
                 this.$html_frame.addClass('hidden');
+                $('#score_history_individual').addClass('hidden');
             }
         } else {
             this.$matchStatisticsContainer.removeClass('show').addClass('hidden');
             if (this.type == 'output') {
                 this.$html_frame.removeClass('hidden');
+                $('#score_history_individual').removeClass('hidden');
             }
         }
     }

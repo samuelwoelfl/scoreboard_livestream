@@ -299,6 +299,10 @@ html, body {
   gap: 0px;
 }
 
+.score_history .scores .team_rows .team:last-child {
+  margin-top: -2px;
+}
+
 .score_history .scores .team_rows .score_item {
   display: flex;
   flex-direction: row;
@@ -654,7 +658,7 @@ html, body {
   padding: 60px 30px 70px 30px;
 }
 
-.match_statistics .team_statistics > * {
+.match_statistics .team_statistics > *:not(.spacer) {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -664,8 +668,14 @@ html, body {
   flex-grow: 1;
 }
 
+.match_statistics .spacer {
+  width: 50px;
+  height: 100%;
+  border-bottom: 1px solid rgb(255, 255, 255, 0.2);
+}
+
 .match_statistics .team_stats_container {
-  max-width: 23%;
+  max-width: 22%;
 }
 
 .match_statistics .team_stats_container .team_stats {
@@ -779,8 +789,8 @@ html, body {
 
 .match_statistics .players_container {
   padding: 6px 0px;
-  flex-grow: 0;
-  min-width: 20%;
+  flex-grow: 0 !important;
+  min-width: 20% !important;
 }
 
 .match_statistics .players_container .team {
@@ -853,7 +863,7 @@ html, body {
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  /* max-width: 200px; */
+  max-width: 250px;
   overflow: hidden;
 }
 
@@ -1068,7 +1078,7 @@ html, body {
 .match_statistics .score_history_in_stats .scores {
   display: flex;
   flex-direction: row;
-  gap: 24px;
+  gap: 20px;
   width: 100%;
   overflow: hidden;
 }

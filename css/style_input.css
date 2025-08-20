@@ -105,11 +105,6 @@ input.score.loser {
 }
 
 
-
-.controls .display_options .inner #reset_scores {
-  margin-top: 5px;
-}
-
 .controls .output {
   max-width: 240px;
 }
@@ -740,6 +735,10 @@ select.small {
 
 .starting_team_container .starting_team_sets .starting_team_selector.active select {
   box-shadow: inset 0px 0px 0px 2px var(--primary);
+}
+
+#reset_scores {
+  height: auto;
 }
 
 .setting_entry.boolean {
