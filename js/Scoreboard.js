@@ -161,14 +161,14 @@ export class Scoreboard {
      * @param {string} theme - Theme identifier from themes object
      */
     setTheme(theme) {
-        console.log("setting theme to ", theme);
+        // console.log("setting theme to ", theme);
         // Simplified fallback logic
         if (!(theme in themes)) {
             theme = this.type === 'output' ? 'full' : 'rg';
             this.theme = theme;
         }
 
-        console.log("theme is ", theme);
+        // console.log("theme is ", theme);
 
         const css_path = themes[theme].css_path;
         const extensionIndex = css_path.lastIndexOf('.');
@@ -263,7 +263,7 @@ export class Scoreboard {
                     }
                     
                     this.event_history.push(eventData);
-                    console.log(this.event_history);
+                    // console.log(this.event_history);
                 }
             }
 
@@ -1559,6 +1559,10 @@ export class Scoreboard {
         const breakPercentageB = overallStats.teamB.breakPercentage;
         $('#team_a_break_percentage').text(`${breakPercentageA}`);
         $('#team_b_break_percentage').text(`${breakPercentageB}`);
+        
+        // Update team break absolute values
+        $('#team_a_break_absolute').text(`(${overallStats.teamA.breaks}/${overallStats.teamA.breakOpportunities})`);
+        $('#team_b_break_absolute').text(`(${overallStats.teamB.breaks}/${overallStats.teamB.breakOpportunities})`);
         // Remove 'best' class from both first
         $('#team_a_break_percentage').closest('.stat_item').removeClass('best');
         $('#team_b_break_percentage').closest('.stat_item').removeClass('best');
@@ -1684,9 +1688,13 @@ export class Scoreboard {
             // Update UI and add/remove "best" class accordingly
             const $sideoutElem = $(`#player_${player}_sideout_percentage`);
             const $breakElem = $(`#player_${player}_break_percentage`);
+            const $sideoutAbsoluteElem = $(`#player_${player}_sideout_absolute`);
+            const $breakAbsoluteElem = $(`#player_${player}_break_absolute`);
 
             $sideoutElem.text(`${sideoutPercentage}`);
             $breakElem.text(`${breakPercentage}`);
+            $sideoutAbsoluteElem.text(`(${playerStats.sideouts}/${playerStats.sideoutOpportunities})`);
+            $breakAbsoluteElem.text(`(${playerStats.breaks}/${playerStats.breakOpportunities})`);
 
             if (sideoutPercentage === maxSideout && maxSideout > 0) {
                 $sideoutElem.closest('.stat_item').addClass('best');

@@ -522,7 +522,7 @@ html, body {
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(23, 25, 28, 0.994);
-  border: 2px solid #000000;
+  /* border: 2px solid #000000; */
   border-radius: 12px;
   overflow: hidden;
   width: 80%;
@@ -565,6 +565,7 @@ html, body {
   justify-content: space-between;
   align-items: center;
   background-color: rgb(0, 0, 0, 0.4);
+  gap: 2px;
 }
 
 .match_statistics .stat_item * {
@@ -580,6 +581,14 @@ html, body {
   color: var(--primary);
 }
 
+.match_statistics .stat_item .value_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 12px;
+}
+
 .match_statistics .stat_item .value {
   display: flex;
   flex-direction: row;
@@ -590,8 +599,25 @@ html, body {
 }
 
 .match_statistics .stat_item .value .unit {
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 300;
+}
+
+.match_statistics .stat_item .absolute_value {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.match_statistics .stat_item .absolute_value .stat_value {
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.match_statistics .stat_item.best .absolute_value .stat_value {
+  color: #fcc155aa;
 }
 
 .match_statistics .statistics_header .left,
@@ -933,7 +959,9 @@ html, body {
 }
 
 .match_statistics .player_stats .player_stats_container .player_stats_group .stat_item {
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   padding: 12px 20px 18px 20px;
   border-radius: 4px;
   /* flex-grow: 1; */
